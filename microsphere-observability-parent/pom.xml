@@ -20,6 +20,9 @@
 
     <properties>
         <microsphere.version>${revision}</microsphere.version>
+        <microsphere-spring.version>${revision}</microsphere-spring.version>
+        <microsphere-spring-boot.version>${revision}</microsphere-spring-boot.version>
+        <microsphere-spring-cloud.version>${revision}</microsphere-spring-cloud.version>
         <!-- BOM versions -->
         <spring-boot.version>2.7.12</spring-boot.version>
         <spring-cloud.version>3.1.6</spring-cloud.version>
@@ -89,16 +92,43 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- Microsphere Spring Boot Dependencies -->
+            <!-- Microsphere Spring Cloud Dependencies -->
             <dependency>
                 <groupId>io.github.microsphere-projects</groupId>
-                <artifactId>microsphere-spring-boot-dependencies</artifactId>
-                <version>${revision}</version>
+                <artifactId>microsphere-spring-cloud-dependencies</artifactId>
+                <version>${microsphere-spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
 
+            <!-- Microsphere Spring Boot Dependencies -->
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-spring-boot-dependencies</artifactId>
+                <version>${microsphere-spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
+            <!-- Microsphere Spring Dependencies -->
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-spring-dependencies</artifactId>
+                <version>${microsphere-spring.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Microsphere Dependencies -->
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-dependencies</artifactId>
+                <version>${microsphere.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Mybatis -->
             <dependency>
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>

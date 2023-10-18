@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-parent</artifactId>
+        <artifactId>microsphere-observability-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../microsphere-observability-parent/pom.xml</relativePath>
     </parent>

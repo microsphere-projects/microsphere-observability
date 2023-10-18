@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-parent</artifactId>
+        <artifactId>microsphere-observability-parent</artifactId>
         <version>${revision}</version>
         <relativePath>../microsphere-observability-parent/pom.xml</relativePath>
     </parent>
@@ -15,7 +15,7 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere Projects :: Observability :: Logging</name>
+    <name>Microsphere :: Observability :: Logging</name>
     <description>Microsphere Observability Logging</description>
 
     <properties>
