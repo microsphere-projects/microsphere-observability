@@ -15,7 +15,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>Microsphere Projects :: Observability Dependencies</name>
+    <name>Microsphere Projects :: Observability :: Dependencies</name>
     <description>Microsphere Observability Dependencies</description>
 
     <dependencyManagement>

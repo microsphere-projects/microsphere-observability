@@ -15,7 +15,7 @@
     <version>${revision}</version>
     <packaging>pom</packaging>
 
-    <name>Microsphere Projects :: Observability Parent</name>
+    <name>Microsphere :: Observability :: Parent</name>
     <description>Microsphere Observability Parent</description>
 
     <properties>
