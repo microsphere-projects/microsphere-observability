@@ -45,6 +45,8 @@
     <modules>
         <module>microsphere-observability-parent</module>
         <module>microsphere-observability-dependencies</module>
+        <module>microsphere-observability-logging</module>
+        <module>microsphere-observability-micrometer</module>
     </modules>
 
 </project>
