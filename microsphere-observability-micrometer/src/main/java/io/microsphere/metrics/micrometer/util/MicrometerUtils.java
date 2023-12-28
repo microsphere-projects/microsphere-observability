@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.util;
+package io.microsphere.metrics.micrometer.util;
 
 import io.micrometer.core.instrument.util.NamedThreadFactory;
 import io.microsphere.util.BaseUtils;

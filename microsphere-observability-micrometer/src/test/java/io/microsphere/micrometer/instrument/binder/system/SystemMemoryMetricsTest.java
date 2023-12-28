@@ -16,6 +16,7 @@
  */
 package io.microsphere.micrometer.instrument.binder.system;
 
+import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.Test;
 

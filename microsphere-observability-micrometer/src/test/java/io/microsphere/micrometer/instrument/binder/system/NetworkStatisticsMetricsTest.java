@@ -16,6 +16,7 @@
  */
 package io.microsphere.micrometer.instrument.binder.system;
 
+import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -28,7 +29,7 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
-import static io.microsphere.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.junit.Assert.assertFalse;
 

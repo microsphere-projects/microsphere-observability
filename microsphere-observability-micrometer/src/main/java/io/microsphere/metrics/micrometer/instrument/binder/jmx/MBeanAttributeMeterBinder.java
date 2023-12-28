@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.instrument.binder.jmx;
+package io.microsphere.metrics.micrometer.instrument.binder.jmx;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;

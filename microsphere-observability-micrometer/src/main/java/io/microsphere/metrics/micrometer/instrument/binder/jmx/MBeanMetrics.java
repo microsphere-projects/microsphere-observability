@@ -14,14 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.instrument.binder.jmx;
+package io.microsphere.metrics.micrometer.instrument.binder.jmx;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.lang.NonNull;
 import io.micrometer.core.lang.Nullable;
 import io.microsphere.management.MBeanAttribute;
-import io.microsphere.micrometer.instrument.binder.AbstractMeterBinder;
+import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import javax.management.MBeanAttributeInfo;
 import javax.management.MBeanInfo;

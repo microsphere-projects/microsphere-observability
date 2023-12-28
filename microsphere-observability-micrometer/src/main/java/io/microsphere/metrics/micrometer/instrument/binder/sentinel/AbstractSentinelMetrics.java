@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.instrument.binder.sentinel;
+package io.microsphere.metrics.micrometer.instrument.binder.sentinel;
 
 import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.ClusterNode;
@@ -27,7 +27,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.TimeGauge;
 import io.micrometer.core.instrument.util.StringUtils;
-import io.microsphere.micrometer.instrument.binder.AbstractMeterBinder;
+import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;

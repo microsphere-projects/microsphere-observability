@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.instrument.binder.jdbc.p6spy;
+package io.microsphere.metrics.micrometer.instrument.binder.jdbc.p6spy;
 
 import com.p6spy.engine.common.Loggable;
 import com.p6spy.engine.common.P6LogQuery;
@@ -25,14 +25,12 @@ import com.p6spy.engine.logging.LoggingEventListener;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.microsphere.metrics.micrometer.util.MicrometerUtils;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
-
-import static io.microsphere.micrometer.util.MicrometerUtils.async;
 
 /**
  * Micrometer {@link JdbcEventListener}
@@ -91,7 +89,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
         if (registry == null) {
             return;
         }
-        async(runnable);
+        MicrometerUtils.async(runnable);
     }
 
     /**
