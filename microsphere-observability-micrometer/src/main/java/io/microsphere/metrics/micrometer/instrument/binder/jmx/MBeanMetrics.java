@@ -94,7 +94,7 @@ public class MBeanMetrics extends AbstractMeterBinder {
         }
     }
 
-    private void doBindTo(ObjectName mBeanName, MBeanAttribute mBeanAttribute, MeterRegistry registry) throws Throwable {
+    protected void doBindTo(ObjectName mBeanName, MBeanAttribute mBeanAttribute, MeterRegistry registry) throws Throwable {
         MBeanInfo mBeanInfo = mBeanAttribute.getDeclaringMBeanInfo();
         MBeanAttributeInfo mBeanAttributeInfo = mBeanAttribute.getAttributeInfo();
         Object attributeValue = mBeanAttribute.getValue();
