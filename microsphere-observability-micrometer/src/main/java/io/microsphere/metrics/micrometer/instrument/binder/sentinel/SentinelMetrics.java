@@ -16,7 +16,6 @@
  */
 package io.microsphere.metrics.micrometer.instrument.binder.sentinel;
 
-import com.alibaba.csp.sentinel.concurrent.NamedThreadFactory;
 import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.ClusterNode;
 import com.alibaba.csp.sentinel.node.DefaultNode;
@@ -26,7 +25,6 @@ import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
 import com.alibaba.csp.sentinel.slotchain.ProcessorSlotEntryCallback;
 import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
-import com.alibaba.csp.sentinel.slots.block.flow.FlowRuleManager;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
@@ -36,8 +34,6 @@ import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -48,10 +44,9 @@ import static com.alibaba.csp.sentinel.Constants.ROOT;
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.addEntryCallback;
 import static io.micrometer.core.instrument.Tags.concat;
-import static io.microsphere.reflect.FieldUtils.getStaticFieldValue;
 import static io.microsphere.sentinel.util.SentinelUtils.getResourceTypeAsString;
+import static io.microsphere.sentinel.util.SentinelUtils.getSentinelMetricsTaskExecutor;
 import static java.util.Collections.emptyList;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 /**
  * Sentinel Metrics
@@ -136,17 +131,7 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
     }
 
     private ScheduledExecutorService initScheduler() {
-        String fieldName = "SCHEDULER";
-        ScheduledExecutorService scheduledExecutorService = null;
-        try {
-            scheduledExecutorService = getStaticFieldValue(FlowRuleManager.class, "SCHEDULER");
-        } catch (Throwable e) {
-            logger.warn("The static field[name : '{}'] can't be found in the {}", fieldName, FlowRuleManager.class, e);
-        }
-        if (scheduledExecutorService == null) {
-            scheduledExecutorService = newSingleThreadScheduledExecutor(new NamedThreadFactory("sentinel-metrics-task", true));
-        }
-
+        ScheduledExecutorService scheduledExecutorService = getSentinelMetricsTaskExecutor();
         scheduledExecutorService.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
         return scheduledExecutorService;
     }
