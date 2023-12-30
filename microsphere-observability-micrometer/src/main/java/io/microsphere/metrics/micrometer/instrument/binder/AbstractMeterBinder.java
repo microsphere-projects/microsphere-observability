@@ -2,11 +2,13 @@ package io.microsphere.metrics.micrometer.instrument.binder;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static io.micrometer.core.instrument.Tags.concat;
+import static io.microsphere.util.ClassUtils.getSimpleName;
+import static io.microsphere.util.StringUtils.substringBefore;
 import static java.util.Collections.emptyList;
 
 /**
@@ -15,6 +17,11 @@ import static java.util.Collections.emptyList;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  */
 public abstract class AbstractMeterBinder implements MeterBinder {
+
+    /**
+     * The {@link Tag} key of the metrics origin : "origin"
+     */
+    public static final String ORIGIN_TAG_KEY = "origin";
 
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -25,7 +32,16 @@ public abstract class AbstractMeterBinder implements MeterBinder {
     }
 
     public AbstractMeterBinder(Iterable<Tag> tags) {
-        this.tags = tags;
+        this.tags = concat(tags, ORIGIN_TAG_KEY, getOriginTagValue());
+    }
+
+    /**
+     * The Metric tag value of "origin"
+     *
+     * @return non-null
+     */
+    protected String getOriginTagValue() {
+        return getSimpleName(this.getClass());
     }
 
     @Override
@@ -42,7 +58,7 @@ public abstract class AbstractMeterBinder implements MeterBinder {
     }
 
     protected Iterable<Tag> combine(String... tags) {
-        return Tags.concat(this.tags, tags);
+        return concat(this.tags, tags);
     }
 
     protected abstract boolean supports(MeterRegistry registry);
