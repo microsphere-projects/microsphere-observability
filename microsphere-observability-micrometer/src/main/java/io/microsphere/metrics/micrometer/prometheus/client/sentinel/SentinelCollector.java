@@ -290,8 +290,8 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     }
 
     private List<String> buildLabelValues(String sentinelMetricType, MetricNode metricNode) {
-        List<String> labelValues = new ArrayList<>(commonLabelValues.size() + 4);
         List<String> commonLabelValues = this.commonLabelValues;
+        List<String> labelValues = new ArrayList<>(commonLabelValues.size() + 4);
         String resource = metricNode.getResource();
         String resourceType = getResourceTypeAsString(metricNode.getClassification());
         labelValues.addAll(commonLabelValues);
