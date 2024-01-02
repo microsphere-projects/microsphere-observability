@@ -14,10 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.micrometer.instrument.binder.system;
+package io.microsphere.metrics.micrometer.instrument.binder.system;
 
-import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
-import io.microsphere.micrometer.instrument.binder.AbstractMetricsTest;
+import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -44,7 +43,8 @@ public class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkSta
     @BeforeClass
     public static void prepare() throws Throwable {
         ClassLoader classLoader = NetworkStatisticsMetricsTest.class.getClassLoader();
-        System.setProperty("network.stats.file", Paths.get(classLoader.getResource("test-data/network.stats").toURI()).toAbsolutePath().toString());
+        String testFile = Paths.get(classLoader.getResource("test-data/network.stats").toURI()).toAbsolutePath().toString();
+        System.setProperty("network.stats.file", testFile);
     }
 
     @Test
@@ -55,7 +55,7 @@ public class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkSta
         Path dir = STATS_FILE_PATH.getParent();
         dir.register(watchService, ENTRY_MODIFY);
 
-        new Thread(() -> {
+        Thread thread = new Thread(() -> {
             WatchKey key;
             while (true) {
                 try {
@@ -73,12 +73,12 @@ public class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkSta
                     }
                 }
             }
-        }).start();
+        });
 
 
         File statsFile = STATS_FILE_PATH.toFile();
         statsFile.setLastModified(System.currentTimeMillis());
 
-        Thread.sleep(1000 * 5);
+        thread.join(5000);
     }
 }
