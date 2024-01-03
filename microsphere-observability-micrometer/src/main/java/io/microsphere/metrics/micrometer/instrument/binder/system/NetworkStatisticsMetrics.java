@@ -313,7 +313,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
             synchronized (this) {
                 this.receiveBytes = stats.receiveBytes;
                 this.receivePackets = stats.receivePackets;
-                this.receiveErrors = stats.receivePackets;
+                this.receiveErrors = stats.receiveErrors;
                 this.receiveDrop = stats.receiveDrop;
 
                 this.transmitBytes = stats.transmitBytes;
