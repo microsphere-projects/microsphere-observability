@@ -29,6 +29,7 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 
 import static io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH_PROPERTY_NAME;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.junit.Assert.assertFalse;
 
@@ -44,7 +45,7 @@ public class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkSta
     public static void prepare() throws Throwable {
         ClassLoader classLoader = NetworkStatisticsMetricsTest.class.getClassLoader();
         String testFile = Paths.get(classLoader.getResource("test-data/network.stats").toURI()).toAbsolutePath().toString();
-        System.setProperty("network.stats.file", testFile);
+        System.setProperty(STATS_FILE_PATH_PROPERTY_NAME, testFile);
     }
 
     @Test
