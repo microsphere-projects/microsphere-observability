@@ -51,27 +51,41 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
     public static final Path STATS_FILE_PATH = get(getProperty(STATS_FILE_PATH_PROPERTY_NAME, DEFAULT_STATS_FILE_PATH));
 
+    public static final String INTERVAL_PROPERTY_NAME = "microsphere.metrics.collection.interval";
+
+    public static final long DEFAULT_INTERVAL = TimeUnit.MINUTES.toMillis(1);
+
     private static final Logger logger = LoggerFactory.getLogger(NetworkStatisticsMetrics.class);
 
     private final ConcurrentMap<String, Stats> statsMap = new ConcurrentHashMap<>(8);
 
     private final ScheduledExecutorService scheduledExecutorService;
 
+    /**
+     * The interval time of metrics collection in milliseconds.
+     */
+    private final long interval;
+
     private MeterRegistry registry;
 
     public NetworkStatisticsMetrics() {
-        this(null);
+        this(Long.getLong(INTERVAL_PROPERTY_NAME, DEFAULT_INTERVAL));
     }
 
-    public NetworkStatisticsMetrics(ScheduledExecutorService scheduledExecutorService) {
-        this(emptyList(), scheduledExecutorService);
+    public NetworkStatisticsMetrics(long interval) {
+        this(null, interval);
     }
 
-    public NetworkStatisticsMetrics(Iterable<Tag> tags, ScheduledExecutorService scheduledExecutorService) {
+    public NetworkStatisticsMetrics(ScheduledExecutorService scheduledExecutorService, long interval) {
+        this(emptyList(), scheduledExecutorService, interval);
+    }
+
+    public NetworkStatisticsMetrics(Iterable<Tag> tags, ScheduledExecutorService scheduledExecutorService, long interval) {
         super(tags);
         this.scheduledExecutorService = scheduledExecutorService == null ?
                 newSingleThreadScheduledExecutor(new NamedThreadFactory("Network-Statistics-Metrics-Task-"))
                 : scheduledExecutorService;
+        this.interval = interval;
     }
 
     private void bindStats() {
@@ -122,21 +136,18 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
                 .tags(newTags)
                 .description("Number of good packets received by the interface")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
         Gauge.builder("network.receive.errors", stats, Stats::getReceiveErrors)
                 .tags(newTags)
                 .description("Total number of bad packets received on this network device")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
         Gauge.builder("network.receive.drop", stats, Stats::getReceiveDrop)
                 .tags(newTags)
                 .description("Number of packets received but not processed")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
         Gauge.builder("network.transmit.bytes", stats, Stats::getTransmitBytes)
@@ -150,50 +161,17 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
                 .tags(newTags)
                 .description("Number of packets successfully transmitted")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
         Gauge.builder("network.transmit.errors", stats, Stats::getTransmitErrors)
                 .tags(newTags).description("Total number of transmit problems")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
         Gauge.builder("network.transmit.drop", stats, Stats::getTransmitDrop)
                 .tags(newTags).description("Number of packets dropped on their way to transmission")
                 .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
                 .register(registry);
-    }
-
-    private void asyncBindStatsList() {
-        Thread thread = new Thread(() -> {
-            try {
-                WatchService watchService = FileSystems.getDefault().newWatchService();
-                Path dir = STATS_FILE_PATH.getParent();
-                dir.register(watchService, ENTRY_MODIFY);
-                WatchKey key;
-                while (true) {
-                    key = watchService.poll(1, TimeUnit.SECONDS);
-                    if (key == null) {
-                        continue;
-                    }
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        Path path = (Path) event.context();
-                        if (STATS_FILE_PATH.equals(dir.resolve(path))) {
-                            bindStats();
-                        }
-                    }
-                    key.reset();
-                }
-            } catch (Throwable e) {
-                throw new RuntimeException(e);
-            }
-        });
-
-        thread.setName("Network Statistics Thread");
-        thread.setDaemon(true);
-        thread.start();
     }
 
     @Override
@@ -206,12 +184,11 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
         this.registry = registry;
         bindStats();
         bindStatsOnSchedule();
-        // asyncBindStatsList();
     }
 
     private void bindStatsOnSchedule() {
         if (scheduledExecutorService != null && !scheduledExecutorService.isShutdown()) {
-            scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, 30, TimeUnit.SECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, interval, TimeUnit.MILLISECONDS);
         }
     }
 
