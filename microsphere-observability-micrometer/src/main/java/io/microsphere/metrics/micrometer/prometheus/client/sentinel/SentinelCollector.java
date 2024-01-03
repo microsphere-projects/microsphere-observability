@@ -19,8 +19,6 @@ package io.microsphere.metrics.micrometer.prometheus.client.sentinel;
 import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.ClusterNode;
 import com.alibaba.csp.sentinel.node.DefaultNode;
-import com.alibaba.csp.sentinel.node.EntranceNode;
-import com.alibaba.csp.sentinel.node.Node;
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.node.metric.MetricSearcher;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
@@ -42,12 +40,9 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import static com.alibaba.csp.sentinel.Constants.CONTEXT_DEFAULT_NAME;
-import static com.alibaba.csp.sentinel.Constants.ROOT;
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
 import static com.alibaba.csp.sentinel.config.SentinelConfig.getAppName;
 import static com.alibaba.csp.sentinel.node.metric.MetricWriter.METRIC_BASE_DIR;
@@ -56,7 +51,6 @@ import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegi
 import static com.alibaba.csp.sentinel.util.PidUtil.getPid;
 import static io.microsphere.collection.CollectionUtils.isEmpty;
 import static io.microsphere.sentinel.util.SentinelUtils.getResourceTypeAsString;
-import static io.microsphere.sentinel.util.SentinelUtils.getSentinelMetricsTaskExecutor;
 import static io.microsphere.util.ClassUtils.getSimpleName;
 import static io.prometheus.client.Collector.Type.GAUGE;
 import static java.util.Collections.emptyList;
@@ -93,9 +87,9 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     public static final String RESOURCE_LABEL_NAME = PREFIX + "resource";
 
     /**
-     * The Label name for Sentinel Metric type
+     * The Label name for Sentinel Context
      */
-    public static final String METRIC_TYPE_LABEL_NAME = PREFIX + "metric_type";
+    public static final String CONTEXT_LABEL_NAME = PREFIX + "context";
 
     /**
      * The Label name for Sentinel Resource Type
@@ -120,8 +114,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private volatile MetricSearcher metricSearcher;
 
-    private ScheduledExecutorService scheduler;
-
     public SentinelCollector(long interval) {
         this(interval, emptyMap());
     }
@@ -144,7 +136,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     @Override
     public <T extends Collector> T register(CollectorRegistry registry) {
-        this.scheduler = initScheduler();
         addEntryCallback(getClass().getName(), this);
         return super.register(registry);
     }
@@ -157,41 +148,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     @Override
     public void onBlocked(BlockException ex, Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) {
         updateResourceToContextMapping(context, node);
-    }
-
-    private void async(Runnable runnable) {
-        if (scheduler != null) {
-            scheduler.execute(runnable);
-        }
-    }
-
-    private ScheduledExecutorService initScheduler() {
-        ScheduledExecutorService scheduledExecutorService = getSentinelMetricsTaskExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(this::update, 0, interval, TimeUnit.MILLISECONDS);
-        return scheduledExecutorService;
-    }
-
-    private void update() {
-        updateResourceToContextMapping();
-    }
-
-    private void updateResourceToContextMapping() {
-        updateResourceToContextMapping(ROOT);
-    }
-
-    private void updateResourceToContextMapping(DefaultNode currentNode) {
-        if (currentNode instanceof EntranceNode) {
-            String context = getResource(currentNode);
-            for (Node node : currentNode.getChildList()) {
-                if (node instanceof DefaultNode) {
-                    DefaultNode childNode = (DefaultNode) node;
-                    updateResourceToContextMapping(context, childNode);
-                    if (node instanceof EntranceNode) {
-                        updateResourceToContextMapping(childNode);
-                    }
-                }
-            }
-        }
     }
 
     private void updateResourceToContextMapping(Context context, DefaultNode node) {
@@ -263,13 +219,13 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
                 List<MetricFamilySamples.Sample> samples = new ArrayList<>(size * 7);
                 for (int i = 0; i < size; i++) {
                     MetricNode metricNode = metricNodes.get(i);
-                    samples.add(createSample(metric, "rt", labelNames, metricNode, MetricNode::getRt));
-                    samples.add(createSample(metric, "concurrency", labelNames, metricNode, MetricNode::getConcurrency));
-                    samples.add(createSample(metric, "success_qps", labelNames, metricNode, MetricNode::getSuccessQps));
-                    samples.add(createSample(metric, "pass_qps", labelNames, metricNode, MetricNode::getPassQps));
-                    samples.add(createSample(metric, "occupied_pass_qps", labelNames, metricNode, MetricNode::getOccupiedPassQps));
-                    samples.add(createSample(metric, "block_qps", labelNames, metricNode, MetricNode::getBlockQps));
-                    samples.add(createSample(metric, "exception_qps", labelNames, metricNode, MetricNode::getExceptionQps));
+                    samples.add(createSample("rt", context, labelNames, metricNode, MetricNode::getRt));
+                    samples.add(createSample("concurrency", context, labelNames, metricNode, MetricNode::getConcurrency));
+                    samples.add(createSample("success_qps", context, labelNames, metricNode, MetricNode::getSuccessQps));
+                    samples.add(createSample("pass_qps", context, labelNames, metricNode, MetricNode::getPassQps));
+                    samples.add(createSample("occupied_pass_qps", context, labelNames, metricNode, MetricNode::getOccupiedPassQps));
+                    samples.add(createSample("block_qps", context, labelNames, metricNode, MetricNode::getBlockQps));
+                    samples.add(createSample("exception_qps", context, labelNames, metricNode, MetricNode::getExceptionQps));
                 }
 
                 metricFamilySamplesList.add(new MetricFamilySamples(metric, GAUGE, "Sentinel Context : " + context, samples));
@@ -283,20 +239,20 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
         List<String> labelNames = new ArrayList<>(commonLabelNames.size() + 4);
         labelNames.addAll(commonLabelNames);
         labelNames.add(RESOURCE_LABEL_NAME);
-        labelNames.add(METRIC_TYPE_LABEL_NAME);
+        labelNames.add(CONTEXT_LABEL_NAME);
         labelNames.add(TYPE_LABEL_NAME);
         labelNames.add(VERSION_LABEL_NAME);
         return labelNames;
     }
 
-    private List<String> buildLabelValues(String sentinelMetricType, MetricNode metricNode) {
+    private List<String> buildLabelValues(String context, MetricNode metricNode) {
         List<String> commonLabelValues = this.commonLabelValues;
         List<String> labelValues = new ArrayList<>(commonLabelValues.size() + 4);
         String resource = metricNode.getResource();
         String resourceType = getResourceTypeAsString(metricNode.getClassification());
         labelValues.addAll(commonLabelValues);
         labelValues.add(resource);
-        labelValues.add(sentinelMetricType);
+        labelValues.add(context);
         labelValues.add(resourceType);
         labelValues.add(SENTINEL_VERSION);
         return labelValues;
@@ -331,12 +287,11 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
         return contextMetricsNodesMap;
     }
 
-    private MetricFamilySamples.Sample createSample(String metric,
-                                                    String sentinelMetricType,
-                                                    List<String> labelNames,
-                                                    MetricNode metricNode,
+    private MetricFamilySamples.Sample createSample(String metricSuffix, String context,
+                                                    List<String> labelNames, MetricNode metricNode,
                                                     Function<MetricNode, Number> metricValueFunction) {
-        List<String> labelValues = buildLabelValues(sentinelMetricType, metricNode);
+        String metric = PREFIX + metricSuffix;
+        List<String> labelValues = buildLabelValues(context, metricNode);
         Number value = metricValueFunction.apply(metricNode);
         Long timestampMs = metricNode.getTimestamp();
         return new MetricFamilySamples.Sample(metric, labelNames, labelValues, value.doubleValue(), timestampMs);
