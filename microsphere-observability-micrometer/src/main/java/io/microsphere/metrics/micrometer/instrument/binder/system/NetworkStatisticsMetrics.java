@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.BaseUnits;
+import io.micrometer.core.instrument.util.NamedThreadFactory;
 import io.micrometer.core.lang.NonNullApi;
 import io.micrometer.core.lang.NonNullFields;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
@@ -33,6 +34,7 @@ import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Paths.get;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.util.Collections.emptyList;
+import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
 /**
  * Network Statistics Metrics
@@ -58,12 +60,18 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     private MeterRegistry registry;
 
     public NetworkStatisticsMetrics() {
-        this(emptyList(), null);
+        this(null);
+    }
+
+    public NetworkStatisticsMetrics(ScheduledExecutorService scheduledExecutorService) {
+        this(emptyList(), scheduledExecutorService);
     }
 
     public NetworkStatisticsMetrics(Iterable<Tag> tags, ScheduledExecutorService scheduledExecutorService) {
         super(tags);
-        this.scheduledExecutorService = scheduledExecutorService;
+        this.scheduledExecutorService = scheduledExecutorService == null ?
+                newSingleThreadScheduledExecutor(new NamedThreadFactory("Network-Statistics-Metrics-Task-"))
+                : scheduledExecutorService;
     }
 
     private void bindStats() {
