@@ -18,11 +18,13 @@
     <name>Microsphere :: Observability :: Logging</name>
     <description>Microsphere Observability Logging</description>
 
-    <properties>
-        <log4j.version>1.2.17</log4j.version>
-    </properties>
-
     <dependencies>
+
+        <!-- Microsphere -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-core</artifactId>
+        </dependency>
 
         <!-- SLF4j -->
         <dependency>
