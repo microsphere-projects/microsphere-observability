@@ -40,6 +40,7 @@
 
     <properties>
         <revision>0.0.1-SNAPSHOT</revision>
+        <log4j.version>1.2.17</log4j.version>
     </properties>
 
     <modules>
@@ -47,6 +48,7 @@
         <module>microsphere-observability-dependencies</module>
         <module>microsphere-observability-logging</module>
         <module>microsphere-observability-micrometer</module>
+        <module>microsphere-observability-spring-boot-actuator</module>
     </modules>
 
     <distributionManagement>
