@@ -14,12 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -32,7 +28,6 @@ import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Paths.get;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
 
