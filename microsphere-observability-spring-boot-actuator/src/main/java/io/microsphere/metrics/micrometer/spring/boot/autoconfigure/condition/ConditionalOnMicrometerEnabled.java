@@ -45,5 +45,5 @@ public @interface ConditionalOnMicrometerEnabled {
     /**
      * The property name prefix for Micrometer : "microsphere.metrics.micrometer."
      */
-    String PREFIX = "microsphere.metrics.micrometer.";
+    String PREFIX = "microsphere.micrometer.";
 }
