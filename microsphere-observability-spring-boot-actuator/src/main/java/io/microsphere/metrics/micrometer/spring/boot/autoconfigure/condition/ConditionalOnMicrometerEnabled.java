@@ -43,7 +43,7 @@ import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 public @interface ConditionalOnMicrometerEnabled {
 
     /**
-     * The property name prefix for Micrometer : "microsphere.metrics.micrometer."
+     * The property name prefix for Micrometer : "microsphere.micrometer."
      */
     String PREFIX = "microsphere.micrometer.";
 }
