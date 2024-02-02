@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-micrometer</artifactId>
+    <artifactId>microsphere-micrometer</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 

@@ -19,10 +19,10 @@ package io.microsphere.metrics.micrometer.util;
 import io.micrometer.core.instrument.util.NamedThreadFactory;
 import io.microsphere.util.BaseUtils;
 
-import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 
 import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
-import static java.util.concurrent.Executors.newSingleThreadExecutor;
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
  * The utilities class for Micrometer
@@ -32,10 +32,14 @@ import static java.util.concurrent.Executors.newSingleThreadExecutor;
  */
 public abstract class MicrometerUtils extends BaseUtils {
 
-    private static final ExecutorService asyncExecutor = newSingleThreadExecutor(new NamedThreadFactory("Micrometer-Async-"));
+    public static final int DEFAULT_SCHEDULED_EXECUTOR_SIZE = 1;
+
+    public static final int SCHEDULED_EXECUTOR_SIZE = Integer.getInteger("microsphere.metrics.micrometer.scheduled-executor.core-size", DEFAULT_SCHEDULED_EXECUTOR_SIZE);
+
+    private static final ScheduledExecutorService scheduledExecutor = newScheduledThreadPool(SCHEDULED_EXECUTOR_SIZE, new NamedThreadFactory("Micrometer-Async-"));
 
     static {
-        addShutdownHookCallback(asyncExecutor::shutdownNow);
+        addShutdownHookCallback(scheduledExecutor::shutdownNow);
     }
 
     /**
@@ -45,7 +49,16 @@ public abstract class MicrometerUtils extends BaseUtils {
      */
     public static void async(Runnable task) {
         if (task != null) {
-            asyncExecutor.execute(task);
+            scheduledExecutor.execute(task);
         }
+    }
+
+    /**
+     * Get the instance of {@link ScheduledExecutorService}
+     *
+     * @return non-null
+     */
+    public static ScheduledExecutorService getScheduledExecutor() {
+        return scheduledExecutor;
     }
 }
