@@ -15,8 +15,8 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Spring Boot Actuator</name>
-    <description>Microsphere Observability Spring Boot Actuator</description>
+    <name>Microsphere :: Observability :: Spring Boot Starter</name>
+    <description>Microsphere Observability Spring Boot Starter</description>
 
     <dependencies>
 
