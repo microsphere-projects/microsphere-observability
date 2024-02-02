@@ -1,6 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.microsphere.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration
-
-org.springframework.context.ApplicationListener=\
-io.microsphere.logging.log4j2.spring.boot.listener.AddingInMemoryAppenderListener,\
-io.microsphere.logging.log4j2.spring.boot.listener.RemovingInMemoryAppenderListener

@@ -23,6 +23,7 @@
         <microsphere-spring.version>${revision}</microsphere-spring.version>
         <microsphere-spring-boot.version>${revision}</microsphere-spring-boot.version>
         <microsphere-spring-cloud.version>${revision}</microsphere-spring-cloud.version>
+        <microsphere-sentinel.version>${revision}</microsphere-sentinel.version>
         <!-- BOM versions -->
         <spring-boot.version>2.7.18</spring-boot.version>
         <spring-cloud.version>3.1.6</spring-cloud.version>
@@ -124,6 +125,15 @@
                 <groupId>io.github.microsphere-projects</groupId>
                 <artifactId>microsphere-dependencies</artifactId>
                 <version>${microsphere.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Microsphere Sentinel Dependencies -->
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-sentinel-dependencies</artifactId>
+                <version>${microsphere-sentinel.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>

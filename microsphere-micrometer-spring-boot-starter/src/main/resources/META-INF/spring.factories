@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.MicrometerAutoConfiguration
