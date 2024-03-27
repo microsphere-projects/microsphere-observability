@@ -61,10 +61,10 @@
         <module>microsphere-observability-parent</module>
         <module>microsphere-observability-dependencies</module>
         <module>microsphere-logging</module>
-        <module>microsphere-logging-spring-boot-starter</module>
         <module>microsphere-micrometer</module>
-        <module>microsphere-micrometer-spring-boot-starter</module>
-        <module>microsphere-observability-spring-boot-starter</module>
+        <module>microsphere-logging-spring-boot</module>
+        <module>microsphere-micrometer-spring-boot</module>
+        <module>microsphere-observability-spring-boot</module>
     </modules>
 
     <distributionManagement>
