@@ -41,9 +41,9 @@ public class Log4j2KafkaAppenderProperties {
 
     /**
      * The property prefix of {@link ConfigurationProperties @ConfigurationProperties} for Log4j2's {@link KafkaAppender}
-     * : "microsphere.log4j2.kafka.appender."
+     * : "microsphere.log4j2.kafka.appender"
      */
-    public static final String PREFIX = "microsphere.log4j2.kafka.appender.";
+    public static final String PREFIX = "microsphere.log4j2.kafka.appender";
 
     /**
      * The Kafka topic to use, default value is "java-app-logs"
