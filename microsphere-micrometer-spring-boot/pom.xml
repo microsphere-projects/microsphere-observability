@@ -35,6 +35,22 @@
 
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-spring-boot-actuator</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-logging-spring-boot</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-sentinel-spring-boot</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-micrometer</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -64,6 +80,15 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Third-Party Dependencies -->
+
+        <!-- Alibaba Sentinel -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Micrometer -->
         <dependency>
             <groupId>io.micrometer</groupId>
@@ -81,6 +106,32 @@
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient_pushgateway</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Kafka -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Log4j 2.x -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <optional>true</optional>
         </dependency>
 
