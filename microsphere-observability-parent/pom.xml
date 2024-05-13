@@ -21,6 +21,7 @@
     <properties>
         <microsphere-spring-cloud.version>${revision}</microsphere-spring-cloud.version>
         <microsphere-sentinel.version>${revision}</microsphere-sentinel.version>
+        <microsphere-i18n.version>${revision}</microsphere-i18n.version>
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
@@ -43,6 +44,15 @@
                 <groupId>io.github.microsphere-projects</groupId>
                 <artifactId>microsphere-sentinel-dependencies</artifactId>
                 <version>${microsphere-sentinel.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Microsphere i18n Dependencies -->
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-i18n-dependencies</artifactId>
+                <version>${microsphere-i18n.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
