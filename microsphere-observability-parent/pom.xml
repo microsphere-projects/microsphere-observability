@@ -19,8 +19,8 @@
     <description>Microsphere Observability Parent</description>
 
     <properties>
-        <microsphere-spring-cloud.version>0.0.1</microsphere-spring-cloud.version>
-        <microsphere-sentinel.version>${revision}</microsphere-sentinel.version>
+        <microsphere-spring-cloud.version>0.2.0</microsphere-spring-cloud.version>
+        <microsphere-sentinel.version>0.0.1-SNAPSHOT</microsphere-sentinel.version>
         <microsphere-i18n.version>0.0.1</microsphere-i18n.version>
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
