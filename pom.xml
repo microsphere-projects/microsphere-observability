@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>io.github.microsphere-projects</groupId>
-        <artifactId>microsphere-build</artifactId>
-        <version>0.0.21</version>
+        <artifactId>microsphere-spring-cloud-parent</artifactId>
+        <version>0.2.24</version>
     </parent>
 
     <groupId>io.github.microsphere-projects</groupId>
@@ -52,42 +52,19 @@
     </scm>
 
     <properties>
-        <revision>0.0.1-SNAPSHOT</revision>
+        <revision>0.2.0-SNAPSHOT</revision>
         <log4j.version>1.2.17</log4j.version>
+        <java.version>17</java.version>
     </properties>
 
     <modules>
         <module>microsphere-observability-parent</module>
         <module>microsphere-observability-dependencies</module>
-        <module>microsphere-logging</module>
-        <module>microsphere-micrometer</module>
-        <module>microsphere-logging-spring-boot</module>
-        <module>microsphere-micrometer-spring-boot</module>
+        <module>microsphere-observability-logging</module>
+        <module>microsphere-observability-micrometer</module>
+        <module>microsphere-observability-logging-spring-boot</module>
+        <module>microsphere-observability-micrometer-spring-boot</module>
         <module>microsphere-observability-spring-boot</module>
     </modules>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>snapshot</id>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </repository>
-    </repositories>
 
 </project>
