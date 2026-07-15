@@ -23,10 +23,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The {@link Conditional} annotation test whether the Prometheus metrics export is enabled or not.
@@ -36,8 +38,8 @@ import java.lang.annotation.Target;
  * @see PrometheusMetricsExportAutoConfiguration
  * @since 1.0.0
  */
-@Target({ElementType.TYPE, ElementType.METHOD})
-@Retention(RetentionPolicy.RUNTIME)
+@Target({TYPE, METHOD})
+@Retention(RUNTIME)
 @Documented
 @ConditionalOnBean(name = "io.micrometer.core.instrument.Clock")
 @ConditionalOnEnabledMetricsExport("prometheus")

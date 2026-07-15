@@ -1,0 +1,20 @@
+## Spring Boot
+
+## Microsphere Logging
+
+### Microsphere log4j2 KafkaAppender
+microsphere:
+  log4j2:
+    kafka:
+      appender:
+        name: microsphere-kafka-appender
+        ignore-exceptions: true
+        retryCount: 3
+        topic: java-app-logs
+        key: ${microsphere.log4j2.kafka.appender.topic}-${spring.application.name:default}
+        pattern-layout: '%d{ISO8601} %p %t - %m'
+        sync-send: false
+        send-event-timestamp: false
+        properties:
+          client.id: microsphere-kafka-appender-${spring.application.name:default}
+          batch.size: 1000

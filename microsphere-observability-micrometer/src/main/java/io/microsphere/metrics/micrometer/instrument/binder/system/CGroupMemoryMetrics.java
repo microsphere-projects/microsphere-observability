@@ -1,25 +1,32 @@
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.micrometer.core.lang.NonNullApi;
 import io.micrometer.core.lang.NonNullFields;
+import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import static io.micrometer.core.instrument.Gauge.builder;
+import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
+import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
+import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.util.StringUtils.isNumeric;
 import static java.lang.Long.parseLong;
+import static java.lang.Long.valueOf;
+import static java.lang.System.getProperty;
+import static java.nio.file.Files.exists;
+import static java.nio.file.Files.isReadable;
+import static java.nio.file.Paths.get;
+import static java.util.Collections.emptyList;
 
 /**
  * CGroup Memory Metrics
@@ -34,7 +41,26 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
     private static final String METRIC_PREFIX = "cgroup.";
 
-    private static final Path ROOT_DIRECTORY_PATH = Paths.get(System.getProperty("cgroup.memory.dir", "/sys/fs/cgroup/memory/"));
+    /**
+     * The Default Value of CGroup Memory Directory
+     */
+    public static final String DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE = "/sys/fs/cgroup/memory/";
+
+    /**
+     * The System Property Name of CGroup Memory Directory, default value : "/sys/fs/cgroup/memory/"
+     */
+    @ConfigurationProperty(
+            defaultValue = DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE,
+            source = SYSTEM_PROPERTIES_SOURCE
+    )
+    public static final String CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_NAME = "cgroup.memory.dir";
+
+    /**
+     * The CGroup Memory Directory
+     */
+    public static final String CGROUP_MEMORY_DIR = getProperty(CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_NAME, DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE);
+
+    private static final Path ROOT_DIRECTORY_PATH = get(CGROUP_MEMORY_DIR);
 
     private static final Path MEMORY_STAT_FILE_PATH = ROOT_DIRECTORY_PATH.resolve("memory.stat");
 
@@ -48,7 +74,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
     @Override
     protected boolean supports(MeterRegistry registry) {
-        if (!Files.exists(ROOT_DIRECTORY_PATH)) {
+        if (!exists(ROOT_DIRECTORY_PATH)) {
             logger.info("The CGroup memory directory[path: '{}'] does not exist!", ROOT_DIRECTORY_PATH);
             return false;
         }
@@ -56,8 +82,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     }
 
     @Override
-    protected void doBindTo(MeterRegistry registry) throws Throwable {
-
+    protected void doBindTo(MeterRegistry registry) {
         buildBytesGauge("memory.usage_in_bytes", registry);
         buildBytesGauge("memory.max_usage_in_bytes", registry);
         buildBytesGauge("memory.memsw.usage_in_bytes", registry);
@@ -124,7 +149,10 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     }
 
     private void buildBytesGauge(String name, Supplier<Number> supplier, MeterRegistry registry) {
-        Gauge.builder(name, supplier).tags(tags).baseUnit(BaseUnits.BYTES).register(registry);
+        builder(name, supplier)
+                .tags(tags)
+                .baseUnit(BYTES)
+                .register(registry);
     }
 
     private Long readFileAsLong(String fileName) {
@@ -132,16 +160,16 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     }
 
     private Long readFileAsLong(Path file) {
-        if (!Files.exists(file) || !Files.isReadable(file)) {
+        if (!exists(file) || !isReadable(file)) {
             logger.debug("File[path : {}] does not exist !", file);
-            return Long.valueOf(-1L);
+            return valueOf(-1L);
         }
         return parseLong(readFileContent(file));
     }
 
     private String readFileContent(Path filePath) {
         List<String> lines = readAllLines(filePath);
-        return lines.isEmpty() ? null : lines.get(0).trim();
+        return first(lines);
     }
 
     private List<String> readAllLines(Path filePath) {
@@ -150,7 +178,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
             lines = Files.readAllLines(filePath);
         } catch (Throwable e) {
             logger.warn("File [path : {}] can't be read", filePath, e);
-            lines = Collections.emptyList();
+            lines = emptyList();
         }
         return lines;
     }

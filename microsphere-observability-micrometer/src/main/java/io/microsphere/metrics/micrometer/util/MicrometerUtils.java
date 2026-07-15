@@ -22,6 +22,7 @@ import io.microsphere.util.BaseUtils;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
+import static java.lang.Integer.getInteger;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
@@ -34,7 +35,7 @@ public abstract class MicrometerUtils extends BaseUtils {
 
     public static final int DEFAULT_SCHEDULED_EXECUTOR_SIZE = 1;
 
-    public static final int SCHEDULED_EXECUTOR_SIZE = Integer.getInteger("microsphere.metrics.micrometer.scheduled-executor.core-size", DEFAULT_SCHEDULED_EXECUTOR_SIZE);
+    public static final int SCHEDULED_EXECUTOR_SIZE = getInteger("microsphere.metrics.micrometer.scheduled-executor.core-size", DEFAULT_SCHEDULED_EXECUTOR_SIZE);
 
     private static final ScheduledExecutorService scheduledExecutor = newScheduledThreadPool(SCHEDULED_EXECUTOR_SIZE, new NamedThreadFactory("Micrometer-Async-"));
 

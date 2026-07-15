@@ -46,7 +46,7 @@ public abstract class AbstractMeterBinder implements MeterBinder {
     @Override
     public final void bindTo(MeterRegistry registry) {
         if (!supports(registry)) {
-            logger.info("Current Metrics is not Supported");
+            logger.info("Current Metrics is not supported");
             return;
         }
         try {

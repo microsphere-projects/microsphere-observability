@@ -8,8 +8,6 @@ import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.util.NamedThreadFactory;
 import io.micrometer.core.lang.NonNullApi;
 import io.micrometer.core.lang.NonNullFields;
-import io.microsphere.logging.Logger;
-import io.microsphere.logging.LoggerFactory;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.io.IOException;
@@ -23,7 +21,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.util.StringUtils.split;
 import static java.lang.System.getProperty;
 import static java.nio.charset.StandardCharsets.US_ASCII;
@@ -31,6 +28,7 @@ import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Network Statistics Metrics
@@ -49,9 +47,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
     public static final String INTERVAL_PROPERTY_NAME = "microsphere.metrics.collection.interval";
 
-    public static final long DEFAULT_INTERVAL = TimeUnit.MINUTES.toMillis(1);
-
-    private static final Logger logger = getLogger(NetworkStatisticsMetrics.class);
+    public static final long DEFAULT_INTERVAL = MINUTES.toMillis(1);
 
     private final ConcurrentMap<String, Stats> statsMap = new ConcurrentHashMap<>(8);
 

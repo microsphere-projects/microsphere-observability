@@ -5,10 +5,12 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * The Spring Boot {@link Conditional} annotation for the "cgroup" Subsystem {@link Condition}
@@ -16,8 +18,8 @@ import java.lang.annotation.Target;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @since 1.0.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RUNTIME)
+@Target({TYPE, METHOD})
 @Documented
 @ConditionalOnResource(resources = "file:///sys/fs/cgroup/")
 public @interface ConditionalOnCGroup {

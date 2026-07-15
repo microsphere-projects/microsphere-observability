@@ -22,15 +22,22 @@ import com.p6spy.engine.common.StatementInformation;
 import com.p6spy.engine.event.JdbcEventListener;
 import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.logging.LoggingEventListener;
-import io.micrometer.core.instrument.Counter;
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.microsphere.metrics.micrometer.util.MicrometerUtils;
+import io.microsphere.annotation.ConfigurationProperty;
 
 import javax.annotation.Nullable;
 import java.sql.SQLException;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+
+import static io.micrometer.core.instrument.Counter.builder;
+import static io.micrometer.core.instrument.Gauge.builder;
+import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
+import static io.microsphere.metrics.micrometer.util.MicrometerUtils.async;
+import static java.lang.Character.isWhitespace;
+import static java.lang.Long.getLong;
+import static java.lang.Long.parseLong;
+import static java.lang.String.valueOf;
+import static java.util.Locale.ENGLISH;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Micrometer {@link JdbcEventListener}
@@ -48,9 +55,26 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
 
     public static final String SLOW_SQL_TIME_METRIC_NAME = PREFIX + "slow-sql.time";
 
+    /**
+     * The default value of slow SQL time threshold in seconds : 1 seconds
+     */
+    public static final String DEFAULT_SLOW_SQL_TIME_THRESHOLD_PROPERTY_VALUE = "1";
+
+    /**
+     * The property name of slow SQL time threshold in seconds : "microsphere.jdbc.slow-sql.time.threshold",
+     * default value : 1 seconds
+     */
+    @ConfigurationProperty(
+            type = long.class,
+            defaultValue = DEFAULT_SLOW_SQL_TIME_THRESHOLD_PROPERTY_VALUE,
+            source = SYSTEM_PROPERTIES_SOURCE
+    )
     public static final String SLOW_SQL_TIME_THRESHOLD_PROPERTY_NAME = PREFIX + "slow-sql.time.threshold";
 
-    public static final long DEFAULT_SLOW_SQL_TIME_THRESHOLD = TimeUnit.SECONDS.toNanos(1);
+    /**
+     * The default value of slow SQL time threshold in nanos : 1 seconds
+     */
+    public static final long DEFAULT_SLOW_SQL_TIME_THRESHOLD = SECONDS.toNanos(parseLong(DEFAULT_SLOW_SQL_TIME_THRESHOLD_PROPERTY_VALUE));
 
     /**
      * {@link MeterRegistry}
@@ -68,7 +92,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
     /**
      * Slow SQL Threshold in nanos, default value : 1 seconds
      */
-    private long slowSQLThresholdNanos = Long.getLong(SLOW_SQL_TIME_THRESHOLD_PROPERTY_NAME, DEFAULT_SLOW_SQL_TIME_THRESHOLD);
+    private long slowSQLThresholdNanos = getLong(SLOW_SQL_TIME_THRESHOLD_PROPERTY_NAME, DEFAULT_SLOW_SQL_TIME_THRESHOLD);
 
     @Override
     public void onAfterAnyExecute(StatementInformation statementInformation, long timeElapsedNanos, SQLException e) {
@@ -89,7 +113,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
         if (registry == null) {
             return;
         }
-        MicrometerUtils.async(runnable);
+        async(runnable);
     }
 
     /**
@@ -122,16 +146,16 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
             return;
         }
 
-        String batches = String.valueOf(batchCounts);
+        String batches = valueOf(batchCounts);
 
-        Counter.builder(SQL_SUCCESS_COUNT_METRIC_NAME)
+        builder(SQL_SUCCESS_COUNT_METRIC_NAME)
                 .tags("type", type)
                 .tags("batches", batches)
                 .register(registry)
                 .increment();
 
         if (e != null) {
-            Counter.builder(SQL_FAILURE_COUNT_METRIC_NAME)
+            builder(SQL_FAILURE_COUNT_METRIC_NAME)
                     .tags("type", type)
                     .tags("batches", batches)
                     .register(registry)
@@ -139,7 +163,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
         }
 
         if (timeElapsedNanos > slowSQLThresholdNanos) {
-            Gauge.builder(SLOW_SQL_TIME_METRIC_NAME, () -> timeElapsedNanos)
+            builder(SLOW_SQL_TIME_METRIC_NAME, () -> timeElapsedNanos)
                     .tag("sql", sql)
                     .tags("type", type)
                     .tags("batches", batches)
@@ -151,7 +175,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
         int firstWhitespaceIndex = -1;
         for (int i = 0; i < sql.length(); i++) {
             char c = sql.charAt(i);
-            if (Character.isWhitespace(c)) {
+            if (isWhitespace(c)) {
                 firstWhitespaceIndex = i;
                 break;
             }
@@ -159,7 +183,7 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
 
         if (firstWhitespaceIndex > 0) {
             String type = sql.substring(0, firstWhitespaceIndex);
-            return type.toUpperCase(Locale.ENGLISH);
+            return type.toUpperCase(ENGLISH);
         }
 
         return null;

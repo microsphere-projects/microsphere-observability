@@ -23,32 +23,24 @@ import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmCompilationMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
-import io.micrometer.prometheus.PrometheusMeterRegistry;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
+import io.microsphere.annotation.ConfigurationProperty;
+import io.microsphere.constants.PropertyConstants;
 import io.microsphere.logging.Logger;
-import io.microsphere.logging.LoggerFactory;
-import io.microsphere.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
-import io.microsphere.logging.log4j2.util.Log4j2Utils;
+import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.metrics.micrometer.prometheus.client.sentinel.SentinelCollector;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnEnabledPrometheusMetricsExport;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnEnabledPrometheusPushGateway;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
-import io.microsphere.sentinel.spring.boot.condition.ConditionalOnSentinelEnabled;
 import io.prometheus.client.CollectorRegistry;
-import io.prometheus.client.exporter.BasicAuthHttpConnectionFactory;
-import io.prometheus.client.exporter.PushGateway;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusProperties;
-import org.springframework.boot.actuate.metrics.export.prometheus.PrometheusPushGatewayManager;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -62,11 +54,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
-import org.springframework.util.StringUtils;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Map;
@@ -75,12 +63,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Function;
 
+import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.logging.log4j2.util.Log4j2Utils.findAppender;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getScheduledExecutor;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
-import static io.microsphere.spring.boot.actuate.autoconfigure.ActuatorAutoConfiguration.ACTUATOR_TASK_SCHEDULER_SERVICE_BEAN_NAME;
 
 /**
  * Micrometer(Metrics) Auto-Configuration for Actuator
@@ -95,15 +86,24 @@ import static io.microsphere.spring.boot.actuate.autoconfigure.ActuatorAutoConfi
         MicrometerAutoConfiguration.CGGroupConfiguration.class,
         MicrometerAutoConfiguration.JvmConfiguration.class,
         MicrometerAutoConfiguration.SentinelMetricsConfiguration.class,
-        MicrometerAutoConfiguration.KafkaMetricsConfiguration.class,
-        MicrometerAutoConfiguration.PrometheusMetricsConfiguration.class,
+        MicrometerAutoConfiguration.KafkaMetricsConfiguration.class
 })
 public class MicrometerAutoConfiguration {
 
     private static final Logger logger = getLogger(MicrometerAutoConfiguration.class);
 
-    @ConditionalOnProperty(prefix = PREFIX + "system", name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+    @ConditionalOnProperty(name = SystemConfiguration.ENABLED_PROPERTY_NAME, matchIfMissing = true)
     static class SystemConfiguration {
+
+        /**
+         * The Property Name of enabling system metrics : "microsphere.micrometer.system.enabled"
+         */
+        @ConfigurationProperty(
+                type = boolean.class,
+                defaultValue = "true",
+                source = APPLICATION_SOURCE
+        )
+        public static final String ENABLED_PROPERTY_NAME = PREFIX + "system" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
 
         @Bean
         public NetworkStatisticsMetrics networkStatisticsMetrics(@Value("${microsphere.metrics.collection.interval:60000}") Duration interval) {
@@ -197,7 +197,7 @@ public class MicrometerAutoConfiguration {
     }
 
     @ConditionalOnProperty(prefix = PREFIX + "sentinel", name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
-    @ConditionalOnSentinelEnabled
+    @ConditionalOnSentinelAvailable
     static class SentinelMetricsConfiguration {
 
         @Bean
@@ -240,7 +240,7 @@ public class MicrometerAutoConfiguration {
             ConfigurableApplicationContext context = event.getApplicationContext();
             String clientId = properties.getProperties().get("client.id");
             // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
-            Iterable<Tag> tags = Arrays.asList(Tag.of("spring.id", clientId));
+            Iterable<Tag> tags = ofList(Tag.of("spring.id", clientId));
             KafkaClientMetrics kafkaClientMetrics = new KafkaClientMetrics(producer, tags);
             MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
             kafkaClientMetrics.bindTo(meterRegistry);
@@ -248,7 +248,7 @@ public class MicrometerAutoConfiguration {
 
         private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
             String loggerName = properties.getName();
-            KafkaAppender kafkaAppender = Log4j2Utils.findAppender(loggerName);
+            KafkaAppender kafkaAppender = findAppender(loggerName);
             Producer producer = null;
             if (kafkaAppender != null) {
                 KafkaManager kafkaManager = getFieldValue(kafkaAppender, "manager", KafkaManager.class);
@@ -258,38 +258,5 @@ public class MicrometerAutoConfiguration {
             }
             return producer;
         }
-    }
-
-    @ConditionalOnProperty(prefix = PREFIX + "prometheus", name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
-    @ConditionalOnEnabledPrometheusMetricsExport
-    static class PrometheusMetricsConfiguration {
-
-        @Bean
-        @ConditionalOnEnabledPrometheusPushGateway
-        public PrometheusPushGatewayManager prometheusPushGatewayManager(CollectorRegistry collectorRegistry,
-                                                                         PrometheusProperties prometheusProperties,
-                                                                         @Autowired @Qualifier(ACTUATOR_TASK_SCHEDULER_SERVICE_BEAN_NAME) ThreadPoolTaskScheduler threadPoolTaskScheduler) {
-            PrometheusProperties.Pushgateway properties = prometheusProperties.getPushgateway();
-            Duration pushRate = properties.getPushRate();
-            String job = properties.getJob();
-            Map<String, String> groupingKey = properties.getGroupingKey();
-            PrometheusPushGatewayManager.ShutdownOperation shutdownOperation = properties.getShutdownOperation();
-            PushGateway pushGateway = initializePushGateway(properties.getAddress());
-            if (StringUtils.hasText(properties.getUsername())) {
-                pushGateway.setConnectionFactory(new BasicAuthHttpConnectionFactory(properties.getUsername(), properties.getPassword()));
-            }
-            return new PrometheusPushGatewayManager(pushGateway, collectorRegistry, threadPoolTaskScheduler,
-                    pushRate, job, groupingKey, shutdownOperation);
-        }
-
-        private PushGateway initializePushGateway(String url) {
-            try {
-                return new PushGateway(new URL(url));
-            } catch (MalformedURLException ex) {
-                logger.warn("Invalid PushGateway base url '{}': update your configuration to a valid URL", url);
-                return new PushGateway(url);
-            }
-        }
-
     }
 }

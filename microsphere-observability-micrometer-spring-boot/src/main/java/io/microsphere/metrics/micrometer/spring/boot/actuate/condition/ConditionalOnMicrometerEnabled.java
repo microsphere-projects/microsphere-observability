@@ -17,16 +17,19 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.condition;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.microsphere.annotation.ConfigurationProperty;
+import io.microsphere.constants.PropertyConstants;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
+import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * Spring Boot Condition for Micrometer Enabled
@@ -35,10 +38,10 @@ import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
  * @see MeterRegistry
  * @since 1.0.0
  */
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.TYPE, ElementType.METHOD})
+@Retention(RUNTIME)
+@Target({TYPE, METHOD})
 @Documented
-@ConditionalOnProperty(prefix = ConditionalOnMicrometerEnabled.PREFIX, name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = ConditionalOnMicrometerEnabled.ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnClass(name = {"io.micrometer.core.instrument.MeterRegistry"})
 public @interface ConditionalOnMicrometerEnabled {
 
@@ -46,4 +49,14 @@ public @interface ConditionalOnMicrometerEnabled {
      * The property name prefix for Micrometer : "microsphere.micrometer."
      */
     String PREFIX = "microsphere.micrometer.";
+
+    /**
+     * The property name for enabling Micrometer features : "microsphere.micrometer.enabled"
+     */
+    @ConfigurationProperty(
+            type = boolean.class,
+            defaultValue = "true",
+            source = APPLICATION_SOURCE
+    )
+    String ENABLED_PROPERTY_NAME = PREFIX + PropertyConstants.ENABLED_PROPERTY_NAME;
 }

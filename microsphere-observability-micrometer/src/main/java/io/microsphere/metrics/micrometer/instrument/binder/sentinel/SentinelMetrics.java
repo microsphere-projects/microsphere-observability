@@ -28,26 +28,24 @@ import com.alibaba.csp.sentinel.slots.block.BlockException;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.TimeGauge;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import io.microsphere.logging.Logger;
-import io.microsphere.logging.LoggerFactory;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import static com.alibaba.csp.sentinel.Constants.ROOT;
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.addEntryCallback;
 import static io.micrometer.core.instrument.Tags.concat;
+import static io.micrometer.core.instrument.TimeGauge.builder;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getSentinelMetricsTaskExecutor;
-import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static java.util.Collections.emptyList;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Sentinel Metrics
@@ -59,8 +57,6 @@ import static java.util.Collections.emptyList;
  * @since 1.0.0
  */
 public class SentinelMetrics extends AbstractMeterBinder implements Runnable, ProcessorSlotEntryCallback<DefaultNode> {
-
-    private static final Logger logger = getLogger(SentinelMetrics.class);
 
     /**
      * The Metric prefix : "sentinel."
@@ -94,7 +90,7 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
     /**
      * Processed the mapping between Sentinel resource name and {@link ClusterNode}
      */
-    private final ConcurrentMap<String, ClusterNode> processedResourceClusterNodes = new ConcurrentHashMap<>(256);
+    private final ConcurrentMap<String, ClusterNode> processedResourceClusterNodes = newConcurrentHashMap(256);
 
     public SentinelMetrics() {
         this(emptyList());
@@ -110,7 +106,7 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
     }
 
     @Override
-    protected void doBindTo(MeterRegistry registry) throws Throwable {
+    protected void doBindTo(MeterRegistry registry) {
         this.registry = registry;
         this.scheduler = initScheduler();
         addEntryCallback(getClass().getName(), this);
@@ -133,7 +129,7 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
 
     private ScheduledExecutorService initScheduler() {
         ScheduledExecutorService scheduledExecutorService = getSentinelMetricsTaskExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(this, 0, 1, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, 1, MINUTES);
         return scheduledExecutorService;
     }
 
@@ -180,32 +176,68 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
 
         Iterable<Tag> tags = buildTags(resourceName, contextName, clusterNode);
 
-        TimeGauge.builder(metricNamePrefix + "rt", clusterNode, TimeUnit.MILLISECONDS, ClusterNode::avgRt).tags(tags).register(registry);
+        builder(metricNamePrefix + "rt", clusterNode, MILLISECONDS, ClusterNode::avgRt)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "total", clusterNode::totalRequest).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "total", clusterNode::totalRequest)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "success", clusterNode::totalSuccess).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "success", clusterNode::totalSuccess)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "pass", clusterNode::totalPass).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "pass", clusterNode::totalPass)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "block", clusterNode::blockRequest).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "block", clusterNode::blockRequest)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "exception", clusterNode::totalException).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "exception", clusterNode::totalException)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "total-qps", clusterNode::totalQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "total-qps", clusterNode::totalQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "success-qps", clusterNode::successQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "success-qps", clusterNode::successQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "max-success-qps", clusterNode::maxSuccessQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "max-success-qps", clusterNode::maxSuccessQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "pass-qps", clusterNode::passQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "pass-qps", clusterNode::passQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "block-qps", clusterNode::blockQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "block-qps", clusterNode::blockQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
 
-        Gauge.builder(metricNamePrefix + "exception-qps", clusterNode::exceptionQps).strongReference(true).tags(tags).register(registry);
+        Gauge.builder(metricNamePrefix + "exception-qps", clusterNode::exceptionQps)
+                .strongReference(true)
+                .tags(tags)
+                .register(registry);
     }
 
     private Iterable<Tag> buildTags(String resourceName, String contextName, ClusterNode clusterNode) {
-        return combine(RESOURCE_TAG_KEY, resourceName, CONTEXT_TAG_KEY, contextName, TYPE_TAG_KEY, getResourceTypeAsString(clusterNode.getResourceType()));
+        return combine(RESOURCE_TAG_KEY, resourceName, CONTEXT_TAG_KEY, contextName, TYPE_TAG_KEY,
+                getResourceTypeAsString(clusterNode.getResourceType()));
     }
 }

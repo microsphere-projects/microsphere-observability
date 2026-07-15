@@ -20,10 +20,18 @@
 
     <dependencies>
 
+        <!-- Microsphere Annotation Processor -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-annotation-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Microsphere Java Core -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-java-core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Log4j2 -->
@@ -32,6 +40,11 @@
             <artifactId>microsphere-log4j2</artifactId>
         </dependency>
 
+        <!-- Microsphere Logback -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-logback</artifactId>
+        </dependency>
 
         <!-- Microsphere I18n Core -->
         <dependency>
@@ -44,13 +57,6 @@
         <dependency>
             <groupId>jakarta.servlet</groupId>
             <artifactId>jakarta.servlet-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Spring Framework -->
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
             <optional>true</optional>
         </dependency>
 

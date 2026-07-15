@@ -18,8 +18,8 @@ package io.microsphere.metrics.micrometer.instrument.binder.jmx;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
-import io.micrometer.core.lang.NonNull;
-import io.micrometer.core.lang.Nullable;
+import io.microsphere.annotation.Nonnull;
+import io.microsphere.annotation.Nullable;
 import io.microsphere.management.MBeanAttribute;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
@@ -57,17 +57,16 @@ public class MBeanMetrics extends AbstractMeterBinder {
     private final MBeanAttributeMeterBinder[] attributeMeterBinders;
 
     private final int attributeMeterBindersCount;
-
-
-    public MBeanMetrics(@NonNull ObjectName objectNameToQuery, MBeanAttributeMeterBinder... attributeMeterBinders) {
+    
+    public MBeanMetrics(@Nonnull ObjectName objectNameToQuery, MBeanAttributeMeterBinder... attributeMeterBinders) {
         this(getPlatformMBeanServer(), objectNameToQuery, attributeMeterBinders);
     }
 
-    public MBeanMetrics(@Nullable MBeanServer mbeanserver, @NonNull ObjectName objectNameToQuery, MBeanAttributeMeterBinder... attributeMeterBinders) {
+    public MBeanMetrics(@Nullable MBeanServer mbeanserver, @Nonnull ObjectName objectNameToQuery, MBeanAttributeMeterBinder... attributeMeterBinders) {
         this(mbeanserver, objectNameToQuery, null, attributeMeterBinders);
     }
 
-    public MBeanMetrics(@NonNull MBeanServer mbeanserver, @NonNull ObjectName objectNameToQuery, @Nullable QueryExp queryExp,
+    public MBeanMetrics(@Nonnull MBeanServer mbeanserver, @Nonnull ObjectName objectNameToQuery, @Nullable QueryExp queryExp,
                         MBeanAttributeMeterBinder... attributeMeterBinders) {
         this.mBeanServer = mbeanserver;
         this.objectNameToQuery = objectNameToQuery;

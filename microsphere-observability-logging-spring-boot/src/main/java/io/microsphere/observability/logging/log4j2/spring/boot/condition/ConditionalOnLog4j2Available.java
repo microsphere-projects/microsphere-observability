@@ -14,12 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.metrics.micrometer.spring.boot.actuate.condition;
+package io.microsphere.observability.logging.log4j2.spring.boot.condition;
 
-import org.springframework.boot.actuate.autoconfigure.metrics.export.ConditionalOnEnabledMetricsExport;
-import org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
@@ -31,18 +28,18 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * The {@link Conditional} annotation test whether the Prometheus push gateway is enabled or not.
+ * {@link @Conditional} that checks if the log4j2 is available
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
- * @see ConditionalOnEnabledMetricsExport
- * @see PrometheusMetricsExportAutoConfiguration
+ * @see Conditional
  * @since 1.0.0
  */
-@Target({TYPE, METHOD})
 @Retention(RUNTIME)
+@Target({TYPE, METHOD})
 @Documented
-@ConditionalOnEnabledPrometheusMetricsExport
-@ConditionalOnClass(name = "io.prometheus.client.exporter.PushGateway")
-@ConditionalOnProperty(prefix = "management.metrics.export.prometheus.pushgateway", name = "enabled")
-public @interface ConditionalOnEnabledPrometheusPushGateway {
+@ConditionalOnClass(name = {
+        "org.apache.logging.log4j.spi.LoggerContextFactory",        // Log4j2 API
+        "org.apache.logging.log4j.core.impl.Log4jContextFactory"    // Log4j2 Core API
+})
+public @interface ConditionalOnLog4j2Available {
 }
