@@ -109,18 +109,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient_pushgateway</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>

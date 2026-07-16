@@ -23,20 +23,17 @@ import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmCompilationMetrics;
 import io.micrometer.core.instrument.binder.jvm.JvmInfoMetrics;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.constants.PropertyConstants;
 import io.microsphere.logging.Logger;
-import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
-import io.microsphere.metrics.micrometer.prometheus.client.sentinel.SentinelCollector;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
-import io.prometheus.client.CollectorRegistry;
+import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaManager;
@@ -200,20 +197,20 @@ public class MicrometerAutoConfiguration {
     @ConditionalOnSentinelAvailable
     static class SentinelMetricsConfiguration {
 
-        @Bean
-        @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
-        public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
-                                                   @Value("${microsphere.metrics.collection.interval:60000}") Duration interval,
-                                                   @Value("${spring.application.name:default}") String applicationName) {
-            SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
-            sentinelCollector.commonLabel("application", applicationName);
-            CollectorRegistry collectorRegistry = registry.getPrometheusRegistry();
-            sentinelCollector.register(collectorRegistry);
-            return sentinelCollector;
-        }
+//        @Bean
+//        @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
+//        public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
+//                                                   @Value("${microsphere.metrics.collection.interval:60000}") Duration interval,
+//                                                   @Value("${spring.application.name:default}") String applicationName) {
+//            SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
+//            sentinelCollector.commonLabel("application", applicationName);
+//            PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
+//            sentinelCollector.register(collectorRegistry);
+//            return sentinelCollector;
+//        }
 
         @Bean
-        @ConditionalOnMissingBean(SentinelCollector.class)
+        // @ConditionalOnMissingBean(SentinelCollector.class)
         public SentinelMetrics sentinelMetrics() {
             return new SentinelMetrics();
         }

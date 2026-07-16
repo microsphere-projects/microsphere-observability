@@ -55,12 +55,6 @@
             <optional>true</optional>
         </dependency>
 
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Alibaba Sentinel -->
         <dependency>
             <groupId>com.alibaba.csp</groupId>
