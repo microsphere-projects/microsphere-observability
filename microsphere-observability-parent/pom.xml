@@ -24,7 +24,7 @@
         <microsphere-i18n.version>0.2.19</microsphere-i18n.version>
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
-        <mybatis.version>3.5.11</mybatis.version>
+        <mybatis.version>3.5.19</mybatis.version>
     </properties>
 
     <dependencyManagement>
