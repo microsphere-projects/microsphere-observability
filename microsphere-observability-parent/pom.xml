@@ -23,7 +23,7 @@
         <microsphere-alibaba-sentinel.version>0.2.0</microsphere-alibaba-sentinel.version>
         <microsphere-i18n.version>0.2.19</microsphere-i18n.version>
         <!-- Third-party versions -->
-        <mybatis-starter.version>3.0.1</mybatis-starter.version>
+        <mybatis-starter.version>4.1.0</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
     </properties>
 
