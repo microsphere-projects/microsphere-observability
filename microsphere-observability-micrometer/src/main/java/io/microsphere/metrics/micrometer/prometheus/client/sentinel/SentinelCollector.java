@@ -26,13 +26,12 @@ import com.alibaba.csp.sentinel.slotchain.ProcessorSlotEntryCallback;
 import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
 import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot;
+import io.microsphere.annotation.Nonnull;
 import io.microsphere.logging.Logger;
-import io.microsphere.logging.LoggerFactory;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.prometheus.client.Collector;
 import io.prometheus.client.CollectorRegistry;
 
-import javax.annotation.Nonnull;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;

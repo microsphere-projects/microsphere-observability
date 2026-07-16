@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
-import org.springframework.context.event.EventListener;
+import org.springframework.context.ApplicationListener;
 
 import static io.microsphere.logging.LoggerFactory.getLogger;
 
@@ -16,17 +16,16 @@ import static io.microsphere.logging.LoggerFactory.getLogger;
  * @since 1.0.0
  */
 @ConditionalOnWebApplication
-public class WebServerLoggingAutoConfiguration {
+public class WebServerLoggingAutoConfiguration implements ApplicationListener<WebServerInitializedEvent> {
 
     private static final Logger logger = getLogger(WebServerLoggingAutoConfiguration.class);
 
-    @EventListener(WebServerInitializedEvent.class)
-    public void onWebServerInitializedEvent(WebServerInitializedEvent event) {
-        WebServer webServer = event.getWebServer();
-        WebServerApplicationContext context = event.getApplicationContext();
+    @Override
+    public void onApplicationEvent(WebServerInitializedEvent event) {
         if (logger.isTraceEnabled()) {
-            logger.trace("WebServer[class : '{}' , context : '{}'] port : {}", webServer.getClass().getName(),
-                    context.getId(), webServer.getPort());
+            WebServer webServer = event.getWebServer();
+            WebServerApplicationContext context = event.getApplicationContext();
+            logger.trace("WebServer['{}' , context : '{}'] port : {}", webServer, context.getId(), webServer.getPort());
         }
     }
 }

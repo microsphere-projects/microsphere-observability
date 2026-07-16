@@ -24,8 +24,8 @@ import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.logging.LoggingEventListener;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.microsphere.annotation.ConfigurationProperty;
+import io.microsphere.annotation.Nullable;
 
-import javax.annotation.Nullable;
 import java.sql.SQLException;
 
 import static io.micrometer.core.instrument.Counter.builder;
