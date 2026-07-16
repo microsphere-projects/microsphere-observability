@@ -26,11 +26,6 @@ jobs:
         maven-profile-spring-cloud: [ 'spring-cloud-2022' , 'spring-cloud-2023' , 'spring-cloud-2024' ,
                                       'spring-cloud-2025' ]
     steps:
-      - name: Docker Setup Compose
-        uses: docker/setup-compose-action@v1.2.0
-        with:
-          version: latest
-
       - name: Checkout Source
         uses: actions/checkout@v5
 
@@ -40,9 +35,6 @@ jobs:
           distribution: 'temurin'
           java-version: ${{ matrix.java }}
           cache: maven
-
-      - name: Run Docker Compose
-        run: docker compose -f "docker/test-services.yml" up -d
 
       - name: Build with Maven
         run: mvn
