@@ -18,14 +18,15 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.micrometer.core.instrument.Meter;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Paths;
 import java.util.List;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 /**
  * {@link CGroupMemoryMetrics} Test
@@ -33,17 +34,17 @@ import static org.junit.Assert.assertTrue;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-public class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
+class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
 
-    @BeforeClass
-    public static void prepare() throws Throwable {
+    @BeforeAll
+    static void prepare() throws Throwable {
         ClassLoader classLoader = CGroupMemoryMetricsTest.class.getClassLoader();
         String testDir = Paths.get(classLoader.getResource("test-data/").toURI()).toAbsolutePath().toString();
         System.setProperty("cgroup.memory.dir", testDir);
     }
 
     @Test
-    public void test() throws Throwable {
+    void test() throws Throwable {
         assertFalse(registry.getMeters().isEmpty());
 
         assertMeterPresent("cgroup.memory.usage_in_bytes");

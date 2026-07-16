@@ -17,8 +17,8 @@
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.nio.file.FileSystems;
@@ -31,7 +31,7 @@ import java.nio.file.WatchService;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics.STATS_FILE_PATH_PROPERTY_NAME;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * {@link NetworkStatisticsMetrics} Test
@@ -39,9 +39,9 @@ import static org.junit.Assert.assertFalse;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-public class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkStatisticsMetrics> {
+class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkStatisticsMetrics> {
 
-    @BeforeClass
+    @BeforeAll
     public static void prepare() throws Throwable {
         ClassLoader classLoader = NetworkStatisticsMetricsTest.class.getClassLoader();
         String testFile = Paths.get(classLoader.getResource("test-data/network.stats").toURI()).toAbsolutePath().toString();

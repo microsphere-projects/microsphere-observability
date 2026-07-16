@@ -20,8 +20,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.MeterBinder;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.logging.Logger;
-import io.microsphere.logging.LoggerFactory;
-import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -60,8 +59,8 @@ public abstract class AbstractMetricsTest<T extends MeterBinder> {
         return null;
     }
 
-    @Before
-    public void bindTo() {
+    @BeforeEach
+    protected void bindTo() {
         metrics.bindTo(registry);
         logger.info("The Metrics[type:'{}'] bind to the registry[type:'{}']", metrics.getClass().getName(), registry.getClass().getName());
     }

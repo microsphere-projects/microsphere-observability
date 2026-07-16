@@ -18,10 +18,11 @@ package io.microsphere.metrics.micrometer.instrument.binder.jdbc.p6spy;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 /**
  * {@link MicrometerJdbcEventListener} Test
@@ -30,18 +31,18 @@ import static org.junit.Assert.assertEquals;
  * @see MicrometerJdbcEventListener
  * @since 1.0.0
  */
-public class MicrometerJdbcEventListenerTest {
+class MicrometerJdbcEventListenerTest {
 
     private MicrometerJdbcEventListener listener;
 
-    @Before
-    public void init() {
+    @BeforeEach
+    void init() {
         MeterRegistry registry = new SimpleMeterRegistry();
         listener = new MicrometerJdbcEventListener(registry);
     }
 
     @Test
-    public void testResolveStatementType() {
+    void testResolveStatementType() {
         String type = listener.resolveStatementType("SELECT * FROM users;");
         assertEquals("SELECT", type);
 
@@ -56,7 +57,7 @@ public class MicrometerJdbcEventListenerTest {
     }
 
     @Test
-    public void testAddMetrics() {
+    void testAddMetrics() {
         String sql = "SELECT * FROM users;";
         listener.addMetrics(sql, 1000000000, 0, null);
     }

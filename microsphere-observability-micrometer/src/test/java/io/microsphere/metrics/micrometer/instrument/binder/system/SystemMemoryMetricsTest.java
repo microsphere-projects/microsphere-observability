@@ -17,9 +17,9 @@
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * {@link SystemMemoryMetrics} Test
@@ -27,7 +27,7 @@ import static org.junit.Assert.assertFalse;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-public class SystemMemoryMetricsTest extends AbstractMetricsTest<SystemMemoryMetrics> {
+class SystemMemoryMetricsTest extends AbstractMetricsTest<SystemMemoryMetrics> {
 
     @Test
     public void test() {
