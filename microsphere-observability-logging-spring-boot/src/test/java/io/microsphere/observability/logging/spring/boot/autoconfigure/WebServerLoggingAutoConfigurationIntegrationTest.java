@@ -24,17 +24,19 @@ import org.springframework.boot.test.context.SpringBootTest;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
- * {@link WebServerLoggingAutoConfiguration} Test
+ * {@link WebServerLoggingAutoConfiguration} Integration Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-@SpringBootTest(classes = WebServerLoggingAutoConfigurationTest.class,
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(
+        classes = {
+                WebServerLoggingAutoConfigurationIntegrationTest.class
+        },
         properties = "spring.main.web-application-type=reactive"
 )
 @EnableAutoConfiguration
-public class WebServerLoggingAutoConfigurationTest {
+public class WebServerLoggingAutoConfigurationIntegrationTest {
 
     @Autowired
     private WebServerLoggingAutoConfiguration webServerLoggingAutoConfiguration;

@@ -16,31 +16,32 @@
  */
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
+import io.microsphere.observability.logging.spring.boot.autoconfigure.ApplicationLoggingAutoConfiguration.LoggingUncaughtExceptionHandler;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.reactive.server.WebTestClient;
+
+import static java.lang.Thread.getDefaultUncaughtExceptionHandler;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
- * {@link WebMvcLoggingAutoConfiguration} Test
+ * {@link ApplicationLoggingAutoConfiguration} Integration Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
-@SpringBootTest(classes = WebMvcLoggingAutoConfigurationTest.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        classes = {
+                ApplicationLoggingAutoConfigurationIntegrationTest.class
+        },
+        webEnvironment = NONE)
 @EnableAutoConfiguration
-public class WebMvcLoggingAutoConfigurationTest {
-
-    @Autowired
-    private WebMvcLoggingAutoConfiguration webMvcLoggingAutoConfiguration;
+public class ApplicationLoggingAutoConfigurationIntegrationTest {
 
     @Test
-    void test(@Autowired WebTestClient webClient) {
-        webClient.get()
-                .uri("/")
-                .exchange()
-                .expectStatus().isNotFound();
+    public void test() {
+        Thread.UncaughtExceptionHandler uncaughtExceptionHandler = getDefaultUncaughtExceptionHandler();
+        assertTrue(uncaughtExceptionHandler instanceof LoggingUncaughtExceptionHandler);
     }
-
 }
