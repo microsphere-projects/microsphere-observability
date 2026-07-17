@@ -125,6 +125,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Logback -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Kafka -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
@@ -165,13 +172,6 @@
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-boot-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <!-- Logback -->
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <optional>true</optional>
         </dependency>
 
     </dependencies>
