@@ -11,12 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-micrometer</artifactId>
+    <artifactId>microsphere-observability-prometheus-metrics</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Micrometer</name>
-    <description>Microsphere Observability Micrometer</description>
+    <name>Microsphere :: Observability :: Prometheus Metrics</name>
+    <description>Microsphere Observability Prometheus Metrics</description>
 
     <dependencies>
 
@@ -41,17 +41,18 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Micrometer -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Prometheus -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-registry-prometheus</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Prometheus Simpleclient(Legacy) -->
+        <!-- https://prometheus.github.io/client_java/migration/simpleclient/ -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>simpleclient</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -65,20 +66,6 @@
         <dependency>
             <groupId>com.alibaba.csp</groupId>
             <artifactId>sentinel-transport-simple-http</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- P6spy -->
-        <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Java Common Annotations -->
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
             <optional>true</optional>
         </dependency>
 

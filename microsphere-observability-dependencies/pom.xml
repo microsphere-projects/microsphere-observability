@@ -29,19 +29,31 @@
 
             <dependency>
                 <groupId>io.github.microsphere-projects</groupId>
-                <artifactId>microsphere-observability-logging-spring-boot</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>io.github.microsphere-projects</groupId>
                 <artifactId>microsphere-observability-micrometer</artifactId>
                 <version>${revision}</version>
             </dependency>
 
             <dependency>
                 <groupId>io.github.microsphere-projects</groupId>
-                <artifactId>microsphere-observability-micrometer-spring-boot</artifactId>
+                <artifactId>microsphere-observability-prometheus-metrics</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-observability-logging-spring-boot</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-observability-metrics-spring-boot</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-observability-spring-boot</artifactId>
                 <version>${revision}</version>
             </dependency>
 
