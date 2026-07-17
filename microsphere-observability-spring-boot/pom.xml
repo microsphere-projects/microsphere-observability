@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-micrometer-spring-boot</artifactId>
+            <artifactId>microsphere-observability-metrics-spring-boot</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -73,11 +73,18 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- SLF4j -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Log4j 1.x -->
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Log4j 2.x -->
@@ -120,20 +127,13 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- SLF4j -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
-        
+
         <!-- Logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
