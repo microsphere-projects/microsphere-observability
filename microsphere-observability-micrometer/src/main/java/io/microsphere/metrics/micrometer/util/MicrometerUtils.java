@@ -21,7 +21,7 @@ import io.microsphere.util.BaseUtils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
-import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
+import static io.microsphere.concurrent.ExecutorUtils.shutdownOnExit;
 import static java.lang.Integer.getInteger;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
@@ -40,7 +40,7 @@ public abstract class MicrometerUtils extends BaseUtils {
     private static final ScheduledExecutorService scheduledExecutor = newScheduledThreadPool(SCHEDULED_EXECUTOR_SIZE, new NamedThreadFactory("Micrometer-Async-"));
 
     static {
-        addShutdownHookCallback(scheduledExecutor::shutdownNow);
+        shutdownOnExit(scheduledExecutor);
     }
 
     /**

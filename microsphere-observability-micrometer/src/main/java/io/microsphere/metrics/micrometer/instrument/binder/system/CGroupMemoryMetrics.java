@@ -3,9 +3,6 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
-import io.micrometer.core.lang.NonNullApi;
-import io.micrometer.core.lang.NonNullFields;
-import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.nio.file.Files;
@@ -17,12 +14,12 @@ import java.util.function.Supplier;
 
 import static io.micrometer.core.instrument.Gauge.builder;
 import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
-import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
 import static io.microsphere.collection.ListUtils.first;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.PREFIX;
 import static io.microsphere.util.StringUtils.isNumeric;
 import static java.lang.Long.parseLong;
 import static java.lang.Long.valueOf;
-import static java.lang.System.getProperty;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.isReadable;
 import static java.nio.file.Paths.get;
@@ -35,32 +32,11 @@ import static java.util.Collections.emptyList;
  * @see <a href="https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt">https://www.kernel.org/doc/Documentation/cgroup-v1/memory.txt</a>
  * @see JvmMemoryMetrics
  */
-@NonNullApi
-@NonNullFields
 public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
-    private static final String METRIC_PREFIX = "cgroup.";
+    private static final String METRIC_PREFIX = PREFIX;
 
-    /**
-     * The Default Value of CGroup Memory Directory
-     */
-    public static final String DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE = "/sys/fs/cgroup/memory/";
-
-    /**
-     * The System Property Name of CGroup Memory Directory, default value : "/sys/fs/cgroup/memory/"
-     */
-    @ConfigurationProperty(
-            defaultValue = DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE,
-            source = SYSTEM_PROPERTIES_SOURCE
-    )
-    public static final String CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_NAME = "cgroup.memory.dir";
-
-    /**
-     * The CGroup Memory Directory
-     */
-    public static final String CGROUP_MEMORY_DIR = getProperty(CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_NAME, DEFAULT_CGROUP_MEMORY_DIR_SYSTEM_PROPERTY_VALUE);
-
-    private static final Path ROOT_DIRECTORY_PATH = get(CGROUP_MEMORY_DIR);
+    private static final Path ROOT_DIRECTORY_PATH = get(CGROUP_DIRECTORY).resolve("memory");
 
     private static final Path MEMORY_STAT_FILE_PATH = ROOT_DIRECTORY_PATH.resolve("memory.stat");
 

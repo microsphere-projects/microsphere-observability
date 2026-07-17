@@ -83,6 +83,11 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
      */
     public static final String VERSION_TAG_KEY = METRIC_PREFIX + "version";
 
+    /**
+     * The interval time of metrics collection in milliseconds.
+     */
+    private final long interval;
+
     private MeterRegistry registry;
 
     private ScheduledExecutorService scheduler;
@@ -92,12 +97,13 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
      */
     private final ConcurrentMap<String, ClusterNode> processedResourceClusterNodes = newConcurrentHashMap(256);
 
-    public SentinelMetrics() {
-        this(emptyList());
+    public SentinelMetrics(long interval) {
+        this(interval, emptyList());
     }
 
-    public SentinelMetrics(Iterable<Tag> tags) {
+    public SentinelMetrics(long interval, Iterable<Tag> tags) {
         super(concat(tags, VERSION_TAG_KEY, SENTINEL_VERSION));
+        this.interval = interval;
     }
 
     @Override
