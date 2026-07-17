@@ -32,12 +32,10 @@ import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import io.prometheus.client.CollectorRegistry;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
@@ -50,9 +48,18 @@ import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegi
 import static com.alibaba.csp.sentinel.util.PidUtil.getPid;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
 import static io.microsphere.collection.CollectionUtils.isEmpty;
+import static io.microsphere.collection.ListUtils.newArrayList;
+import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.CONTEXT_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.ORIGIN_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.PREFIX;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.RESOURCE_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.TYPE_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.constants.MetricsConstants.VERSION_LABEL_NAME;
 import static io.microsphere.util.ClassUtils.getSimpleName;
 import static io.prometheus.client.Collector.Type.GAUGE;
+import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
@@ -72,36 +79,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     private static final Logger logger = getLogger(SentinelCollector.class);
 
     /**
-     * The prefix : "sentinel_"
-     */
-    public static final String PREFIX = "sentinel_";
-
-    /**
-     * The Label name of the metrics origin : "origin"
-     */
-    public static final String ORIGIN_LABEL_NAME = "origin";
-
-    /**
-     * The Label name for Sentinel Resource
-     */
-    public static final String RESOURCE_LABEL_NAME = PREFIX + "resource";
-
-    /**
-     * The Label name for Sentinel Context
-     */
-    public static final String CONTEXT_LABEL_NAME = PREFIX + "context";
-
-    /**
-     * The Label name for Sentinel Resource Type
-     */
-    public static final String TYPE_LABEL_NAME = PREFIX + "resource_type";
-
-    /**
-     * The Label name for Sentinel Version
-     */
-    public static final String VERSION_LABEL_NAME = PREFIX + "version";
-
-    /**
      * The interval time of metrics collection in milliseconds.
      */
     private final long interval;
@@ -110,7 +87,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private final List<String> commonLabelValues;
 
-    private final ConcurrentMap<String, String> resourceToContextMapping = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, String> resourceToContextMapping = newConcurrentHashMap(256);
 
     private volatile MetricSearcher metricSearcher;
 
@@ -168,14 +145,14 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     }
 
     private List<String> initCommonLabelNames(Map<String, String> commonLabels) {
-        List<String> labelNames = new ArrayList<>(commonLabels.size() + 2);
+        List<String> labelNames = newArrayList(commonLabels.size() + 2);
         labelNames.add(ORIGIN_LABEL_NAME);
         labelNames.addAll(commonLabels.keySet());
         return labelNames;
     }
 
     private List<String> initCommonLabelValues(Map<String, String> commonLabels) {
-        List<String> labelValues = new ArrayList<>(commonLabels.size() + 2);
+        List<String> labelValues = newArrayList(commonLabels.size() + 2);
         labelValues.add(getSimpleName(this.getClass()));
         labelValues.addAll(commonLabels.values());
         return labelValues;
@@ -208,7 +185,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
             return emptyList();
         }
         List<String> labelNames = buildLabelNames();
-        List<MetricFamilySamples> metricFamilySamplesList = new ArrayList<>(resourceMetricsNodesMap.size());
+        List<MetricFamilySamples> metricFamilySamplesList = newArrayList(resourceMetricsNodesMap.size());
         for (Map.Entry<String, List<MetricNode>> entry : resourceMetricsNodesMap.entrySet()) {
             List<MetricNode> metricNodes = entry.getValue();
             int size = metricNodes.size();
@@ -216,7 +193,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
                 String context = entry.getKey();
                 String metric = context;
 
-                List<Sample> samples = new ArrayList<>(size * 7);
+                List<Sample> samples = newArrayList(size * 7);
                 for (int i = 0; i < size; i++) {
                     MetricNode metricNode = metricNodes.get(i);
                     samples.add(createSample("rt", context, labelNames, metricNode, MetricNode::getRt));
@@ -236,7 +213,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private List<String> buildLabelNames() {
         List<String> commonLabelNames = this.commonLabelNames;
-        List<String> labelNames = new ArrayList<>(commonLabelNames.size() + 4);
+        List<String> labelNames = newArrayList(commonLabelNames.size() + 4);
         labelNames.addAll(commonLabelNames);
         labelNames.add(RESOURCE_LABEL_NAME);
         labelNames.add(CONTEXT_LABEL_NAME);
@@ -247,7 +224,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private List<String> buildLabelValues(String context, MetricNode metricNode) {
         List<String> commonLabelValues = this.commonLabelValues;
-        List<String> labelValues = new ArrayList<>(commonLabelValues.size() + 4);
+        List<String> labelValues = newArrayList(commonLabelValues.size() + 4);
         String resource = metricNode.getResource();
         String resourceType = getResourceTypeAsString(metricNode.getClassification());
         labelValues.addAll(commonLabelValues);
@@ -260,7 +237,7 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private Map<String, List<MetricNode>> getContextMetricNodesMap() {
         MetricSearcher metricSearcher = this.getMetricSearcher();
-        long endTimeMs = System.currentTimeMillis();
+        long endTimeMs = currentTimeMillis();
         long beginTimeMs = endTimeMs - interval;
         List<MetricNode> metricNodes = null;
         try {

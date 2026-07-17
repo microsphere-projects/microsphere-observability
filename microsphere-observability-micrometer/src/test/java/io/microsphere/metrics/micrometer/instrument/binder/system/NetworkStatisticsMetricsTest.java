@@ -44,7 +44,7 @@ class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkStatistics
     @BeforeAll
     public static void prepare() throws Throwable {
         ClassLoader classLoader = NetworkStatisticsMetricsTest.class.getClassLoader();
-        String testFile = Paths.get(classLoader.getResource("test-data/network.stats").toURI()).toAbsolutePath().toString();
+        String testFile = Paths.get(classLoader.getResource("test-data/memory/network.stats").toURI()).toAbsolutePath().toString();
         System.setProperty(STATS_FILE_PATH_PROPERTY_NAME, testFile);
     }
 

@@ -6,8 +6,6 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.BaseUnits;
 import io.micrometer.core.instrument.util.NamedThreadFactory;
-import io.micrometer.core.lang.NonNullApi;
-import io.micrometer.core.lang.NonNullFields;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.io.IOException;
@@ -35,8 +33,6 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  */
-@NonNullApi
-@NonNullFields
 public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
     public static final String STATS_FILE_PATH_PROPERTY_NAME = "microsphere.metrics.network.stats.file";

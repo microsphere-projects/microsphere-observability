@@ -46,12 +46,12 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ConditionalOnMicrometerEnabled {
 
     /**
-     * The property name prefix for Micrometer : "microsphere.micrometer."
+     * The property name prefix for Micrometer : "microsphere.metrics.micrometer."
      */
-    String PREFIX = "microsphere.micrometer.";
+    String PREFIX = "microsphere.metrics.micrometer.";
 
     /**
-     * The property name for enabling Micrometer features : "microsphere.micrometer.enabled"
+     * The property name for enabling Micrometer features : "microsphere.metrics.micrometer.enabled"
      */
     @ConfigurationProperty(
             type = boolean.class,

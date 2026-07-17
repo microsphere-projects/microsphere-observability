@@ -1,0 +1,41 @@
+## Spring Boot Actuator Metrics
+
+microsphere:
+  ## Microsphere Metrics
+  metrics:
+    ### Metrics Tags
+    tags:
+      application: ${spring.application.name:default}
+      profiles: ${spring.profiles.active:default}
+
+    ### Microsphere Metrics Micrometer
+    micrometer:
+      enabled: true
+
+      ### Microsphere Metrics Micrometer - System
+      system:
+        enabled: true
+
+      ### Microsphere Metrics Micrometer - CGroup
+      cgroup:
+        enabled: true
+
+      ### Microsphere Metrics Micrometer - JVM
+      jvm:
+        enabled: true
+
+      ### Microsphere Metrics Micrometer - Sentinel
+      sentinel:
+        enabled: true
+
+      ### Microsphere Metrics Micrometer - Prometheus
+      prometheus:
+        enabled: true
+
+      ### Microsphere Metrics Micrometer - Kafka
+      kafka:
+        enabled: true
+
+    ### Microsphere Metrics Collection Internal
+    collection:
+      interval: ${management.metrics.export.prometheus.pushgateway.push-rate:60000}

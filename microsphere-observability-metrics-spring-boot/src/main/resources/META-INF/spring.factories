@@ -1,2 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.MicrometerAutoConfiguration
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration,\
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.JvmMetricsAutoConfiguration,\
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration,\
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration,\
+io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration
