@@ -8,6 +8,9 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup.CGROUP_DIRECTORY_PLACEHOLDER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
@@ -21,6 +24,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 @Documented
-@ConditionalOnResource(resources = "file:///sys/fs/cgroup/")
+@ConditionalOnResource(resources = CGROUP_DIRECTORY_PLACEHOLDER)
 public @interface ConditionalOnCGroup {
+
+    /**
+     * The Placeholder of CGroup Directory System Property
+     */
+    String CGROUP_DIRECTORY_PLACEHOLDER = "${" + CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME + ":file://" + DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE + "}";
 }

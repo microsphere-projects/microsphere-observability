@@ -21,9 +21,9 @@ import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
 import java.util.List;
 
+import static java.nio.file.Paths.get;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,8 +39,8 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
     @BeforeAll
     static void prepare() throws Throwable {
         ClassLoader classLoader = CGroupMemoryMetricsTest.class.getClassLoader();
-        String testDir = Paths.get(classLoader.getResource("test-data/").toURI()).toAbsolutePath().toString();
-        System.setProperty("cgroup.memory.dir", testDir);
+        String testDir = get(classLoader.getResource("test-data/").toURI()).toAbsolutePath().toString();
+        System.setProperty("cgroup.dir", testDir);
     }
 
     @Test
