@@ -25,10 +25,28 @@
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
+        <prometheus.version>1.8.0</prometheus.version>
+        <opentelemetry-instrumentation.version>2.29.0</opentelemetry-instrumentation.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- OpenTelemetry Instrumentation BOM -->
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-bom</artifactId>
+                <version>${opentelemetry-instrumentation.version}</version>
+            </dependency>
+
+            <!-- Prometheus Metrics BOM -->
+            <dependency>
+                <groupId>io.prometheus</groupId>
+                <artifactId>prometheus-metrics-bom</artifactId>
+                <version>${prometheus.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
             <!-- Microsphere Spring Cloud Dependencies -->
             <dependency>
