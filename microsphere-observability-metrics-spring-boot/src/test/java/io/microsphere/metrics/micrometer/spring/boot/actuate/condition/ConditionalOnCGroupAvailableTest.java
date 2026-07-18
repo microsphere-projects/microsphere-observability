@@ -27,7 +27,7 @@ import java.io.File;
 
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.CGroupUtils.getCGroupDirectoryPath;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup.CGROUP_DIRECTORY_PLACEHOLDER;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_PLACEHOLDER;
 import static io.microsphere.spring.beans.BeanUtils.isBeanPresent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -35,13 +35,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
- * {@link ConditionalOnCGroup} Test
+ * {@link ConditionalOnCGroupAvailable} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see ConditionalOnCGroup
+ * @see ConditionalOnCGroupAvailable
  * @since 1.0.0
  */
-public class ConditionalOnCGroupTest {
+public class ConditionalOnCGroupAvailableTest {
 
     @Test
     void test() {
@@ -60,7 +60,7 @@ public class ConditionalOnCGroupTest {
             },
             webEnvironment = NONE
     )
-    @ConditionalOnCGroup
+    @ConditionalOnCGroupAvailable
     static class DefaultTest {
 
         @Autowired
@@ -83,7 +83,7 @@ public class ConditionalOnCGroupTest {
                     "cgroup.dir=file://${user.dir}"
             }
     )
-    @ConditionalOnCGroup
+    @ConditionalOnCGroupAvailable
     static class SpecifiedTest {
 
         @Autowired
@@ -104,7 +104,7 @@ public class ConditionalOnCGroupTest {
                     "cgroup.dir=file://not-found"
             }
     )
-    @ConditionalOnCGroup
+    @ConditionalOnCGroupAvailable
     static class DisabledTest {
 
         @Autowired
