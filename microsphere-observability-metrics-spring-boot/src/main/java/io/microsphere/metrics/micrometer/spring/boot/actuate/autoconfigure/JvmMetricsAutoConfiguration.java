@@ -27,7 +27,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
@@ -39,13 +39,13 @@ import java.util.function.Function;
 
 import static io.micrometer.core.instrument.Tags.of;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
-import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.JvmMetricsAutoConfiguration.JVM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.util.ArrayUtils.EMPTY_STRING_ARRAY;
+import static io.microsphere.util.ArrayUtils.arrayToString;
 import static java.util.concurrent.ForkJoinPool.commonPool;
 
 /**
@@ -123,20 +123,20 @@ public class JvmMetricsAutoConfiguration {
 
     @EventListener(ApplicationStartedEvent.class)
     public void registerExecutorServiceMetrics(ApplicationStartedEvent event) {
-        ApplicationContext context = event.getApplicationContext();
+        ConfigurableApplicationContext context = event.getApplicationContext();
         MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
         registerExecutorServiceMetrics(context, ConcurrentTaskExecutor.class, ConcurrentTaskExecutor::getConcurrentExecutor, meterRegistry);
         registerExecutorServiceMetrics(context, ExecutorService.class, e -> e, meterRegistry);
         registerExecutorServiceMetrics(commonPool(), "ForkJoinPool-commonPool", meterRegistry);
     }
 
-    private <T> void registerExecutorServiceMetrics(ApplicationContext applicationContext, Class<T> beanType,
+    private <T> void registerExecutorServiceMetrics(ConfigurableApplicationContext context, Class<T> beanType,
                                                     Function<T, Executor> executorConverter, MeterRegistry meterRegistry) {
-        Map<String, T> beansMap = applicationContext.getBeansOfType(beanType);
+        Map<String, T> beansMap = context.getBeansOfType(beanType);
         if (beansMap.isEmpty()) {
             if (logger.isTraceEnabled()) {
                 logger.trace("No Bean can't be found in the ApplicationContext[id: '{}'] by type : '{}'",
-                        applicationContext.getId(), beanType.getName());
+                        context.getId(), beanType.getName());
             }
             return;
         }
@@ -162,7 +162,7 @@ public class JvmMetricsAutoConfiguration {
         String prefix = executorServiceMetricsPrefix;
         if (logger.isTraceEnabled()) {
             logger.trace("ExecutorService[name: '{}', type: '{}'] {} -> ExecutorServiceMetrics[prefix: '{}', tags: {}]",
-                    name, executorService.getClass().getName(), prefix, ofList(executorServiceMetricsTags));
+                    name, executorService.getClass().getName(), prefix, arrayToString(executorServiceMetricsTags));
         }
         return new ExecutorServiceMetrics(executorService, name, prefix, of(executorServiceMetricsTags));
     }
