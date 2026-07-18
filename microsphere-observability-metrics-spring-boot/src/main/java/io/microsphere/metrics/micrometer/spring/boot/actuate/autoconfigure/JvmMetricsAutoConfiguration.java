@@ -20,11 +20,11 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
 import io.microsphere.logging.Logger;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationContext;
@@ -40,10 +40,12 @@ import java.util.function.Function;
 import static io.micrometer.core.instrument.Tags.of;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.collection.Lists.ofList;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.JvmMetricsAutoConfiguration.ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.JvmMetricsAutoConfiguration.JVM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
+import static io.microsphere.util.ArrayUtils.EMPTY_STRING_ARRAY;
 import static java.util.concurrent.ForkJoinPool.commonPool;
 
 /**
@@ -54,8 +56,11 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = JVM_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnMicrometerEnabled
+@ConditionalOnClass(name = {
+        "io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics"                               // Micrometer API
+})
 @AutoConfigureAfter(name = {
         "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration",           // Spring Boot API [2.0, 4.0)
         "org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration"     // Spring Boot API [4.0, )
@@ -65,6 +70,16 @@ public class JvmMetricsAutoConfiguration {
     private static final Logger logger = getLogger(JvmMetricsAutoConfiguration.class);
 
     /**
+     * The Property Name prefix of JVM : "microsphere.metrics.micrometer.jvm."
+     */
+    public static final String JVM_METRICS_PROPERTY_NAME_PREFIX = PREFIX + "jvm" + DOT;
+
+    /**
+     * The Property Name prefix of {@link ExecutorService} Metrics : "microsphere.metrics.micrometer.jvm.executor-service."
+     */
+    public static final String EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX = JVM_METRICS_PROPERTY_NAME_PREFIX + "executor-service" + DOT;
+
+    /**
      * The Property Name of enabling JVM metrics : "microsphere.metrics.micrometer.jvm.enabled"
      */
     @ConfigurationProperty(
@@ -72,13 +87,29 @@ public class JvmMetricsAutoConfiguration {
             defaultValue = "true",
             source = APPLICATION_SOURCE
     )
-    public static final String ENABLED_PROPERTY_NAME = PREFIX + "jvm" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
+    public static final String JVM_METRICS_ENABLED_PROPERTY_NAME = JVM_METRICS_PROPERTY_NAME_PREFIX + ENABLED_PROPERTY_NAME;
 
-    @Value("${microsphere.executor-service.metrics.prefix:}")
+    /**
+     * The Property Name of {@link ExecutorService} Metrics prefix : "microsphere.metrics.micrometer.jvm.executor-service.prefix"
+     */
+    @ConfigurationProperty(
+            source = APPLICATION_SOURCE
+    )
+    public static final String EXECUTOR_SERVICE_METRICS_PREFIX_PROPERTY_NAME = EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX + "prefix";
+
+    /**
+     * The Property Name of {@link ExecutorService} Metrics tags : "microsphere.metrics.micrometer.jvm.executor-service.tags"
+     */
+    @ConfigurationProperty(
+            source = APPLICATION_SOURCE
+    )
+    public static final String EXECUTOR_SERVICE_METRICS_TAGS_PROPERTY_NAME = EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX + "tags";
+
+    @Value("${" + EXECUTOR_SERVICE_METRICS_PREFIX_PROPERTY_NAME + ":}")
     private String executorServiceMetricsPrefix;
 
-    @Value("${microsphere.executor-service.metrics.tags:}")
-    private String[] executorServiceMetricsTags = new String[0];
+    @Value("${" + EXECUTOR_SERVICE_METRICS_TAGS_PROPERTY_NAME + ":}")
+    private String[] executorServiceMetricsTags = EMPTY_STRING_ARRAY;
 
     @EventListener(ApplicationStartedEvent.class)
     public void registerExecutorServiceMetrics(ApplicationStartedEvent event) {
