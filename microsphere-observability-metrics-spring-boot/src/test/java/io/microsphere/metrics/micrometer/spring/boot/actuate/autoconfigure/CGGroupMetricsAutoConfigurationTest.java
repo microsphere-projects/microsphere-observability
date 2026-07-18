@@ -21,10 +21,13 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Set;
 
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration.CGROUP_METRICS_ENABLED_PROPERTY_NAME;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
@@ -44,6 +47,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         }
 )
 class CGGroupMetricsAutoConfigurationTest extends AutoConfigurationTest<CGGroupMetricsAutoConfiguration> {
+
+    @Test
+    void testConstants() {
+        assertEquals("microsphere.metrics.micrometer.cgroup.enabled", CGROUP_METRICS_ENABLED_PROPERTY_NAME);
+    }
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {

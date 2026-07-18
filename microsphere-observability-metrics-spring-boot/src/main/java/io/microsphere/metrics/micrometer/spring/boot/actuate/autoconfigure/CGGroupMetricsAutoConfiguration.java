@@ -18,7 +18,6 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
@@ -29,8 +28,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration.ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration.CGROUP_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 
 /**
@@ -46,7 +46,7 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
 @ConditionalOnClass(name = {
         "io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics"  // Microsphere Observability Micrometer API
 })
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = CGROUP_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnMicrometerEnabled
 public class CGGroupMetricsAutoConfiguration {
 
@@ -58,7 +58,7 @@ public class CGGroupMetricsAutoConfiguration {
             defaultValue = "true",
             source = APPLICATION_SOURCE
     )
-    public static final String ENABLED_PROPERTY_NAME = PREFIX + "cgroup" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
+    public static final String CGROUP_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "cgroup" + DOT + ENABLED_PROPERTY_NAME;
 
     @Bean
     @ConditionalOnMissingBean
