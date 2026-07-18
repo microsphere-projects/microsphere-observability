@@ -28,7 +28,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 public @interface ConditionalOnCGroup {
 
     /**
-     * The Placeholder of CGroup Directory System Property
+     * The Placeholder of CGroup Directory System Property : "${cgroup.dir:file:///sys/fs/cgroup/}"
      */
     String CGROUP_DIRECTORY_PLACEHOLDER = "${" + CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME + ":file://" + DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE + "}";
 }

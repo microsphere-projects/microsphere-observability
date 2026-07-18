@@ -15,8 +15,8 @@
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Micrometer Spring Boot</name>
-    <description>Microsphere Observability Micrometer Spring Boot</description>
+    <name>Microsphere :: Observability :: Metrics Spring Boot</name>
+    <description>Microsphere Observability Metrics Spring Boot</description>
 
     <dependencies>
 
@@ -45,18 +45,28 @@
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-boot-core</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Spring Boot Actuator -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-boot-actuator</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Alibaba Sentinel Spring Boot -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-alibaba-sentinel-spring-boot</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Microsphere Redis Spring Boot -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-redis-spring-boot</artifactId>
+            <optional>true</optional>
         </dependency>
 
         <!-- Spring Boot Dependencies -->
@@ -70,6 +80,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.logging.log4j</groupId>
+                    <artifactId>log4j-to-slf4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -93,6 +109,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Spring Data Redis -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
             <optional>true</optional>
         </dependency>
 
