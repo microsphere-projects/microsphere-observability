@@ -18,10 +18,14 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 
+import io.micrometer.core.instrument.MeterRegistry;
+import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Set;
+
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
  * {@link CGGroupMetricsAutoConfiguration} Test
@@ -33,22 +37,29 @@ import java.util.Set;
 @SpringBootTest(
         classes = {
                 CGGroupMetricsAutoConfigurationTest.class
+        },
+        webEnvironment = NONE,
+        properties = {
+                "cgroup.dir=file://${user.dir}"
         }
 )
 class CGGroupMetricsAutoConfigurationTest extends AutoConfigurationTest<CGGroupMetricsAutoConfiguration> {
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
-
+        autoConfiguredClasses.add(CGroupMemoryMetrics.class);
     }
 
     @Override
     protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
-
+        globalDisabledPropertyValues.add("microsphere.metrics.micrometer.cgroup.enabled=false");
+        globalDisabledPropertyValues.add("microsphere.metrics.micrometer.enabled=false");
+        globalDisabledPropertyValues.add("cgroup.dir=file://not-found");
     }
 
     @Override
     protected void configureGlobalMissingClasses(Set<Class<?>> globalMissingClasses) {
-
+        globalMissingClasses.add(CGroupMemoryMetrics.class);
+        globalMissingClasses.add(MeterRegistry.class);
     }
 }
