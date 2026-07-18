@@ -15,14 +15,12 @@ import static io.micrometer.core.instrument.Gauge.builder;
 import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
 import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.PREFIX;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.CGroupUtils.getCGroupDirectoryPath;
 import static io.microsphere.util.StringUtils.isNumeric;
 import static io.microsphere.util.StringUtils.split;
 import static java.lang.Long.parseLong;
 import static java.lang.Long.valueOf;
-import static java.lang.System.getProperty;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.isReadable;
 import static java.nio.file.Paths.get;
@@ -49,7 +47,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
     public CGroupMemoryMetrics(Iterable<Tag> tags) {
         super(tags);
-        String cgroupDirectory = getProperty(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME, DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE);
+        String cgroupDirectory = getCGroupDirectoryPath();
         this.memoryDirectoryPath = get(cgroupDirectory).resolve("memory");
         this.memoryStaFilePath = memoryDirectoryPath.resolve("memory.stat");
     }

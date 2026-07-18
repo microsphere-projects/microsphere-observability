@@ -15,29 +15,34 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.micrometer.instrument.binder.system.constants;
+package io.microsphere.metrics.micrometer.instrument.binder.system.util;
 
-
-import org.junit.jupiter.api.Test;
+import io.microsphere.annotation.Nonnull;
+import io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants;
 
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.PREFIX;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static java.lang.System.getProperty;
 
 /**
- * {@link CGroupConstants} Test
+ * The Utilities of CGroup
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see CGroupConstants
  * @since 1.0.0
  */
-class CGroupConstantsTest {
+public abstract class CGroupUtils {
 
-    @Test
-    void testConstants() {
-        assertEquals("cgroup.", PREFIX);
-        assertEquals("/sys/fs/cgroup/", DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE);
-        assertEquals("cgroup.dir", CGROUP_DIRECTORY_PATH_PROPERTY_NAME);
+    /**
+     * Get the CGroup Directory Path
+     *
+     * @return the CGroup Directory Path
+     */
+    @Nonnull
+    public static final String getCGroupDirectoryPath() {
+        return getProperty(CGROUP_DIRECTORY_PATH_PROPERTY_NAME, DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE);
+    }
+
+    private CGroupUtils() {
     }
 }
