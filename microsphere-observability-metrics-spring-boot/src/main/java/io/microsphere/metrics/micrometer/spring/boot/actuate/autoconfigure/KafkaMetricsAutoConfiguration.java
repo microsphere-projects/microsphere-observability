@@ -58,9 +58,10 @@ import static io.microsphere.reflect.FieldUtils.getFieldValue;
 @ConditionalOnProperty(name = KAFKA_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnMicrometerAvailable
 @ConditionalOnClass(name = {
-        "io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics",                                   // Micrometer API
+        "io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics",                                   // Micrometer Core API
         "org.apache.kafka.clients.KafkaClient",                                                            // Kafka Client API
-        "org.springframework.kafka.core.ProducerFactory"                                                   // Spring Kafka API
+        "org.springframework.kafka.core.ProducerFactory",                                                  // Spring Kafka API
+        "io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties"            // Microsphere Observability Logging Spring Boot API
 })
 @AutoConfigureAfter(name = {
         // Spring Boot Actuator API [2.0, 4.0)
