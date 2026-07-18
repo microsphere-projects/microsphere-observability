@@ -20,7 +20,6 @@ package io.microsphere.metrics.micrometer.instrument.binder.system.constants;
 import io.microsphere.annotation.ConfigurationProperty;
 
 import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
-import static java.lang.System.getProperty;
 
 /**
  * The Constants of CGroup
@@ -49,10 +48,5 @@ public interface CGroupConstants {
             source = SYSTEM_PROPERTIES_SOURCE
     )
     String CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME = PREFIX + "dir";
-
-    /**
-     * The CGroup Directory
-     */
-    String CGROUP_DIRECTORY = getProperty(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME, DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE);
 
 }
