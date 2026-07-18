@@ -25,10 +25,11 @@ import org.springframework.mock.env.MockEnvironment;
 
 import java.io.File;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup.CGROUP_DIRECTORY_PLACEHOLDER;
 import static io.microsphere.spring.beans.BeanUtils.isBeanPresent;
+import static java.lang.System.getProperty;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -68,7 +69,8 @@ public class ConditionalOnCGroupTest {
 
         @Test
         void test() {
-            File file = new File(CGROUP_DIRECTORY);
+            String cgroupDir = getProperty(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME, DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE);
+            File file = new File(cgroupDir);
             assertEquals(file.exists(), isBeanPresent(this.beanFactory, DefaultTest.class));
         }
     }

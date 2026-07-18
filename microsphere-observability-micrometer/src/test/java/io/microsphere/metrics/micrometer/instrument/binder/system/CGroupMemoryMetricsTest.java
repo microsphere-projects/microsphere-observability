@@ -18,11 +18,16 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.micrometer.core.instrument.Meter;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
+import static io.microsphere.util.ClassLoaderUtils.getDefaultClassLoader;
+import static java.lang.System.getProperties;
+import static java.lang.System.setProperty;
 import static java.nio.file.Paths.get;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,13 +43,18 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
 
     @BeforeAll
     static void prepare() throws Throwable {
-        ClassLoader classLoader = CGroupMemoryMetricsTest.class.getClassLoader();
+        ClassLoader classLoader = getDefaultClassLoader();
         String testDir = get(classLoader.getResource("test-data/").toURI()).toAbsolutePath().toString();
-        System.setProperty("cgroup.dir", testDir);
+        setProperty(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME, testDir);
+    }
+
+    @AfterAll
+    static void cleanup() {
+        getProperties().remove(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME);
     }
 
     @Test
-    void test() throws Throwable {
+    void test() {
         assertFalse(registry.getMeters().isEmpty());
 
         assertMeterPresent("cgroup.memory.usage_in_bytes");

@@ -22,10 +22,9 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.reflect.JavaType.from;
+import static io.microsphere.util.ClassUtils.newInstance;
 
 /**
  * Abstract Metrics Test
@@ -46,17 +45,11 @@ public abstract class AbstractMetricsTest<T extends MeterBinder> {
     }
 
     protected T createMetrics() {
-        Type type = getClass().getGenericSuperclass();
-        if (type instanceof ParameterizedType) {
-            ParameterizedType pType = (ParameterizedType) type;
-            Class<?> metricsType = (Class) pType.getActualTypeArguments()[0];
-            try {
-                return (T) metricsType.newInstance();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
+        Class<?> metricsType = from(getClass())
+                .as(AbstractMetricsTest.class)
+                .getGenericType(0)
+                .toClass();
+        return (T) newInstance(metricsType);
     }
 
     @BeforeEach
