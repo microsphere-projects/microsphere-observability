@@ -19,7 +19,7 @@ package io.microsphere.metrics.micrometer.instrument.binder.system.constants;
 
 import io.microsphere.annotation.ConfigurationProperty;
 
-import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
+import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 
 /**
  * The Constants of CGroup
@@ -42,10 +42,11 @@ public interface CGroupConstants {
 
     /**
      * The Property Name of CGroup Directory Path: "cgroup.dir"
+     * Please do not change the default value of this property, unless it's for testing purposes.
      */
     @ConfigurationProperty(
             defaultValue = DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE,
-            source = SYSTEM_PROPERTIES_SOURCE
+            source = APPLICATION_SOURCE
     )
     String CGROUP_DIRECTORY_PATH_PROPERTY_NAME = PREFIX + "dir";
 
