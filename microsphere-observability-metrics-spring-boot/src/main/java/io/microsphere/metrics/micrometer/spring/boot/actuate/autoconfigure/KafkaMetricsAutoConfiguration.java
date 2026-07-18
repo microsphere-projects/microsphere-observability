@@ -88,9 +88,7 @@ public class KafkaMetricsAutoConfiguration {
     @Bean
     @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
     public ApplicationListener<ApplicationStartedEvent> applicationReadyEventApplicationListener(Log4j2KafkaAppenderProperties properties) {
-        return event -> {
-            bindKafkaAppenderMetrics(event, properties);
-        };
+        return event -> bindKafkaAppenderMetrics(event, properties);
     }
 
     private void bindKafkaAppenderMetrics(ApplicationStartedEvent event, Log4j2KafkaAppenderProperties properties) {
