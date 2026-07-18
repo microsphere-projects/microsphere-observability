@@ -19,55 +19,54 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
+import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
+import org.apache.kafka.clients.KafkaClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.ProducerFactory;
 
 import java.util.Set;
 
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration.CGROUP_METRICS_ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.KAFKA_METRICS_ENABLED_PROPERTY_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
- * {@link CGGroupMetricsAutoConfiguration} Test
+ * {@link KafkaMetricsAutoConfiguration} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see CGGroupMetricsAutoConfiguration
+ * @see KafkaMetricsAutoConfiguration
  * @since 1.0.0
  */
 @SpringBootTest(
         classes = {
-                CGGroupMetricsAutoConfigurationTest.class
+                KafkaMetricsAutoConfigurationTest.class
         },
-        webEnvironment = NONE,
-        properties = {
-                "cgroup.dir=file://${user.dir}"
-        }
+        webEnvironment = NONE
 )
-class CGGroupMetricsAutoConfigurationTest extends AutoConfigurationTest<CGGroupMetricsAutoConfiguration> {
+class KafkaMetricsAutoConfigurationTest extends AutoConfigurationTest<KafkaMetricsAutoConfiguration> {
 
     @Test
     void testConstants() {
-        assertEquals("microsphere.metrics.micrometer.cgroup.enabled", CGROUP_METRICS_ENABLED_PROPERTY_NAME);
+        assertEquals("microsphere.metrics.micrometer.kafka.enabled", KAFKA_METRICS_ENABLED_PROPERTY_NAME);
     }
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
-        autoConfiguredClasses.add(CGroupMemoryMetrics.class);
     }
 
     @Override
     protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
         globalDisabledPropertyValues.add("microsphere.metrics.micrometer.enabled=false");
-        globalDisabledPropertyValues.add("microsphere.metrics.micrometer.cgroup.enabled=false");
-        globalDisabledPropertyValues.add("cgroup.dir=file://not-found");
+        globalDisabledPropertyValues.add("microsphere.metrics.micrometer.kafka.enabled=false");
     }
 
     @Override
     protected void configureGlobalMissingClasses(Set<Class<?>> globalMissingClasses) {
-        globalMissingClasses.add(CGroupMemoryMetrics.class);
         globalMissingClasses.add(MeterRegistry.class);
+        globalMissingClasses.add(KafkaClientMetrics.class);
+        globalMissingClasses.add(KafkaClient.class);
+        globalMissingClasses.add(ProducerFactory.class);
     }
 }
