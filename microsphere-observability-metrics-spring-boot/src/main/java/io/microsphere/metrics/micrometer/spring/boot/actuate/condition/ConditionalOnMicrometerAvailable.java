@@ -17,6 +17,7 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.condition;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
 import java.lang.annotation.Documented;
@@ -39,6 +40,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 @ConditionalOnMicrometerEnabled
 @ConditionalOnClass(name = {
+        "io.micrometer.core.instrument.MeterRegistry"                // Micrometer Core API
+})
+@ConditionalOnBean(type = {
         "io.micrometer.core.instrument.MeterRegistry"                // Micrometer Core API
 })
 public @interface ConditionalOnMicrometerAvailable {

@@ -62,12 +62,17 @@ import static io.microsphere.reflect.FieldUtils.getFieldValue;
         "org.apache.kafka.clients.KafkaClient",                                                            // Kafka Client API
         "org.springframework.kafka.core.ProducerFactory"                                                   // Spring Kafka API
 })
-@AutoConfigureAfter(
-        name = {
-                "org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration",   // Spring Boot API [2.0, 4.0)
-                "org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration"      // Spring Boot API [4.0,)
-        }
-)
+@AutoConfigureAfter(name = {
+        // Spring Boot Actuator API [2.0, 4.0)
+        "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration",
+        // Spring Boot Actuator API [4.0, )
+        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration"
+
+})
 public class KafkaMetricsAutoConfiguration {
 
     /**

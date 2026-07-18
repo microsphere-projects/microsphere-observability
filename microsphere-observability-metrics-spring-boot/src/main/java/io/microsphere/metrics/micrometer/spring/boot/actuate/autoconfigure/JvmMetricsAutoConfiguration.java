@@ -52,18 +52,28 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
  * The Auto-Configuration class for JVM Metrics
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = JVM_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnClass(name = {
-        "io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics"                               // Micrometer API
+        "io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics"                                    // Micrometer Core API
 })
 @AutoConfigureAfter(name = {
-        "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration",           // Spring Boot API [2.0, 4.0)
-        "org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration"     // Spring Boot API [4.0, )
+        // Spring Boot Actuator API [2.0, 4.0)
+        "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration",
+        // Spring Boot Actuator API [4.0, )
+        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration"
+
 })
 public class JvmMetricsAutoConfiguration {
 
