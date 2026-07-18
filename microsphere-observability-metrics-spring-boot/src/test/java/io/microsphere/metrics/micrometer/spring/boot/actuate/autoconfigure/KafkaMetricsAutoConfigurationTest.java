@@ -21,6 +21,7 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.apache.kafka.clients.KafkaClient;
 import org.junit.jupiter.api.Test;
@@ -70,5 +71,6 @@ class KafkaMetricsAutoConfigurationTest extends AutoConfigurationTest<KafkaMetri
         globalMissingClasses.add(KafkaClientMetrics.class);
         globalMissingClasses.add(KafkaClient.class);
         globalMissingClasses.add(ProducerFactory.class);
+        globalMissingClasses.add(Log4j2KafkaAppenderProperties.class);
     }
 }
