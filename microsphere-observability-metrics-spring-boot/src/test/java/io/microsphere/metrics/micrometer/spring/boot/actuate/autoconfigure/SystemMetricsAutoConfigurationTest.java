@@ -19,6 +19,7 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
@@ -46,6 +47,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @SpringBootTest(
         classes = {
+                SimpleMeterRegistry.class,
                 SystemMetricsAutoConfigurationTest.class
         },
         webEnvironment = NONE

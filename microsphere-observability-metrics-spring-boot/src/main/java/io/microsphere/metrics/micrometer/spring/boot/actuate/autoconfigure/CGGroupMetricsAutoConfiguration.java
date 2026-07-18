@@ -21,6 +21,7 @@ import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -39,6 +40,10 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see SystemMetricsAutoConfiguration
  * @see CGroupMemoryMetrics
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -46,7 +51,15 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
 @ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = CGROUP_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnClass(name = {
-        "io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics"  // Microsphere Observability Micrometer API
+        "io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics"                    // Microsphere Observability Micrometer API
+})
+@AutoConfigureAfter(name = {
+        // Spring Boot Actuator API [2.0, 4.0)
+        "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        // Spring Boot Actuator API [4.0, )
+        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration"
 })
 public class CGGroupMetricsAutoConfiguration {
 

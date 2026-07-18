@@ -20,6 +20,7 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import com.alibaba.csp.sentinel.SphU;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelPlugin;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
@@ -44,6 +45,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @SpringBootTest(
         classes = {
+                SimpleMeterRegistry.class,
                 SentinelMetricsAutoConfigurationTest.class
         },
         webEnvironment = NONE
