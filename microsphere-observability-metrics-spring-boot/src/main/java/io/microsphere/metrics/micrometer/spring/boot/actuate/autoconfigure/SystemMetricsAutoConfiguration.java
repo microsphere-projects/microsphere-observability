@@ -18,7 +18,6 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
@@ -32,8 +31,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.SYSTEM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getScheduledExecutor;
 
@@ -47,12 +47,18 @@ import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getSchedule
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnMicrometerAvailable
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = SYSTEM_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
         "org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration",            // Spring Boot API [2.0, 4.0)
         "org.springframework.boot.micrometer.metrics.autoconfigure.system.SystemMetricsAutoConfiguration"   // Spring Boot API [4.0,)
 })
 public class SystemMetricsAutoConfiguration {
+
+
+    /**
+     * The Property Name Prefix of System Metrics : "microsphere.metrics.micrometer.system."
+     */
+    public static final String SYSTEM_METRICS_PROPERTY_NAME_PREFIX = PREFIX + "system" + DOT;
 
     /**
      * The Property Name of enabling System metrics : "microsphere.metrics.micrometer.system.enabled"
@@ -62,7 +68,7 @@ public class SystemMetricsAutoConfiguration {
             defaultValue = "true",
             source = APPLICATION_SOURCE
     )
-    public static final String ENABLED_PROPERTY_NAME = PREFIX + "system" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
+    public static final String SYSTEM_METRICS_ENABLED_PROPERTY_NAME = SYSTEM_METRICS_PROPERTY_NAME_PREFIX + ENABLED_PROPERTY_NAME;
 
     /**
      * The Default Property Value of metrics collection interval : "60000"
@@ -70,17 +76,17 @@ public class SystemMetricsAutoConfiguration {
     public static final String DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE = "60000";
 
     /**
-     * The Property Name of metrics collection interval : "microsphere.metrics.collection.interval"
+     * The Property Name of metrics collection interval : "microsphere.metrics.micrometer.system.collection.interval"
      */
     @ConfigurationProperty(
             type = long.class,
             defaultValue = DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE,
             source = APPLICATION_SOURCE
     )
-    public static final String METRICS_COLLECTION_INTERVAL_PROPERTY_NAME = "microsphere.metrics.collection.interval";
+    public static final String METRICS_COLLECTION_INTERVAL_PROPERTY_NAME = SYSTEM_METRICS_PROPERTY_NAME_PREFIX + "collection.interval";
 
     /**
-     * The Property Placeholder of metrics collection interval : "${microsphere.metrics.collection.interval:60000}"
+     * The Property Placeholder of metrics collection interval : "${microsphere.metrics.micrometer.system.collection.interval:60000}"
      */
     public static final String METRICS_COLLECTION_INTERVAL_PLACEHOLDER = "${" + METRICS_COLLECTION_INTERVAL_PROPERTY_NAME + ":" + DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE + "}";
 
