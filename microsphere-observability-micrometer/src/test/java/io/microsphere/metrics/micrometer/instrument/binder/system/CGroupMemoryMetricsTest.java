@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
 import static io.microsphere.util.ClassLoaderUtils.getDefaultClassLoader;
 import static java.lang.System.getProperties;
 import static java.lang.System.setProperty;
@@ -45,12 +45,12 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
     static void prepare() throws Throwable {
         ClassLoader classLoader = getDefaultClassLoader();
         String testDir = get(classLoader.getResource("test-data/").toURI()).toAbsolutePath().toString();
-        setProperty(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME, testDir);
+        setProperty(CGROUP_DIRECTORY_PATH_PROPERTY_NAME, testDir);
     }
 
     @AfterAll
     static void cleanup() {
-        getProperties().remove(CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME);
+        getProperties().remove(CGROUP_DIRECTORY_PATH_PROPERTY_NAME);
     }
 
     @Test

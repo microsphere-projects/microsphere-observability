@@ -36,17 +36,17 @@ public interface CGroupConstants {
     String PREFIX = "cgroup.";
 
     /**
-     * The Default Value of CGroup Directory
+     * The Default Value of CGroup Directory Path: "/sys/fs/cgroup/"
      */
-    String DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE = "/sys/fs/cgroup/";
+    String DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE = "/sys/fs/cgroup/";
 
     /**
-     * The Property Name of CGroup Directory : "cgroup.dir"
+     * The Property Name of CGroup Directory Path: "cgroup.dir"
      */
     @ConfigurationProperty(
-            defaultValue = DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE,
+            defaultValue = DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE,
             source = SYSTEM_PROPERTIES_SOURCE
     )
-    String CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME = PREFIX + "dir";
+    String CGROUP_DIRECTORY_PATH_PROPERTY_NAME = PREFIX + "dir";
 
 }
