@@ -45,6 +45,7 @@ import static io.microsphere.logging.log4j2.util.Log4j2Utils.findAppender;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.KAFKA_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
+import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
 
 /**
  * The Auto-Configuration class for Apache Kafka Metrics
@@ -104,6 +105,7 @@ public class KafkaMetricsAutoConfiguration {
         KafkaClientMetrics kafkaClientMetrics = new KafkaClientMetrics(producer, tags);
         MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
         kafkaClientMetrics.bindTo(meterRegistry);
+        addShutdownHookCallback(kafkaClientMetrics::close);
     }
 
     private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
