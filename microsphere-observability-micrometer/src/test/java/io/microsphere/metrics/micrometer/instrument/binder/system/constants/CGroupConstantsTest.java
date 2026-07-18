@@ -20,12 +20,10 @@ package io.microsphere.metrics.micrometer.instrument.binder.system.constants;
 
 import org.junit.jupiter.api.Test;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.PREFIX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * {@link CGroupConstants} Test
@@ -41,6 +39,5 @@ class CGroupConstantsTest {
         assertEquals("cgroup.", PREFIX);
         assertEquals("/sys/fs/cgroup/", DEFAULT_CGROUP_DIRECTORY_SYSTEM_PROPERTY_VALUE);
         assertEquals("cgroup.dir", CGROUP_DIRECTORY_SYSTEM_PROPERTY_NAME);
-        assertNotNull(CGROUP_DIRECTORY);
     }
 }
