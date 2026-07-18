@@ -21,7 +21,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.logging.Logger;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -56,8 +56,8 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = JVM_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
-@ConditionalOnMicrometerEnabled
 @ConditionalOnClass(name = {
         "io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics"                               // Micrometer API
 })

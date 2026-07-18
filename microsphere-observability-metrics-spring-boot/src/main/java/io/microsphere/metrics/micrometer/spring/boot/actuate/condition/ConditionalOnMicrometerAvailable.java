@@ -17,21 +17,18 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.condition;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Spring Boot Condition for Micrometer Enabled
+ * Spring Boot Condition for Micrometer available
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see MeterRegistry
@@ -40,21 +37,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Retention(RUNTIME)
 @Target({TYPE, METHOD})
 @Documented
-@ConditionalOnProperty(name = ConditionalOnMicrometerEnabled.ENABLED_PROPERTY_NAME, matchIfMissing = true)
-public @interface ConditionalOnMicrometerEnabled {
-
-    /**
-     * The property name prefix for Micrometer : "microsphere.metrics.micrometer."
-     */
-    String PREFIX = "microsphere.metrics.micrometer.";
-
-    /**
-     * The property name for enabling Micrometer features : "microsphere.metrics.micrometer.enabled"
-     */
-    @ConfigurationProperty(
-            type = boolean.class,
-            defaultValue = "true",
-            source = APPLICATION_SOURCE
-    )
-    String ENABLED_PROPERTY_NAME = PREFIX + PropertyConstants.ENABLED_PROPERTY_NAME;
+@ConditionalOnMicrometerEnabled
+@ConditionalOnClass(name = {
+        "io.micrometer.core.instrument.MeterRegistry"                // Micrometer Core API
+})
+public @interface ConditionalOnMicrometerAvailable {
 }
