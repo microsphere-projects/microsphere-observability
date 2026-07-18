@@ -49,8 +49,14 @@ import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getSchedule
 @ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = SYSTEM_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
-        "org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration",            // Spring Boot API [2.0, 4.0)
-        "org.springframework.boot.micrometer.metrics.autoconfigure.system.SystemMetricsAutoConfiguration"   // Spring Boot API [4.0,)
+        // Spring Boot Actuator API [2.0, 4.0)
+        "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration",
+        // Spring Boot Actuator API [4.0, )
+        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.system.SystemMetricsAutoConfiguration"
 })
 public class SystemMetricsAutoConfiguration {
 

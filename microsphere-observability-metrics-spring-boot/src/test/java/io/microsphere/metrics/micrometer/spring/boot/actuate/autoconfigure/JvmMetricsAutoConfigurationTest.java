@@ -19,6 +19,7 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,6 +43,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  */
 @SpringBootTest(
         classes = {
+                SimpleMeterRegistry.class,
                 JvmMetricsAutoConfigurationTest.class
         },
         webEnvironment = NONE
