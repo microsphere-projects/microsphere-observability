@@ -21,7 +21,6 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.producer.Producer;
@@ -37,11 +36,13 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import static io.micrometer.core.instrument.Tag.of;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.collection.Lists.ofList;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.logging.log4j2.util.Log4j2Utils.findAppender;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.KAFKA_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
 
@@ -54,7 +55,7 @@ import static io.microsphere.reflect.FieldUtils.getFieldValue;
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
+@ConditionalOnProperty(name = KAFKA_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnMicrometerEnabled
 @ConditionalOnClass(name = {
         "io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics",                                   // Micrometer API
@@ -77,7 +78,7 @@ public class KafkaMetricsAutoConfiguration {
             defaultValue = "true",
             source = APPLICATION_SOURCE
     )
-    public static final String ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
+    public static final String KAFKA_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + ENABLED_PROPERTY_NAME;
 
     @Bean
     @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
@@ -95,7 +96,7 @@ public class KafkaMetricsAutoConfiguration {
         ConfigurableApplicationContext context = event.getApplicationContext();
         String clientId = properties.getProperties().get("client.id");
         // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
-        Iterable<Tag> tags = ofList(Tag.of("spring.id", clientId));
+        Iterable<Tag> tags = ofList(of("spring.id", clientId));
         KafkaClientMetrics kafkaClientMetrics = new KafkaClientMetrics(producer, tags);
         MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
         kafkaClientMetrics.bindTo(meterRegistry);
