@@ -21,7 +21,7 @@ import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -46,12 +46,12 @@ import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getSchedule
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnMicrometerAvailable
+@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
         "org.springframework.boot.actuate.autoconfigure.metrics.SystemMetricsAutoConfiguration",            // Spring Boot API [2.0, 4.0)
         "org.springframework.boot.micrometer.metrics.autoconfigure.system.SystemMetricsAutoConfiguration"   // Spring Boot API [4.0,)
 })
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
-@ConditionalOnMicrometerEnabled
 public class SystemMetricsAutoConfiguration {
 
     /**

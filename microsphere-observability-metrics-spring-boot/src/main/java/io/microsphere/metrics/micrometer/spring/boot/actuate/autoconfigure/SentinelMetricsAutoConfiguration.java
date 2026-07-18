@@ -19,9 +19,8 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,8 +30,9 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.SENTINEL_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PLACEHOLDER;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 
@@ -44,8 +44,8 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnSentinelAvailable
-@ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
-@ConditionalOnMicrometerEnabled
+@ConditionalOnMicrometerAvailable
+@ConditionalOnProperty(name = SENTINEL_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 public class SentinelMetricsAutoConfiguration {
 
     /**
@@ -56,7 +56,7 @@ public class SentinelMetricsAutoConfiguration {
             defaultValue = "true",
             source = APPLICATION_SOURCE
     )
-    public static final String ENABLED_PROPERTY_NAME = PREFIX + "alibaba-sentinel" + DOT + PropertyConstants.ENABLED_PROPERTY_NAME;
+    public static final String SENTINEL_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "alibaba-sentinel" + DOT + ENABLED_PROPERTY_NAME;
 
 //        @Bean
 //        @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
@@ -71,7 +71,7 @@ public class SentinelMetricsAutoConfiguration {
 //        }
 
     @Bean
-    @ConditionalOnMissingBean(SentinelMetrics.class)
+    @ConditionalOnMissingBean
     public SentinelMetrics sentinelMetrics(@Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
         return new SentinelMetrics(interval.toMillis());
     }
