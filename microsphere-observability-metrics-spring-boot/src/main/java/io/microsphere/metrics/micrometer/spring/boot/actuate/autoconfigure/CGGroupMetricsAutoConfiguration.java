@@ -22,6 +22,7 @@ import io.microsphere.constants.PropertyConstants;
 import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroup;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -37,10 +38,14 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see SystemMetricsAutoConfiguration
+ * @see CGroupMemoryMetrics
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnCGroup
+@ConditionalOnClass(name = {
+        "io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics"  // Microsphere Observability Micrometer API
+})
 @ConditionalOnProperty(name = ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @ConditionalOnMicrometerEnabled
 public class CGGroupMetricsAutoConfiguration {
