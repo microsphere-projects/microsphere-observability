@@ -30,7 +30,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -87,13 +87,11 @@ public class KafkaMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
-    public ApplicationListener<ApplicationReadyEvent> applicationReadyEventApplicationListener(Log4j2KafkaAppenderProperties properties) {
-        return event -> {
-            bindKafkaAppenderMetrics(event, properties);
-        };
+    public ApplicationListener<ApplicationStartedEvent> applicationReadyEventApplicationListener(Log4j2KafkaAppenderProperties properties) {
+        return event -> bindKafkaAppenderMetrics(event, properties);
     }
 
-    private void bindKafkaAppenderMetrics(ApplicationReadyEvent event, Log4j2KafkaAppenderProperties properties) {
+    private void bindKafkaAppenderMetrics(ApplicationStartedEvent event, Log4j2KafkaAppenderProperties properties) {
         Producer producer = getKafkaProducer(properties);
         if (producer == null) {
             return;
