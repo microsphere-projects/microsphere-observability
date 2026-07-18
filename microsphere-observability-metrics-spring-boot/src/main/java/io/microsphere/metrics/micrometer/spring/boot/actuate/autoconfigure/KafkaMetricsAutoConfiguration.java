@@ -21,7 +21,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
@@ -56,7 +56,7 @@ import static io.microsphere.reflect.FieldUtils.getFieldValue;
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnProperty(name = KAFKA_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
-@ConditionalOnMicrometerEnabled
+@ConditionalOnMicrometerAvailable
 @ConditionalOnClass(name = {
         "io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics",                                   // Micrometer API
         "org.apache.kafka.clients.KafkaClient",                                                            // Kafka Client API
