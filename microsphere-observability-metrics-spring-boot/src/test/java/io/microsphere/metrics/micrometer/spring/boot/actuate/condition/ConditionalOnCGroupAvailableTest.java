@@ -27,7 +27,7 @@ import java.io.File;
 
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.CGroupUtils.getCGroupDirectoryPath;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_PLACEHOLDER;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_LOCATION_PLACEHOLDER;
 import static io.microsphere.spring.beans.BeanUtils.isBeanPresent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,11 +47,11 @@ public class ConditionalOnCGroupAvailableTest {
     void test() {
         String path = "file:///sys/fs/cgroup/";
         MockEnvironment environment = new MockEnvironment();
-        assertEquals(path, environment.resolvePlaceholders(CGROUP_DIRECTORY_PLACEHOLDER));
+        assertEquals(path, environment.resolvePlaceholders(CGROUP_DIRECTORY_LOCATION_PLACEHOLDER));
 
         path = "/var/";
         environment.setProperty(CGROUP_DIRECTORY_PATH_PROPERTY_NAME, path);
-        assertEquals(path, environment.resolvePlaceholders(CGROUP_DIRECTORY_PLACEHOLDER));
+        assertEquals(path, environment.resolvePlaceholders(CGROUP_DIRECTORY_LOCATION_PLACEHOLDER));
     }
 
     @SpringBootTest(

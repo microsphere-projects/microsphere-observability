@@ -35,20 +35,23 @@ import static java.util.Collections.emptyList;
  */
 public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
-    private static final String METRIC_PREFIX = PREFIX;
+    public static final String METRIC_PREFIX = PREFIX;
 
     private final Path memoryDirectoryPath;
 
     private final Path memoryStaFilePath;
 
     public CGroupMemoryMetrics() {
-        this(emptyList());
+        this(get(getCGroupDirectoryPath()));
     }
 
-    public CGroupMemoryMetrics(Iterable<Tag> tags) {
+    public CGroupMemoryMetrics(Path cgroupDirectoryPath) {
+        this(cgroupDirectoryPath, emptyList());
+    }
+
+    public CGroupMemoryMetrics(Path cgroupDirectoryPath, Iterable<Tag> tags) {
         super(tags);
-        String cgroupDirectory = getCGroupDirectoryPath();
-        this.memoryDirectoryPath = get(cgroupDirectory).resolve("memory");
+        this.memoryDirectoryPath = cgroupDirectoryPath.resolve("memory");
         this.memoryStaFilePath = memoryDirectoryPath.resolve("memory.stat");
     }
 

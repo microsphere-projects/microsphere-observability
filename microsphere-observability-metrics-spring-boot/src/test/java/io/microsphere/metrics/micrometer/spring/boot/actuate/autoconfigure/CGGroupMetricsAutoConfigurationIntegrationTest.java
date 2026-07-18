@@ -17,8 +17,18 @@
 
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+
+import static io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics.METRIC_PREFIX;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
  * {@link CGGroupMetricsAutoConfiguration} Integration Test
@@ -30,8 +40,29 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest(
         classes = {
                 CGGroupMetricsAutoConfigurationTest.class
+        },
+        webEnvironment = NONE,
+        properties = {
+                "cgroup.dir=file://${user.dir}/../microsphere-observability-micrometer/src/test/resources/test-data"
         }
 )
 @EnableAutoConfiguration
 class CGGroupMetricsAutoConfigurationIntegrationTest {
+
+    @Autowired
+    private MeterRegistry meterRegistry;
+
+    @Autowired
+    private CGroupMemoryMetrics cgroupMemoryMetrics;
+
+    @Test
+    void test() {
+        assertNotNull(cgroupMemoryMetrics);
+        assertEquals(16, this.meterRegistry.getMeters()
+                .stream()
+                .map(Meter::getId)
+                .map(Meter.Id::getName)
+                .filter(name -> name.startsWith(METRIC_PREFIX))
+                .count());
+    }
 }
