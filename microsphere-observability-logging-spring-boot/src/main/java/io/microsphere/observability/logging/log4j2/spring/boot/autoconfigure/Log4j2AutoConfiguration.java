@@ -101,7 +101,9 @@ public class Log4j2AutoConfiguration {
 
         private void initializeKafkaAppender(KafkaAppender kafkaAppender) {
             InMemoryAppender inMemoryAppender = findInMemoryAppender();
-            inMemoryAppender.transfer(kafkaAppender);
+            if (inMemoryAppender != null) {
+                inMemoryAppender.transfer(kafkaAppender);
+            }
             addAppenderForAllLoggers(kafkaAppender);
         }
 
