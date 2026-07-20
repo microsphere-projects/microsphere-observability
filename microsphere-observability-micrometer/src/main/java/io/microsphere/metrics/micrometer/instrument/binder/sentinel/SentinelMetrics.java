@@ -45,7 +45,6 @@ import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getSenti
 import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.MINUTES;
 
 /**
  * Sentinel Metrics
@@ -135,7 +134,7 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
 
     private ScheduledExecutorService initScheduler() {
         ScheduledExecutorService scheduledExecutorService = getSentinelMetricsTaskExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(this, 0, 1, MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(this, 0, this.interval, MILLISECONDS);
         return scheduledExecutorService;
     }
 
