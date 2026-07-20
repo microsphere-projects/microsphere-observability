@@ -48,6 +48,7 @@ import static io.microsphere.logging.log4j2.util.Log4j2Utils.addAppenderForAllLo
 import static io.microsphere.logging.log4j2.util.Log4j2Utils.getLoggerContext;
 import static io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties.PREFIX;
 import static io.microsphere.spring.beans.BeanUtils.getBeanIfAvailable;
+import static org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender.newBuilder;
 import static org.apache.logging.log4j.core.config.Property.createProperty;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -106,7 +107,7 @@ public class Log4j2AutoConfiguration {
             LoggerContext loggerContext = getLoggerContext();
             Log4j2KafkaAppenderProperties properties = this.kafkaAppenderProperties;
 
-            KafkaAppender.Builder builder = KafkaAppender.newBuilder()
+            KafkaAppender.Builder builder = newBuilder()
                     .setName(properties.getName())
                     .setIgnoreExceptions(properties.isIgnoreExceptions())
                     .setKey(properties.getKey())
