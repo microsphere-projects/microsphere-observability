@@ -30,6 +30,7 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
@@ -37,6 +38,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -88,6 +90,13 @@ public class Log4j2AutoConfiguration {
             KafkaAppender kafkaAppender = buildKafkaAppender(context);
             initializeKafkaAppender(kafkaAppender);
             return kafkaAppender;
+        }
+
+        @EventListener(ApplicationStartedEvent.class)
+        public void onApplicationStartedEvent(ApplicationStartedEvent event) {
+            ConfigurableApplicationContext context = event.getApplicationContext();
+            KafkaAppender kafkaAppender = context.getBean(KafkaAppender.class);
+            initializeKafkaAppender(kafkaAppender);
         }
 
         private void initializeKafkaAppender(KafkaAppender kafkaAppender) {

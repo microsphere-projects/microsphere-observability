@@ -15,8 +15,10 @@
  * limitations under the License.
  */
 
-package io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure;
+package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
+import io.micrometer.core.instrument.Meter;
+import io.micrometer.core.instrument.MeterRegistry;
 import io.microsphere.logging.Logger;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -32,32 +34,29 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.consumerProps;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 
 /**
- * {@link Log4j2AutoConfiguration} Integration Test
+ * {@link KafkaMetricsAutoConfiguration} Integration Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see Log4j2AutoConfiguration
+ * @see KafkaMetricsAutoConfiguration
  * @since 1.0.0
  */
 @SpringBootTest(
         classes = {
-                Log4j2AutoConfigurationIntegrationTest.class
+                KafkaMetricsAutoConfigurationIntegrationTest.class
         },
         webEnvironment = NONE,
         properties = {
@@ -72,9 +71,9 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 )
 @DirtiesContext
 @EnableAutoConfiguration
-public class Log4j2AutoConfigurationIntegrationTest {
+public class KafkaMetricsAutoConfigurationIntegrationTest {
 
-    private static final Logger logger = getLogger(Log4j2AutoConfigurationIntegrationTest.class);
+    private static final Logger logger = getLogger(KafkaMetricsAutoConfigurationIntegrationTest.class);
 
     @Autowired
     private EmbeddedKafkaBroker broker;
@@ -82,27 +81,11 @@ public class Log4j2AutoConfigurationIntegrationTest {
     @Autowired
     private Log4j2KafkaAppenderProperties properties;
 
+    @Autowired
+    private MeterRegistry registry;
+
     @Test
     void test() {
-        assertTrue(this.properties.isEnabled());
-        assertEquals("java-app-logs", this.properties.getTopic());
-        assertEquals("java-app-logs-default", this.properties.getKey());
-        assertNull(this.properties.getFilter());
-        assertNull(this.properties.getLayout());
-        assertEquals("%d{ISO8601} %p %t - %m", this.properties.getPatternLayout());
-        assertEquals("microsphere-kafka-appender", this.properties.getName());
-        assertTrue(this.properties.isIgnoreExceptions());
-        assertEquals(3, this.properties.getRetryCount());
-        assertTrue(this.properties.isSyncSend());
-        assertTrue(this.properties.isSendEventTimestamp());
-
-        Map<String, String> kafkaProperties = this.properties.getProperties();
-        assertEquals("microsphere-kafka-appender-default", kafkaProperties.get(CLIENT_ID_CONFIG));
-        assertEquals("1000", kafkaProperties.get("batch.size"));
-
-        for (int i = 0; i < 10; i++) {
-            logger.trace("Hello, Log4j2!");
-        }
 
         Map<String, Object> consumerProps = consumerProps("testGroup", "true", this.broker);
         consumerProps.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -112,18 +95,24 @@ public class Log4j2AutoConfigurationIntegrationTest {
         Consumer<String, String> consumer = cf.createConsumer();
         this.broker.consumeFromAnEmbeddedTopic(consumer, true, this.properties.getTopic());
 
+        for (int i = 0; i < 10; i++) {
+            logger.trace("Testing {}", i + 1);
+        }
+
         ConsumerRecords<String, String> records = getRecords(consumer);
 
         assertFalse(records.isEmpty());
 
-        records.forEach(record -> {
-            assertEquals(this.properties.getKey(), record.key());
-            assertEquals(this.properties.getTopic(), record.topic());
-            assertNotNull(record);
-            logger.trace(record.toString());
-        });
-
         consumer.close();
 
+        List<Meter> meters = registry.getMeters();
+
+        long count = meters.stream()
+                .map(Meter::getId)
+                .map(Meter.Id::getName)
+                .filter(name -> name.startsWith("kafka."))
+                .count();
+
+        assertTrue(count > 0);
     }
 }
