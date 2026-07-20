@@ -34,11 +34,11 @@ import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.event.EventListener;
 
 import java.io.Serializable;
 import java.util.Map;
@@ -48,6 +48,7 @@ import static io.microsphere.logging.log4j2.util.Log4j2Utils.addAppenderForAllLo
 import static io.microsphere.logging.log4j2.util.Log4j2Utils.getLoggerContext;
 import static io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties.PREFIX;
 import static io.microsphere.spring.beans.BeanUtils.getBeanIfAvailable;
+import static org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender.newBuilder;
 import static org.apache.logging.log4j.core.config.Property.createProperty;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -76,7 +77,7 @@ public class Log4j2AutoConfiguration {
     @ConditionalOnClass(name = "org.apache.kafka.clients.KafkaClient")
     @ConditionalOnProperty(prefix = PREFIX, name = "properties.bootstrap.servers")
     @EnableConfigurationProperties(Log4j2KafkaAppenderProperties.class)
-    class KafkaAppenderConfiguration implements ApplicationListener<ApplicationStartedEvent> {
+    class KafkaAppenderConfiguration {
 
         private final Log4j2KafkaAppenderProperties kafkaAppenderProperties;
 
@@ -86,11 +87,13 @@ public class Log4j2AutoConfiguration {
 
         @Bean(initMethod = "start", destroyMethod = "stop")
         public KafkaAppender kafkaAppender(ConfigurableApplicationContext context) {
-            return buildKafkaAppender(context);
+            KafkaAppender kafkaAppender = buildKafkaAppender(context);
+            initializeKafkaAppender(kafkaAppender);
+            return kafkaAppender;
         }
 
-        @Override
-        public void onApplicationEvent(ApplicationStartedEvent event) {
+        @EventListener(ApplicationStartedEvent.class)
+        public void onApplicationStartedEvent(ApplicationStartedEvent event) {
             ConfigurableApplicationContext context = event.getApplicationContext();
             KafkaAppender kafkaAppender = context.getBean(KafkaAppender.class);
             initializeKafkaAppender(kafkaAppender);
@@ -106,7 +109,7 @@ public class Log4j2AutoConfiguration {
             LoggerContext loggerContext = getLoggerContext();
             Log4j2KafkaAppenderProperties properties = this.kafkaAppenderProperties;
 
-            KafkaAppender.Builder builder = KafkaAppender.newBuilder()
+            KafkaAppender.Builder builder = newBuilder()
                     .setName(properties.getName())
                     .setIgnoreExceptions(properties.isIgnoreExceptions())
                     .setKey(properties.getKey())
