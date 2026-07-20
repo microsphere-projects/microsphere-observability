@@ -30,11 +30,9 @@ import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.boot.context.logging.LoggingApplicationListener;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.logging.log4j2.Log4J2LoggingSystem;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -77,7 +75,7 @@ public class Log4j2AutoConfiguration {
     @ConditionalOnClass(name = "org.apache.kafka.clients.KafkaClient")
     @ConditionalOnProperty(prefix = PREFIX, name = "properties.bootstrap.servers")
     @EnableConfigurationProperties(Log4j2KafkaAppenderProperties.class)
-    class KafkaAppenderConfiguration implements ApplicationListener<ApplicationStartedEvent> {
+    class KafkaAppenderConfiguration {
 
         private final Log4j2KafkaAppenderProperties kafkaAppenderProperties;
 
@@ -87,14 +85,9 @@ public class Log4j2AutoConfiguration {
 
         @Bean(initMethod = "start", destroyMethod = "stop")
         public KafkaAppender kafkaAppender(ConfigurableApplicationContext context) {
-            return buildKafkaAppender(context);
-        }
-
-        @Override
-        public void onApplicationEvent(ApplicationStartedEvent event) {
-            ConfigurableApplicationContext context = event.getApplicationContext();
-            KafkaAppender kafkaAppender = context.getBean(KafkaAppender.class);
+            KafkaAppender kafkaAppender = buildKafkaAppender(context);
             initializeKafkaAppender(kafkaAppender);
+            return kafkaAppender;
         }
 
         private void initializeKafkaAppender(KafkaAppender kafkaAppender) {
