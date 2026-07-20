@@ -71,7 +71,7 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 )
 @DirtiesContext
 @EnableAutoConfiguration
-public class KafkaMetricsAutoConfigurationIntegrationTest {
+class KafkaMetricsAutoConfigurationIntegrationTest {
 
     private static final Logger logger = getLogger(KafkaMetricsAutoConfigurationIntegrationTest.class);
 
