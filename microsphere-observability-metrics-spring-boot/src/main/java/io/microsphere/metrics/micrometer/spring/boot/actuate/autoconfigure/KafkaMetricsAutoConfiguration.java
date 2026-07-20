@@ -17,7 +17,6 @@
 
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
-import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
@@ -31,11 +30,8 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
-import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.event.EventListener;
 
 import static io.micrometer.core.instrument.Tag.of;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
@@ -46,7 +42,7 @@ import static io.microsphere.logging.log4j2.util.Log4j2Utils.findAppender;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.KAFKA_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
-import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
+import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
 
 /**
  * The Auto-Configuration class for Apache Kafka Metrics
@@ -78,9 +74,6 @@ import static io.microsphere.util.ShutdownHookUtils.addShutdownHookCallback;
         // Microsphere Observability Logging Spring Boot API
         "io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration"
 })
-@Import(value = {
-        KafkaMetricsAutoConfiguration.Log4j2KafkaAppenderConfiguration.class
-})
 public class KafkaMetricsAutoConfiguration {
 
     /**
@@ -93,45 +86,28 @@ public class KafkaMetricsAutoConfiguration {
     )
     public static final String KAFKA_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + ENABLED_PROPERTY_NAME;
 
-
     @ConditionalOnLog4j2Available
     @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
-    static class Log4j2KafkaAppenderConfiguration {
+    @Bean(destroyMethod = "close")
+    public KafkaClientMetrics kafkaClientMetrics(Log4j2KafkaAppenderProperties properties) {
+        Producer producer = getKafkaProducer(properties);
+        String clientId = properties.getProperties().get(CLIENT_ID_CONFIG);
+        // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
+        Iterable<Tag> tags = ofList(of("spring.id", clientId));
+        return new KafkaClientMetrics(producer, tags);
+    }
 
-        @EventListener(ApplicationStartedEvent.class)
-        public void onApplicationStartedEvent(ApplicationStartedEvent event) {
-            bindKafkaAppenderMetrics(event);
-        }
-
-        private void bindKafkaAppenderMetrics(ApplicationStartedEvent event) {
-            ConfigurableApplicationContext context = event.getApplicationContext();
-            Log4j2KafkaAppenderProperties properties = context.getBean(Log4j2KafkaAppenderProperties.class);
-            Producer producer = getKafkaProducer(properties);
-            if (producer == null) {
-                return;
+    private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
+        String loggerName = properties.getName();
+        KafkaAppender kafkaAppender = findAppender(loggerName);
+        Producer producer = null;
+        if (kafkaAppender != null) {
+            KafkaManager kafkaManager = getFieldValue(kafkaAppender, "manager", KafkaManager.class);
+            if (kafkaManager != null) {
+                producer = getFieldValue(kafkaManager, "producer", Producer.class);
             }
-            String clientId = properties.getProperties().get("client.id");
-            // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
-            Iterable<Tag> tags = ofList(of("spring.id", clientId));
-            KafkaClientMetrics kafkaClientMetrics = new KafkaClientMetrics(producer, tags);
-            MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
-            kafkaClientMetrics.bindTo(meterRegistry);
-            addShutdownHookCallback(kafkaClientMetrics::close);
         }
-
-        private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
-            String loggerName = properties.getName();
-            KafkaAppender kafkaAppender = findAppender(loggerName);
-            Producer producer = null;
-            if (kafkaAppender != null) {
-                KafkaManager kafkaManager = getFieldValue(kafkaAppender, "manager", KafkaManager.class);
-                if (kafkaManager != null) {
-                    producer = getFieldValue(kafkaManager, "producer", Producer.class);
-                }
-            }
-            return producer;
-        }
-
+        return producer;
     }
 
 }
