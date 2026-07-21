@@ -20,7 +20,6 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
-import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.junit.jupiter.api.Test;
@@ -30,9 +29,9 @@ import org.springframework.core.convert.ConversionService;
 
 import java.util.Set;
 
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.METRICS_COLLECTION_INTERVAL_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PLACEHOLDER;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.SYSTEM_METRICS_ENABLED_PROPERTY_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.boot.convert.ApplicationConversionService.getSharedInstance;
@@ -63,13 +62,12 @@ class SystemMetricsAutoConfigurationTest extends AutoConfigurationTest<SystemMet
     void testConstants() {
         assertEquals("microsphere.metrics.micrometer.system.enabled", SYSTEM_METRICS_ENABLED_PROPERTY_NAME);
         assertEquals("60000", DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE);
-        assertEquals("microsphere.metrics.micrometer.system.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
-        assertEquals("${microsphere.metrics.micrometer.system.collection.interval:60000}", METRICS_COLLECTION_INTERVAL_PLACEHOLDER);
+        assertEquals("system.metrics.micrometer.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
+        assertEquals("${system.metrics.micrometer.collection.interval:60000}", METRICS_COLLECTION_INTERVAL_PLACEHOLDER);
     }
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
-        autoConfiguredClasses.add(NetworkStatisticsMetrics.class);
         autoConfiguredClasses.add(SystemMemoryMetrics.class);
     }
 

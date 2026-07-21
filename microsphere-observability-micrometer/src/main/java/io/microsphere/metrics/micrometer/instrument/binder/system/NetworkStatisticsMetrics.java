@@ -9,7 +9,6 @@ import io.microsphere.metrics.micrometer.util.MicrometerUtils;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
@@ -27,6 +26,7 @@ import static java.lang.Long.parseLong;
 import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.file.Files.exists;
 import static java.nio.file.Files.readAllLines;
+import static java.nio.file.Paths.get;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
@@ -53,7 +53,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     private MeterRegistry registry;
 
     public NetworkStatisticsMetrics() {
-        this(Paths.get(getNetworkStatsFilePath()), getMetricsCollectionInterval());
+        this(get(getNetworkStatsFilePath()), getMetricsCollectionInterval());
     }
 
     public NetworkStatisticsMetrics(Path statsFilePath, long interval) {

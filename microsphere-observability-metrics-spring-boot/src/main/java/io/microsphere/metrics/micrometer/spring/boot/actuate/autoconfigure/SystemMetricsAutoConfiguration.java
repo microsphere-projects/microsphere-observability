@@ -25,17 +25,26 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnResource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
+import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_NETWORK_STATS_FILE_PATH;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.METRICS_COLLECTION_INTERVAL_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_STATS_FILE_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.SYSTEM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
-import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getScheduledExecutor;
+import static java.nio.file.Paths.get;
 
 /**
  * The Auto-Configuration class for System Metrics
@@ -60,7 +69,6 @@ import static io.microsphere.metrics.micrometer.util.MicrometerUtils.getSchedule
 })
 public class SystemMetricsAutoConfiguration {
 
-
     /**
      * The Property Name Prefix of System Metrics : "microsphere.metrics.micrometer.system."
      */
@@ -77,29 +85,25 @@ public class SystemMetricsAutoConfiguration {
     public static final String SYSTEM_METRICS_ENABLED_PROPERTY_NAME = SYSTEM_METRICS_PROPERTY_NAME_PREFIX + ENABLED_PROPERTY_NAME;
 
     /**
-     * The Default Property Value of metrics collection interval : "60000"
+     * The Placeholder of Network Stats File Location : "${system.network.stats.file:file:///proc/net/dev}"
      */
-    public static final String DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE = "60000";
+    public static final String NETWORK_STATS_FILE_LOCATION_PLACEHOLDER = "${" + NETWORK_STATS_FILE_PATH_PROPERTY_NAME + ":file://" + DEFAULT_NETWORK_STATS_FILE_PATH + "}";
 
     /**
-     * The Property Name of metrics collection interval : "microsphere.metrics.micrometer.system.collection.interval"
-     */
-    @ConfigurationProperty(
-            type = long.class,
-            defaultValue = DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE,
-            source = APPLICATION_SOURCE
-    )
-    public static final String METRICS_COLLECTION_INTERVAL_PROPERTY_NAME = SYSTEM_METRICS_PROPERTY_NAME_PREFIX + "collection.interval";
-
-    /**
-     * The Property Placeholder of metrics collection interval : "${microsphere.metrics.micrometer.system.collection.interval:60000}"
+     * The Property Placeholder of metrics collection interval : "${system.metrics.micrometer.collection.interval:60000}"
      */
     public static final String METRICS_COLLECTION_INTERVAL_PLACEHOLDER = "${" + METRICS_COLLECTION_INTERVAL_PROPERTY_NAME + ":" + DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE + "}";
 
     @Bean
     @ConditionalOnMissingBean
-    public NetworkStatisticsMetrics networkStatisticsMetrics(@Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
-        return new NetworkStatisticsMetrics(getScheduledExecutor(), interval.toMillis());
+    @ConditionalOnResource(resources = NETWORK_STATS_FILE_LOCATION_PLACEHOLDER)
+    public NetworkStatisticsMetrics networkStatisticsMetrics(
+            @Value(NETWORK_STATS_FILE_LOCATION_PLACEHOLDER) String networkStatsFileLocation,
+            @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
+            ResourceLoader resourceLoader) throws IOException {
+        Resource resource = resourceLoader.getResource(networkStatsFileLocation);
+        URI uri = resource.getURI();
+        return new NetworkStatisticsMetrics(get(uri), interval.toMillis());
     }
 
     @Bean
