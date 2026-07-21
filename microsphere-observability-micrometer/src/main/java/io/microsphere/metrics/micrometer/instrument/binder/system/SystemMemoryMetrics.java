@@ -27,6 +27,7 @@ import java.lang.management.PlatformManagedObject;
 import static io.micrometer.core.instrument.Gauge.builder;
 import static io.microsphere.lang.function.ThrowableSupplier.execute;
 import static io.microsphere.management.JmxUtils.getOperatingSystemMXBean;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.PREFIX;
 import static io.microsphere.util.ClassLoaderUtils.resolveClass;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.management.ManagementFactory.getPlatformMXBean;
@@ -40,14 +41,16 @@ import static java.util.Collections.emptyList;
  */
 public class SystemMemoryMetrics extends AbstractMeterBinder {
 
-    private static final String TARGET_CLASS_NAME = "com.sun.management.OperatingSystemMXBean";
+    public static final String METRIC_PREFIX = PREFIX;
 
-    private static final Class<?> TARGET_CLASS = resolveClass(TARGET_CLASS_NAME, getSystemClassLoader());
+    public static final String OPERATING_SYSTEM_MXBEAN_CLASS_NAME = "com.sun.management.OperatingSystemMXBean";
 
-    private static final boolean SUPPORTED = isSupported();
+    private static final Class<?> OPERATING_SYSTEM_MXBEAN_CLASS = resolveClass(OPERATING_SYSTEM_MXBEAN_CLASS_NAME, getSystemClassLoader());
 
-    private static boolean isSupported() {
-        return execute(() -> getPlatformMXBean((Class<PlatformManagedObject>) TARGET_CLASS) != null, e -> false);
+    public static final boolean SUPPORTED = isSupported();
+
+    public static boolean isSupported() {
+        return execute(() -> getPlatformMXBean((Class<PlatformManagedObject>) OPERATING_SYSTEM_MXBEAN_CLASS) != null, e -> false);
     }
 
     public SystemMemoryMetrics() {
@@ -68,35 +71,35 @@ public class SystemMemoryMetrics extends AbstractMeterBinder {
 
         OperatingSystemMXBean operatingSystemBean = (OperatingSystemMXBean) getOperatingSystemMXBean();
 
-        builder("memory.swap.space.total", operatingSystemBean, OperatingSystemMXBean::getTotalSwapSpaceSize)
+        builder(METRIC_PREFIX + "memory.swap.space.total", operatingSystemBean, OperatingSystemMXBean::getTotalSwapSpaceSize)
                 .tags(tags)
                 .description("Total swap space size")
                 .baseUnit(BaseUnits.BYTES)
                 .strongReference(true)
                 .register(registry);
 
-        builder("memory.swap.space.free", operatingSystemBean, OperatingSystemMXBean::getFreeSwapSpaceSize)
+        builder(METRIC_PREFIX + "memory.swap.space.free", operatingSystemBean, OperatingSystemMXBean::getFreeSwapSpaceSize)
                 .tags(tags)
                 .description("Free swap space size")
                 .baseUnit(BaseUnits.BYTES)
                 .strongReference(true)
                 .register(registry);
 
-        builder("memory.committed.virtual", operatingSystemBean, OperatingSystemMXBean::getCommittedVirtualMemorySize)
+        builder(METRIC_PREFIX + "memory.committed.virtual", operatingSystemBean, OperatingSystemMXBean::getCommittedVirtualMemorySize)
                 .tags(tags)
                 .description("Committed virtual memory size")
                 .baseUnit(BaseUnits.BYTES)
                 .strongReference(true)
                 .register(registry);
 
-        builder("memory.physical.total", operatingSystemBean, OperatingSystemMXBean::getTotalPhysicalMemorySize)
+        builder(METRIC_PREFIX + "memory.physical.total", operatingSystemBean, OperatingSystemMXBean::getTotalPhysicalMemorySize)
                 .tags(tags)
                 .description("Total physical memory size")
                 .baseUnit(BaseUnits.BYTES)
                 .strongReference(true)
                 .register(registry);
 
-        builder("memory.physical.free", operatingSystemBean, OperatingSystemMXBean::getFreePhysicalMemorySize)
+        builder(METRIC_PREFIX + "memory.physical.free", operatingSystemBean, OperatingSystemMXBean::getFreePhysicalMemorySize)
                 .tags(tags)
                 .description("Free physical memory size")
                 .baseUnit(BaseUnits.BYTES)
