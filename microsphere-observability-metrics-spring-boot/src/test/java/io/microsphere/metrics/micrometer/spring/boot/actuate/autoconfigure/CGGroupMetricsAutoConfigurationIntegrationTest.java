@@ -43,7 +43,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         },
         webEnvironment = NONE,
         properties = {
-                "cgroup.dir=file://${user.dir}/../microsphere-observability-micrometer/src/test/resources/test-data"
+                "system.cgroup.dir=file://${user.dir}/../microsphere-observability-micrometer/src/test/resources/test-data"
         }
 )
 @EnableAutoConfiguration
