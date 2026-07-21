@@ -1,32 +1,33 @@
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
-import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.BaseUnits;
-import io.micrometer.core.instrument.util.NamedThreadFactory;
+import io.microsphere.annotation.Nullable;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
+import io.microsphere.metrics.micrometer.util.MicrometerUtils;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
+import static io.micrometer.core.instrument.Gauge.builder;
+import static io.micrometer.core.instrument.Tags.concat;
+import static io.microsphere.collection.ListUtils.newArrayList;
+import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getMetricsCollectionInterval;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getNetworkStatsFilePath;
+import static io.microsphere.util.ObjectUtils.defaultIfNull;
 import static io.microsphere.util.StringUtils.split;
-import static java.lang.System.getProperty;
+import static java.lang.Long.parseLong;
 import static java.nio.charset.StandardCharsets.US_ASCII;
+import static java.nio.file.Files.exists;
 import static java.nio.file.Files.readAllLines;
-import static java.nio.file.Paths.get;
-import static java.util.Collections.emptyList;
-import static java.util.concurrent.Executors.newSingleThreadScheduledExecutor;
-import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Network Statistics Metrics
@@ -35,19 +36,14 @@ import static java.util.concurrent.TimeUnit.MINUTES;
  */
 public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
-    public static final String STATS_FILE_PATH_PROPERTY_NAME = "microsphere.metrics.network.stats.file";
-
-    public static final String DEFAULT_STATS_FILE_PATH = "/proc/net/dev";
-
-    public static final Path STATS_FILE_PATH = get(getProperty(STATS_FILE_PATH_PROPERTY_NAME, DEFAULT_STATS_FILE_PATH));
-
-    public static final String INTERVAL_PROPERTY_NAME = "microsphere.metrics.collection.interval";
-
-    public static final long DEFAULT_INTERVAL = MINUTES.toMillis(1);
-
-    private final ConcurrentMap<String, Stats> statsMap = new ConcurrentHashMap<>(8);
+    private final ConcurrentMap<String, Stats> statsMap = newConcurrentHashMap(8);
 
     private final ScheduledExecutorService scheduledExecutorService;
+
+    /**
+     * The stats file path
+     */
+    private final Path statsFilePath;
 
     /**
      * The interval time of metrics collection in milliseconds.
@@ -57,32 +53,31 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     private MeterRegistry registry;
 
     public NetworkStatisticsMetrics() {
-        this(Long.getLong(INTERVAL_PROPERTY_NAME, DEFAULT_INTERVAL));
+        this(Paths.get(getNetworkStatsFilePath()), getMetricsCollectionInterval());
     }
 
-    public NetworkStatisticsMetrics(long interval) {
-        this(null, interval);
+    public NetworkStatisticsMetrics(Path statsFilePath, long interval) {
+        this(statsFilePath, interval, null);
     }
 
-    public NetworkStatisticsMetrics(ScheduledExecutorService scheduledExecutorService, long interval) {
-        this(emptyList(), scheduledExecutorService, interval);
+    public NetworkStatisticsMetrics(Path statsFilePath, long interval, @Nullable ScheduledExecutorService scheduledExecutorService) {
+        this(statsFilePath, interval, scheduledExecutorService, null);
     }
 
-    public NetworkStatisticsMetrics(Iterable<Tag> tags, ScheduledExecutorService scheduledExecutorService, long interval) {
+    public NetworkStatisticsMetrics(Path statsFilePath, long interval, @Nullable ScheduledExecutorService scheduledExecutorService, @Nullable Iterable<Tag> tags) {
         super(tags);
-        this.scheduledExecutorService = scheduledExecutorService == null ?
-                newSingleThreadScheduledExecutor(new NamedThreadFactory("Network-Statistics-Metrics-Task-"))
-                : scheduledExecutorService;
+        this.statsFilePath = statsFilePath;
         this.interval = interval;
+        this.scheduledExecutorService = defaultIfNull(scheduledExecutorService, MicrometerUtils::getScheduledExecutor);
     }
 
     private void bindStats() {
         List<String> lines = null;
         try {
-            lines = readAllLines(STATS_FILE_PATH, US_ASCII);
+            lines = readAllLines(this.statsFilePath, US_ASCII);
         } catch (IOException e) {
             if (logger.isErrorEnabled()) {
-                logger.error("Network stats file[path : '{}'] can't be read", STATS_FILE_PATH);
+                logger.error("Network stats file[path : '{}'] can't be read", this.statsFilePath);
             }
             return;
         }
@@ -103,60 +98,60 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
                 return stats;
             });
             if (boundStats.update(stats)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("The Stats has been updated : {}", stats);
+                if (logger.isTraceEnabled()) {
+                    logger.trace("The Stats has been updated : {}", stats);
                 }
             }
         }
     }
 
     private void bindStats(Stats stats) {
-        Iterable<Tag> newTags = Tags.concat(tags, "interface", stats.name);
+        Iterable<Tag> newTags = concat(tags, "interface", stats.name);
 
-        Gauge.builder("network.receive.bytes", stats, Stats::getReceiveBytes)
+        builder("network.receive.bytes", stats, Stats::getReceiveBytes)
                 .tags(newTags)
                 .description("Number of good received bytes")
                 .strongReference(true)
                 .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
-        Gauge.builder("network.receive.packets", stats, Stats::getReceivePackets)
+        builder("network.receive.packets", stats, Stats::getReceivePackets)
                 .tags(newTags)
                 .description("Number of good packets received by the interface")
                 .strongReference(true)
                 .register(registry);
 
-        Gauge.builder("network.receive.errors", stats, Stats::getReceiveErrors)
+        builder("network.receive.errors", stats, Stats::getReceiveErrors)
                 .tags(newTags)
                 .description("Total number of bad packets received on this network device")
                 .strongReference(true)
                 .register(registry);
 
-        Gauge.builder("network.receive.drop", stats, Stats::getReceiveDrop)
+        builder("network.receive.drop", stats, Stats::getReceiveDrop)
                 .tags(newTags)
                 .description("Number of packets received but not processed")
                 .strongReference(true)
                 .register(registry);
 
-        Gauge.builder("network.transmit.bytes", stats, Stats::getTransmitBytes)
+        builder("network.transmit.bytes", stats, Stats::getTransmitBytes)
                 .tags(newTags)
                 .description("Number of good transmitted bytes")
                 .strongReference(true)
                 .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
-        Gauge.builder("network.transmit.packets", stats, Stats::getTransmitPackets)
+        builder("network.transmit.packets", stats, Stats::getTransmitPackets)
                 .tags(newTags)
                 .description("Number of packets successfully transmitted")
                 .strongReference(true)
                 .register(registry);
 
-        Gauge.builder("network.transmit.errors", stats, Stats::getTransmitErrors)
+        builder("network.transmit.errors", stats, Stats::getTransmitErrors)
                 .tags(newTags).description("Total number of transmit problems")
                 .strongReference(true)
                 .register(registry);
 
-        Gauge.builder("network.transmit.drop", stats, Stats::getTransmitDrop)
+        builder("network.transmit.drop", stats, Stats::getTransmitDrop)
                 .tags(newTags).description("Number of packets dropped on their way to transmission")
                 .strongReference(true)
                 .register(registry);
@@ -164,7 +159,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
     @Override
     protected boolean supports(MeterRegistry registry) {
-        return Files.exists(STATS_FILE_PATH);
+        return exists(this.statsFilePath);
     }
 
     @Override
@@ -175,8 +170,9 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     }
 
     private void bindStatsOnSchedule() {
+        ScheduledExecutorService scheduledExecutorService = this.scheduledExecutorService;
         if (scheduledExecutorService != null && !scheduledExecutorService.isShutdown()) {
-            scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, interval, TimeUnit.MILLISECONDS);
+            scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, this.interval, MILLISECONDS);
         }
     }
 
@@ -192,7 +188,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
             char[] chars = data.toCharArray();
             int length = chars.length;
 
-            List<String> values = new ArrayList<>(16);
+            List<String> values = newArrayList(16);
 
             for (int i = 0; i < length; i++) {
                 char c = chars[i];
@@ -217,15 +213,15 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
             stats = new Stats(name);
 
-            stats.receiveBytes = Long.parseLong(values.get(index++));
-            stats.receivePackets = Long.parseLong(values.get(index++));
-            stats.receiveErrors = Long.parseLong(values.get(index++));
-            stats.receiveDrop = Long.parseLong(values.get(index++));
+            stats.receiveBytes = parseLong(values.get(index++));
+            stats.receivePackets = parseLong(values.get(index++));
+            stats.receiveErrors = parseLong(values.get(index++));
+            stats.receiveDrop = parseLong(values.get(index++));
             index += 4;
-            stats.transmitBytes = Long.parseLong(values.get(index++));
-            stats.transmitPackets = Long.parseLong(values.get(index++));
-            stats.transmitErrors = Long.parseLong(values.get(index++));
-            stats.transmitDrop = Long.parseLong(values.get(index++));
+            stats.transmitBytes = parseLong(values.get(index++));
+            stats.transmitPackets = parseLong(values.get(index++));
+            stats.transmitErrors = parseLong(values.get(index++));
+            stats.transmitDrop = parseLong(values.get(index++));
         }
         return stats;
     }
