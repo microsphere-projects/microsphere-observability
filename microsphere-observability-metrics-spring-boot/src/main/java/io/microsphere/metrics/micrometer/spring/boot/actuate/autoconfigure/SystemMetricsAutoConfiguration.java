@@ -21,6 +21,7 @@ import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.system.NetworkStatisticsMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnPlatformMXBeanAvailable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,6 +39,7 @@ import java.time.Duration;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.SystemMemoryMetrics.OPERATING_SYSTEM_MXBEAN_CLASS_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_NETWORK_STATS_FILE_PATH;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.METRICS_COLLECTION_INTERVAL_PROPERTY_NAME;
@@ -108,6 +110,7 @@ public class SystemMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnPlatformMXBeanAvailable(type = OPERATING_SYSTEM_MXBEAN_CLASS_NAME)
     public SystemMemoryMetrics systemMemoryMetrics() {
         return new SystemMemoryMetrics();
     }

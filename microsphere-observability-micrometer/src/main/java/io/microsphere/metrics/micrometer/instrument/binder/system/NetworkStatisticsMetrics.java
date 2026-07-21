@@ -18,6 +18,7 @@ import static io.micrometer.core.instrument.Gauge.builder;
 import static io.micrometer.core.instrument.Tags.concat;
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_PREFIX;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getMetricsCollectionInterval;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getNetworkStatsFilePath;
 import static io.microsphere.util.ObjectUtils.defaultIfNull;
@@ -35,6 +36,8 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  */
 public class NetworkStatisticsMetrics extends AbstractMeterBinder {
+
+    public static final String METRIC_PREFIX = NETWORK_PREFIX;
 
     private final ConcurrentMap<String, Stats> statsMap = newConcurrentHashMap(8);
 
@@ -108,50 +111,50 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     private void bindStats(Stats stats) {
         Iterable<Tag> newTags = concat(tags, "interface", stats.name);
 
-        builder("network.receive.bytes", stats, Stats::getReceiveBytes)
+        builder(METRIC_PREFIX + "receive.bytes", stats, Stats::getReceiveBytes)
                 .tags(newTags)
                 .description("Number of good received bytes")
                 .strongReference(true)
                 .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
-        builder("network.receive.packets", stats, Stats::getReceivePackets)
+        builder(METRIC_PREFIX + "receive.packets", stats, Stats::getReceivePackets)
                 .tags(newTags)
                 .description("Number of good packets received by the interface")
                 .strongReference(true)
                 .register(registry);
 
-        builder("network.receive.errors", stats, Stats::getReceiveErrors)
+        builder(METRIC_PREFIX + "receive.errors", stats, Stats::getReceiveErrors)
                 .tags(newTags)
                 .description("Total number of bad packets received on this network device")
                 .strongReference(true)
                 .register(registry);
 
-        builder("network.receive.drop", stats, Stats::getReceiveDrop)
+        builder(METRIC_PREFIX + "receive.drop", stats, Stats::getReceiveDrop)
                 .tags(newTags)
                 .description("Number of packets received but not processed")
                 .strongReference(true)
                 .register(registry);
 
-        builder("network.transmit.bytes", stats, Stats::getTransmitBytes)
+        builder(METRIC_PREFIX + "transmit.bytes", stats, Stats::getTransmitBytes)
                 .tags(newTags)
                 .description("Number of good transmitted bytes")
                 .strongReference(true)
                 .baseUnit(BaseUnits.BYTES)
                 .register(registry);
 
-        builder("network.transmit.packets", stats, Stats::getTransmitPackets)
+        builder(METRIC_PREFIX + "transmit.packets", stats, Stats::getTransmitPackets)
                 .tags(newTags)
                 .description("Number of packets successfully transmitted")
                 .strongReference(true)
                 .register(registry);
 
-        builder("network.transmit.errors", stats, Stats::getTransmitErrors)
+        builder(METRIC_PREFIX + "transmit.errors", stats, Stats::getTransmitErrors)
                 .tags(newTags).description("Total number of transmit problems")
                 .strongReference(true)
                 .register(registry);
 
-        builder("network.transmit.drop", stats, Stats::getTransmitDrop)
+        builder(METRIC_PREFIX + "transmit.drop", stats, Stats::getTransmitDrop)
                 .tags(newTags).description("Number of packets dropped on their way to transmission")
                 .strongReference(true)
                 .register(registry);
