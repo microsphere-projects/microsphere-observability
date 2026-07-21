@@ -101,7 +101,7 @@ public class ConditionalOnCGroupAvailableTest {
             },
             webEnvironment = NONE,
             properties = {
-                    "cgroup.dir=file://not-found"
+                    "system.cgroup.dir=file://not-found"
             }
     )
     @ConditionalOnCGroupAvailable
