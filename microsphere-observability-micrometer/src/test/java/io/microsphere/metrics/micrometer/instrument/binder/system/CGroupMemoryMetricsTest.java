@@ -57,22 +57,22 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
     void test() {
         assertFalse(registry.getMeters().isEmpty());
 
-        assertMeterPresent("cgroup.memory.usage_in_bytes");
-        assertMeterPresent("cgroup.memory.max_usage_in_bytes");
-        assertMeterPresent("cgroup.memory.memsw.usage_in_bytes");
-        assertMeterPresent("cgroup.memory.memsw.max_usage_in_bytes");
-        assertMeterPresent("cgroup.memory.limit_in_bytes");
-        assertMeterPresent("cgroup.memory.stat.cache");
-        assertMeterPresent("cgroup.memory.stat.rss");
-        assertMeterPresent("cgroup.memory.stat.mapped_file");
-        assertMeterPresent("cgroup.memory.stat.swap");
-        assertMeterPresent("cgroup.memory.stat.active_anon");
-        assertMeterPresent("cgroup.memory.stat.inactive_anon");
-        assertMeterPresent("cgroup.memory.stat.active_file");
-        assertMeterPresent("cgroup.memory.stat.inactive_file");
-        assertMeterPresent("cgroup.memory.stat.unevictable");
-        assertMeterPresent("cgroup.memory.stat.hierarchical_memory_limit");
-        assertMeterPresent("cgroup.memory.stat.hierarchical_memsw_limit");
+        assertMeterPresent("system.cgroup.memory.usage_in_bytes");
+        assertMeterPresent("system.cgroup.memory.max_usage_in_bytes");
+        assertMeterPresent("system.cgroup.memory.memsw.usage_in_bytes");
+        assertMeterPresent("system.cgroup.memory.memsw.max_usage_in_bytes");
+        assertMeterPresent("system.cgroup.memory.limit_in_bytes");
+        assertMeterPresent("system.cgroup.memory.stat.cache");
+        assertMeterPresent("system.cgroup.memory.stat.rss");
+        assertMeterPresent("system.cgroup.memory.stat.mapped_file");
+        assertMeterPresent("system.cgroup.memory.stat.swap");
+        assertMeterPresent("system.cgroup.memory.stat.active_anon");
+        assertMeterPresent("system.cgroup.memory.stat.inactive_anon");
+        assertMeterPresent("system.cgroup.memory.stat.active_file");
+        assertMeterPresent("system.cgroup.memory.stat.inactive_file");
+        assertMeterPresent("system.cgroup.memory.stat.unevictable");
+        assertMeterPresent("system.cgroup.memory.stat.hierarchical_memory_limit");
+        assertMeterPresent("system.cgroup.memory.stat.hierarchical_memsw_limit");
     }
 
     private void assertMeterPresent(String metricName) {
