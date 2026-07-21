@@ -45,7 +45,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         },
         webEnvironment = NONE,
         properties = {
-                "cgroup.dir=file://${user.dir}"
+                "system.cgroup.dir=file://${user.dir}"
         }
 )
 class CGGroupMetricsAutoConfigurationTest extends AutoConfigurationTest<CGGroupMetricsAutoConfiguration> {
@@ -64,7 +64,7 @@ class CGGroupMetricsAutoConfigurationTest extends AutoConfigurationTest<CGGroupM
     protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
         globalDisabledPropertyValues.add("microsphere.metrics.micrometer.enabled=false");
         globalDisabledPropertyValues.add("microsphere.metrics.micrometer.cgroup.enabled=false");
-        globalDisabledPropertyValues.add("cgroup.dir=file://not-found");
+        globalDisabledPropertyValues.add("system.cgroup.dir=file://not-found");
     }
 
     @Override
