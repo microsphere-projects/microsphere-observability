@@ -80,7 +80,7 @@ public class ConditionalOnCGroupAvailableTest {
             },
             webEnvironment = NONE,
             properties = {
-                    "cgroup.dir=file://${user.dir}"
+                    "system.cgroup.dir=file://${user.dir}"
             }
     )
     @ConditionalOnCGroupAvailable
