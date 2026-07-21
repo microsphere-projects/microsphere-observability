@@ -28,12 +28,15 @@ import java.lang.management.ManagementFactory;
 import java.lang.management.PlatformManagedObject;
 import java.util.Map;
 
+import static io.microsphere.lang.function.ThrowableSupplier.execute;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.spring.core.annotation.ResolvablePlaceholderAnnotationAttributes.of;
 import static io.microsphere.text.FormatUtils.format;
+import static io.microsphere.util.ArrayUtils.isEmpty;
 import static io.microsphere.util.ClassLoaderUtils.resolveClass;
 import static java.lang.ClassLoader.getSystemClassLoader;
 import static java.lang.management.ManagementFactory.getPlatformMXBean;
+import static java.util.Objects.nonNull;
 import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.match;
 import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.noMatch;
 
@@ -57,6 +60,12 @@ class PlatformMXBeanCondition extends SpringBootCondition {
         Map<String, Object> annotationAttributes = metadata.getAnnotationAttributes(annotationType.getName());
         ResolvablePlaceholderAnnotationAttributes attributes = of(annotationAttributes, annotationType, context.getEnvironment());
         Class<?>[] interfaceClasses = attributes.getClassArray("value");
+        String[] interfaceClassNames = attributes.getStringArray("type");
+
+        if (isEmpty(interfaceClasses) && isEmpty(interfaceClassNames)) {
+            return noMatch("The annotation attributes[type : 'value' and type : 'type'] are empty");
+        }
+
         for (Class<?> interfaceClass : interfaceClasses) {
             if (!isPlatformMXBeanAvailable(interfaceClass)) {
                 return noMatch(format("The PlatformMXBean interface class[name : '{}'] is not available", interfaceClass.getName()));
@@ -65,7 +74,6 @@ class PlatformMXBeanCondition extends SpringBootCondition {
 
         ClassLoader systemClassLoader = getSystemClassLoader();
 
-        String[] interfaceClassNames = attributes.getStringArray("type");
         for (String interfaceClassName : interfaceClassNames) {
             Class<?> interfaceClass = resolveClass(interfaceClassName, systemClassLoader);
             if (interfaceClass == null) {
@@ -81,11 +89,9 @@ class PlatformMXBeanCondition extends SpringBootCondition {
 
     static boolean isPlatformMXBeanAvailable(Class<?> interfaceClass) {
         if (!PlatformManagedObject.class.isAssignableFrom(interfaceClass)) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("The PlatformMXBean interface[{}] is not a subtype of java.lang.management.PlatformManagedObject", interfaceClass);
-            }
+            logger.warn("The PlatformMXBean interface[{}] is not a subtype of java.lang.management.PlatformManagedObject", interfaceClass);
             return false;
         }
-        return getPlatformMXBean((Class<PlatformManagedObject>) interfaceClass) != null;
+        return execute(() -> nonNull(getPlatformMXBean((Class<PlatformManagedObject>) interfaceClass)), e -> false);
     }
 }
