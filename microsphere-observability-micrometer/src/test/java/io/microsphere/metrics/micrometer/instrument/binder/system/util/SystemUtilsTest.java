@@ -49,23 +49,24 @@ class SystemUtilsTest {
 
     @Test
     void testGetCGroupDirectoryPath() {
-        assertSame(DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE, getCGroupDirectoryPath());
         assertSystemPropertyValue(CGROUP_DIRECTORY_PATH_PROPERTY_NAME, "test_path", SystemUtils::getCGroupDirectoryPath);
+        assertSame(DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE, getCGroupDirectoryPath());
     }
 
     @Test
     void testGetNetworkStatsFilePath() {
-        assertSame(DEFAULT_NETWORK_STATS_FILE_PATH, getNetworkStatsFilePath());
         assertSystemPropertyValue(NETWORK_STATS_FILE_PATH_PROPERTY_NAME, "test_path", SystemUtils::getNetworkStatsFilePath);
+        assertSame(DEFAULT_NETWORK_STATS_FILE_PATH, getNetworkStatsFilePath());
     }
 
     @Test
     void testGetMetricsCollectionInterval() {
-        assertEquals(parseLong(DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE), getMetricsCollectionInterval());
         assertSystemPropertyValue(METRICS_COLLECTION_INTERVAL_PROPERTY_NAME, 1000, SystemUtils::getMetricsCollectionInterval);
+        assertEquals(parseLong(DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE), getMetricsCollectionInterval());
     }
 
     <V> void assertSystemPropertyValue(String name, V value, Supplier<V> propertyValueSupplier) {
+        getProperties().remove(name);
         setProperty(name, valueOf(value));
         assertEquals(valueOf(value), valueOf(propertyValueSupplier.get()));
         getProperties().remove(name);
