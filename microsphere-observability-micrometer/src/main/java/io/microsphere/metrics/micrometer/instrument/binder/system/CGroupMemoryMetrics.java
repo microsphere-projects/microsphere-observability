@@ -15,8 +15,7 @@ import static io.micrometer.core.instrument.Gauge.builder;
 import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
 import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.PREFIX;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.util.CGroupUtils.getCGroupDirectoryPath;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getCGroupDirectoryPath;
 import static io.microsphere.util.StringUtils.isNumeric;
 import static io.microsphere.util.StringUtils.split;
 import static java.lang.Long.parseLong;
@@ -35,7 +34,7 @@ import static java.util.Collections.emptyList;
  */
 public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
-    public static final String METRIC_PREFIX = PREFIX;
+    public static final String METRIC_PREFIX = "cgroup.";
 
     private final Path memoryDirectoryPath;
 

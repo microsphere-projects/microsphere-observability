@@ -25,8 +25,8 @@ import org.springframework.mock.env.MockEnvironment;
 
 import java.io.File;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.util.CGroupUtils.getCGroupDirectoryPath;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getCGroupDirectoryPath;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_LOCATION_PLACEHOLDER;
 import static io.microsphere.spring.beans.BeanUtils.isBeanPresent;
 import static org.junit.jupiter.api.Assertions.assertEquals;
