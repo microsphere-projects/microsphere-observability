@@ -7,8 +7,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
-import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.CGroupConstants.DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_LOCATION_PLACEHOLDER;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
