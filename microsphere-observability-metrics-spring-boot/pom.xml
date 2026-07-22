@@ -155,10 +155,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Kafka -->
+        <!-- Log4j 1.x -->
         <dependency>
-            <groupId>org.apache.kafka</groupId>
-            <artifactId>kafka-clients</artifactId>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -175,10 +175,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- SLF4j -->
+        <!-- Kafka -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -216,7 +216,6 @@
             <artifactId>logback-classic</artifactId>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 
