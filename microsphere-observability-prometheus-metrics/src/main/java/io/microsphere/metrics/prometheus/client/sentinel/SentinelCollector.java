@@ -158,7 +158,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
         return labelValues;
     }
 
-
     private MetricSearcher newMetricSearcher() {
         String appName = getAppName();
         int pid = getPid();
@@ -265,8 +264,8 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     }
 
     private Sample createSample(String metricSuffix, String context,
-                                                    List<String> labelNames, MetricNode metricNode,
-                                                    Function<MetricNode, Number> metricValueFunction) {
+                                List<String> labelNames, MetricNode metricNode,
+                                Function<MetricNode, Number> metricValueFunction) {
         String metric = PREFIX + metricSuffix;
         List<String> labelValues = buildLabelValues(context, metricNode);
         Number value = metricValueFunction.apply(metricNode);
