@@ -36,6 +36,9 @@ microsphere:
       kafka:
         enabled: true
 
-    ### Microsphere Metrics Collection Internal
-    collection:
-      interval: ${management.metrics.export.prometheus.pushgateway.push-rate:60000}
+### Microsphere Metrics Collection Internal
+system:
+  metrics:
+    micrometer:
+      collection:
+        interval: ${management.metrics.export.prometheus.pushgateway.push-rate:60000}
