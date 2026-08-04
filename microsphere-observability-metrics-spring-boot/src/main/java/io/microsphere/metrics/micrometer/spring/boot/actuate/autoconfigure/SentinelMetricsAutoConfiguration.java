@@ -21,20 +21,16 @@ import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentin
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.time.Duration;
-
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.SENTINEL_METRICS_ENABLED_PROPERTY_NAME;
-import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PLACEHOLDER;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 
 /**
@@ -81,7 +77,7 @@ public class SentinelMetricsAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public SentinelMetrics sentinelMetrics(@Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
-        return new SentinelMetrics(interval.toMillis());
+    public SentinelMetrics sentinelMetrics() {
+        return new SentinelMetrics();
     }
 }
