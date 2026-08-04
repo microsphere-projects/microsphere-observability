@@ -23,8 +23,8 @@ import io.microsphere.logging.Logger;
 import org.junit.jupiter.api.BeforeEach;
 
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.reflect.ConstructorUtils.newInstance;
 import static io.microsphere.reflect.JavaType.from;
-import static io.microsphere.util.ClassUtils.newInstance;
 
 /**
  * Abstract Metrics Test
