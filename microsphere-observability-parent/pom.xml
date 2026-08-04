@@ -19,9 +19,9 @@
     <description>Microsphere Observability Parent</description>
 
     <properties>
-        <microsphere-spring-cloud.version>0.2.24</microsphere-spring-cloud.version>
+        <microsphere-spring-cloud.version>0.2.25</microsphere-spring-cloud.version>
         <microsphere-alibaba-sentinel.version>0.2.0</microsphere-alibaba-sentinel.version>
-        <microsphere-i18n.version>0.2.19</microsphere-i18n.version>
+        <microsphere-i18n.version>0.2.20</microsphere-i18n.version>
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
