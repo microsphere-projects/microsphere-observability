@@ -16,33 +16,27 @@
  */
 package io.microsphere.metrics.micrometer.instrument.binder.sentinel;
 
-import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.ClusterNode;
 import com.alibaba.csp.sentinel.node.DefaultNode;
-import com.alibaba.csp.sentinel.node.EntranceNode;
-import com.alibaba.csp.sentinel.node.Node;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
 import com.alibaba.csp.sentinel.slotchain.ProcessorSlotEntryCallback;
-import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
-import com.alibaba.csp.sentinel.slots.block.BlockException;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.MeterBinder;
+import io.microsphere.alibaba.sentinel.event.ClusterNodeAddedEvent;
+import io.microsphere.alibaba.sentinel.event.ClusterNodeAddedEventListener;
+import io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
-import java.util.Objects;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.Collection;
 
-import static com.alibaba.csp.sentinel.Constants.ROOT;
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
-import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.addEntryCallback;
+import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.getEntryCallbacks;
 import static io.micrometer.core.instrument.Tags.concat;
 import static io.micrometer.core.instrument.TimeGauge.builder;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
-import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getSentinelMetricsTaskExecutor;
-import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
+import static io.microsphere.constants.SymbolConstants.DOT;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -55,7 +49,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @see MetricTimerListener
  * @since 1.0.0
  */
-public class SentinelMetrics extends AbstractMeterBinder implements Runnable, ProcessorSlotEntryCallback<DefaultNode> {
+public class SentinelMetrics extends AbstractMeterBinder implements ClusterNodeAddedEventListener {
 
     /**
      * The Metric prefix : "sentinel."
@@ -82,102 +76,48 @@ public class SentinelMetrics extends AbstractMeterBinder implements Runnable, Pr
      */
     public static final String VERSION_TAG_KEY = METRIC_PREFIX + "version";
 
-    /**
-     * The interval time of metrics collection in milliseconds.
-     */
-    private final long interval;
+    MeterRegistry registry;
 
-    private MeterRegistry registry;
-
-    private ScheduledExecutorService scheduler;
-
-    /**
-     * Processed the mapping between Sentinel resource name and {@link ClusterNode}
-     */
-    private final ConcurrentMap<String, ClusterNode> processedResourceClusterNodes = newConcurrentHashMap(256);
-
-    public SentinelMetrics(long interval) {
-        this(interval, emptyList());
+    public SentinelMetrics() {
+        this(emptyList());
     }
 
-    public SentinelMetrics(long interval, Iterable<Tag> tags) {
+    public SentinelMetrics(Iterable<Tag> tags) {
         super(concat(tags, VERSION_TAG_KEY, SENTINEL_VERSION));
-        this.interval = interval;
     }
 
     @Override
     protected boolean supports(MeterRegistry registry) {
-        return true;
+        return getSentinelNodeEventPublisher() != null;
     }
 
     @Override
     protected void doBindTo(MeterRegistry registry) {
         this.registry = registry;
-        this.scheduler = initScheduler();
-        addEntryCallback(getClass().getName(), this);
+        SentinelNodeEventPublisher sentinelNodeEventPublisher = getSentinelNodeEventPublisher();
+        sentinelNodeEventPublisher.addEventListener(this);
     }
 
     @Override
-    public void onPass(Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) throws Exception {
-        addMetricsAsync(context, resourceWrapper, node);
+    public void onEvent(ClusterNodeAddedEvent event) {
+        String contextName = event.getContextName();
+        String resourceName = event.getResourceName();
+        ClusterNode clusterNode = event.getClusterNode();
+        addMetrics(contextName, resourceName, clusterNode, this.registry);
     }
 
-    @Override
-    public void onBlocked(BlockException ex, Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) {
-        addMetricsAsync(context, resourceWrapper, node);
-    }
-
-    @Override
-    public void run() {
-        addMetrics(ROOT);
-    }
-
-    private ScheduledExecutorService initScheduler() {
-        ScheduledExecutorService scheduledExecutorService = getSentinelMetricsTaskExecutor();
-        scheduledExecutorService.scheduleAtFixedRate(this, 0, this.interval, MILLISECONDS);
-        return scheduledExecutorService;
-    }
-
-    private void addMetricsAsync(Context context, ResourceWrapper resourceWrapper, DefaultNode node) {
-        this.scheduler.execute(() -> {
-            String contextName = context.getName();
-            String resourceName = resourceWrapper.getName();
-            addMetrics(contextName, resourceName, node);
-        });
-    }
-
-    private void addMetrics(DefaultNode currentNode) {
-        for (Node node : currentNode.getChildList()) {
-            if (node instanceof DefaultNode childNode) {
-                String resourceName = getResourceName(currentNode);
-                String childResourceName = getResourceName(childNode);
-                if (node instanceof EntranceNode) {
-                    addMetrics(childNode);
-                }
-                String contextName = resourceName;
-                addMetrics(contextName, childResourceName, childNode);
+    private SentinelNodeEventPublisher getSentinelNodeEventPublisher() {
+        Collection<ProcessorSlotEntryCallback<DefaultNode>> entryCallbacks = getEntryCallbacks();
+        for (ProcessorSlotEntryCallback<DefaultNode> callback : entryCallbacks) {
+            if (callback instanceof SentinelNodeEventPublisher) {
+                return (SentinelNodeEventPublisher) callback;
             }
         }
-    }
-
-    private String getResourceName(DefaultNode node) {
-        return node.getId().getName();
-    }
-
-    private void addMetrics(String contextName, String resourceName, DefaultNode node) {
-        if (contextName == null || resourceName == null) {
-            return;
-        }
-        ClusterNode clusterNode = node.getClusterNode();
-        ClusterNode processedClusterNode = processedResourceClusterNodes.get(resourceName);
-        if (!Objects.equals(processedClusterNode, clusterNode)) {
-            addMetrics(contextName, resourceName, clusterNode, registry);
-            processedResourceClusterNodes.put(resourceName, clusterNode);
-        }
+        return null;
     }
 
     private void addMetrics(String contextName, String resourceName, ClusterNode clusterNode, MeterRegistry registry) {
-        String metricNamePrefix = METRIC_PREFIX + resourceName + ".";
+        String metricNamePrefix = METRIC_PREFIX + resourceName + DOT;
 
         Iterable<Tag> tags = buildTags(resourceName, contextName, clusterNode);
 
