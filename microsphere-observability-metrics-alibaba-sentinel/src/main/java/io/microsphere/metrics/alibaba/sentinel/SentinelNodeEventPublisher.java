@@ -37,8 +37,7 @@ import static com.alibaba.csp.sentinel.Constants.ROOT;
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.addEntryCallback;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getSentinelMetricsTaskExecutor;
 import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
-import static io.microsphere.event.EventDispatcher.newDefault;
-import static io.microsphere.event.EventDispatcher.parallel;
+import static io.microsphere.event.EventDispatcher.of;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
@@ -72,7 +71,7 @@ public class SentinelNodeEventPublisher implements Runnable, ProcessorSlotEntryC
     public SentinelNodeEventPublisher(long interval, @Nullable Executor eventDispatcherExecutor) {
         this.interval = interval;
         this.scheduler = initScheduler();
-        this.eventDispatcher = eventDispatcherExecutor == null ? newDefault() : parallel(eventDispatcherExecutor);
+        this.eventDispatcher = of(eventDispatcherExecutor);
         addEntryCallback(getClass().getName(), this);
     }
 

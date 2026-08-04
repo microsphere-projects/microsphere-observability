@@ -29,7 +29,13 @@
 
             <dependency>
                 <groupId>io.github.microsphere-projects</groupId>
-                <artifactId>microsphere-observability-micrometer</artifactId>
+                <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.github.microsphere-projects</groupId>
+                <artifactId>microsphere-observability-metrics-micrometer</artifactId>
                 <version>${revision}</version>
             </dependency>
 
