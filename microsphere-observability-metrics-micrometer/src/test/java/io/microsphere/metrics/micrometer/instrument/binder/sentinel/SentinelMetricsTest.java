@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.removeEntryCallback;
+import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -62,7 +63,7 @@ class SentinelMetricsTest {
     @Test
     void testSupports() {
         assertFalse(this.sentinelMetrics.supports(this.registry));
-        assertDoesNotThrow(() -> new SentinelNodeEventPublisher());
+        assertDoesNotThrow(() -> addEntryCallback(new SentinelNodeEventPublisher()));
         assertTrue(this.sentinelMetrics.supports(this.registry));
     }
 
@@ -70,19 +71,20 @@ class SentinelMetricsTest {
     void testDoBindTo() {
         assertDoesNotThrow(() -> this.sentinelMetrics.bindTo(this.registry));
         assertNull(this.sentinelMetrics.registry);
-        assertDoesNotThrow(() -> new SentinelNodeEventPublisher());
+        assertDoesNotThrow(() -> addEntryCallback(new SentinelNodeEventPublisher()));
         assertDoesNotThrow(() -> this.sentinelMetrics.bindTo(this.registry));
         assertNotNull(this.sentinelMetrics.registry);
     }
 
     @Test
     void testOnEvent() {
-        assertDoesNotThrow(() -> new SentinelNodeEventPublisher());
+        assertDoesNotThrow(() -> addEntryCallback(new SentinelNodeEventPublisher()));
         SentinelTemplate sntinelTemplate = new SentinelTemplate();
         this.sentinelMetrics.bindTo(this.registry);
         String resourceName = "test-resource";
         for (int i = 0; i < 100; i++) {
-            sntinelTemplate.execute(resourceName, () -> {});
+            sntinelTemplate.execute(resourceName, () -> {
+            });
         }
         assertEquals(12, this.registry.getMeters().size());
     }

@@ -17,7 +17,6 @@
 package io.microsphere.metrics.micrometer.instrument.binder.sentinel;
 
 import com.alibaba.csp.sentinel.node.ClusterNode;
-import com.alibaba.csp.sentinel.node.DefaultNode;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
 import com.alibaba.csp.sentinel.slotchain.ProcessorSlotEntryCallback;
 import io.micrometer.core.instrument.Gauge;
@@ -29,13 +28,11 @@ import io.microsphere.alibaba.sentinel.event.ClusterNodeAddedEventListener;
 import io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
-import java.util.Collection;
-
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
-import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.getEntryCallbacks;
 import static io.micrometer.core.instrument.Tags.concat;
 import static io.micrometer.core.instrument.TimeGauge.builder;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
+import static io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher.getSentinelNodeEventPublisher;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -104,16 +101,6 @@ public class SentinelMetrics extends AbstractMeterBinder implements ClusterNodeA
         String resourceName = event.getResourceName();
         ClusterNode clusterNode = event.getClusterNode();
         addMetrics(contextName, resourceName, clusterNode, this.registry);
-    }
-
-    private SentinelNodeEventPublisher getSentinelNodeEventPublisher() {
-        Collection<ProcessorSlotEntryCallback<DefaultNode>> entryCallbacks = getEntryCallbacks();
-        for (ProcessorSlotEntryCallback<DefaultNode> callback : entryCallbacks) {
-            if (callback instanceof SentinelNodeEventPublisher) {
-                return (SentinelNodeEventPublisher) callback;
-            }
-        }
-        return null;
     }
 
     private void addMetrics(String contextName, String resourceName, ClusterNode clusterNode, MeterRegistry registry) {
