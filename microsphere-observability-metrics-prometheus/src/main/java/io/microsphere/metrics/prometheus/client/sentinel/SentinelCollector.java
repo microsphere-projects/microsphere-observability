@@ -47,7 +47,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
 /**
- * Prometheus {@link Collector} based on Sentinel Metrics
+ * Prometheus {@link Collector} based on ALibaba Sentinel Metrics
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see Collector
