@@ -21,12 +21,14 @@ package io.microsphere.metrics.micrometer.instrument.binder.sentinel;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
+import io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.clearEntryCallback;
 import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.clearExitCallback;
+import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -59,6 +61,9 @@ class SentinelMetricsTest {
         clear();
     }
 
+    void init() {
+        addEntryCallback(new SentinelNodeEventPublisher());
+    }
 
     void clear() {
         clearEntryCallback();
@@ -68,7 +73,7 @@ class SentinelMetricsTest {
     @Test
     void testSupports() {
         assertFalse(this.sentinelMetrics.supports(this.registry));
-        assertDoesNotThrow(SentinelNodeEventPublisherInitFuncTest::init);
+        assertDoesNotThrow(this::init);
         assertTrue(this.sentinelMetrics.supports(this.registry));
     }
 
@@ -76,14 +81,14 @@ class SentinelMetricsTest {
     void testDoBindTo() {
         assertDoesNotThrow(() -> this.sentinelMetrics.bindTo(this.registry));
         assertNull(this.sentinelMetrics.registry);
-        assertDoesNotThrow(SentinelNodeEventPublisherInitFuncTest::init);
+        assertDoesNotThrow(this::init);
         assertDoesNotThrow(() -> this.sentinelMetrics.bindTo(this.registry));
         assertNotNull(this.sentinelMetrics.registry);
     }
 
     @Test
     void testOnEvent() {
-        assertDoesNotThrow(SentinelNodeEventPublisherInitFuncTest::init);
+        assertDoesNotThrow(this::init);
         SentinelTemplate sntinelTemplate = new SentinelTemplate();
         this.sentinelMetrics.bindTo(this.registry);
         String resourceName = "test-resource";
