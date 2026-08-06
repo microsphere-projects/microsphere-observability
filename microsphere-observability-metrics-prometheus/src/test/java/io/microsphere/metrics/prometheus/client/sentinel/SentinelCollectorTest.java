@@ -19,6 +19,7 @@ package io.microsphere.metrics.prometheus.client.sentinel;
 
 
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
+import io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.CollectorRegistry;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Enumeration;
 
+import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
@@ -51,7 +53,13 @@ class SentinelCollectorTest {
     }
 
     @Test
-    void test() throws Throwable {
+    void testOnSentinelMetricsRepositoryReady() throws Throwable {
+        addEntryCallback(new SentinelMetricsRepository());
+        testOnSentinelMetricsRepositoryNotReady();
+    }
+
+    @Test
+    void testOnSentinelMetricsRepositoryNotReady() throws Throwable {
         String resourceName = "test-resource";
         SentinelTemplate sentinelTemplate = new SentinelTemplate();
         for (int i = 0; i < 10; i++) {

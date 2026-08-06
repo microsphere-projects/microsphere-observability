@@ -16,40 +16,23 @@
  */
 package io.microsphere.metrics.prometheus.client.sentinel;
 
-import com.alibaba.csp.sentinel.context.Context;
 import com.alibaba.csp.sentinel.node.ClusterNode;
-import com.alibaba.csp.sentinel.node.DefaultNode;
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
-import com.alibaba.csp.sentinel.node.metric.MetricSearcher;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
-import com.alibaba.csp.sentinel.slotchain.ProcessorSlotEntryCallback;
-import com.alibaba.csp.sentinel.slotchain.ResourceWrapper;
-import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot;
-import io.microsphere.annotation.Nonnull;
+import io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository;
 import io.microsphere.logging.Logger;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
-import io.prometheus.client.CollectorRegistry;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-import static com.alibaba.csp.sentinel.Constants.CONTEXT_DEFAULT_NAME;
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
-import static com.alibaba.csp.sentinel.config.SentinelConfig.getAppName;
-import static com.alibaba.csp.sentinel.node.metric.MetricWriter.METRIC_BASE_DIR;
-import static com.alibaba.csp.sentinel.node.metric.MetricWriter.formMetricFileName;
-import static com.alibaba.csp.sentinel.slots.statistic.StatisticSlotCallbackRegistry.addEntryCallback;
-import static com.alibaba.csp.sentinel.util.PidUtil.getPid;
+import static io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository.getSentinelMetricsRepository;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
-import static io.microsphere.collection.CollectionUtils.isEmpty;
 import static io.microsphere.collection.ListUtils.newArrayList;
-import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.prometheus.constants.MetricsConstants.CONTEXT_LABEL_NAME;
 import static io.microsphere.metrics.prometheus.constants.MetricsConstants.ORIGIN_LABEL_NAME;
@@ -74,7 +57,7 @@ import static java.util.Collections.emptyMap;
  * @see io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics
  * @since 1.0.0
  */
-public class SentinelCollector extends Collector implements ProcessorSlotEntryCallback<DefaultNode> {
+public class SentinelCollector extends Collector {
 
     private static final Logger logger = getLogger(SentinelCollector.class);
 
@@ -87,10 +70,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
 
     private final List<String> commonLabelValues;
 
-    private final ConcurrentMap<String, String> resourceToContextMapping = newConcurrentHashMap(256);
-
-    private volatile MetricSearcher metricSearcher;
-
     public SentinelCollector(long interval) {
         this(interval, emptyMap());
     }
@@ -99,82 +78,6 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
         this.interval = interval;
         this.commonLabelNames = initCommonLabelNames(commonLabels);
         this.commonLabelValues = initCommonLabelValues(commonLabels);
-    }
-
-    @Nonnull
-    private MetricSearcher getMetricSearcher() {
-        MetricSearcher metricSearcher = this.metricSearcher;
-        if (metricSearcher == null) {
-            metricSearcher = newMetricSearcher();
-            this.metricSearcher = metricSearcher;
-        }
-        return metricSearcher;
-    }
-
-    @Override
-    public <T extends Collector> T register(CollectorRegistry registry) {
-        addEntryCallback(getClass().getName(), this);
-        return super.register(registry);
-    }
-
-    @Override
-    public void onPass(Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) throws Exception {
-        updateResourceToContextMapping(context, node);
-    }
-
-    @Override
-    public void onBlocked(BlockException ex, Context context, ResourceWrapper resourceWrapper, DefaultNode node, int count, Object... args) {
-        updateResourceToContextMapping(context, node);
-    }
-
-    private void updateResourceToContextMapping(Context context, DefaultNode node) {
-        updateResourceToContextMapping(context.getName(), node);
-    }
-
-    private void updateResourceToContextMapping(String context, DefaultNode node) {
-        String resource = getResource(node);
-        resourceToContextMapping.put(resource, context);
-    }
-
-    private String getResource(DefaultNode node) {
-        return node.getId().getName();
-    }
-
-    private String getContext(String resource) {
-        return resourceToContextMapping.getOrDefault(resource, CONTEXT_DEFAULT_NAME);
-    }
-
-    private List<String> initCommonLabelNames(Map<String, String> commonLabels) {
-        List<String> labelNames = newArrayList(commonLabels.size() + 2);
-        labelNames.add(ORIGIN_LABEL_NAME);
-        labelNames.addAll(commonLabels.keySet());
-        return labelNames;
-    }
-
-    private List<String> initCommonLabelValues(Map<String, String> commonLabels) {
-        List<String> labelValues = newArrayList(commonLabels.size() + 2);
-        labelValues.add(getSimpleName(this.getClass()));
-        labelValues.addAll(commonLabels.values());
-        return labelValues;
-    }
-
-    private MetricSearcher newMetricSearcher() {
-        String appName = getAppName();
-        int pid = getPid();
-        return new MetricSearcher(METRIC_BASE_DIR, formMetricFileName(appName, pid));
-    }
-
-    /**
-     * Configure the common label
-     *
-     * @param labelName  the label name
-     * @param labelValue the label value
-     * @return {@link SentinelCollector}
-     */
-    public SentinelCollector commonLabel(String labelName, String labelValue) {
-        this.commonLabelNames.add(labelName);
-        this.commonLabelValues.add(labelValue);
-        return this;
     }
 
     @Override
@@ -210,6 +113,33 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
         return metricFamilySamplesList;
     }
 
+    private List<String> initCommonLabelNames(Map<String, String> commonLabels) {
+        List<String> labelNames = newArrayList(commonLabels.size() + 2);
+        labelNames.add(ORIGIN_LABEL_NAME);
+        labelNames.addAll(commonLabels.keySet());
+        return labelNames;
+    }
+
+    private List<String> initCommonLabelValues(Map<String, String> commonLabels) {
+        List<String> labelValues = newArrayList(commonLabels.size() + 2);
+        labelValues.add(getSimpleName(this.getClass()));
+        labelValues.addAll(commonLabels.values());
+        return labelValues;
+    }
+
+    /**
+     * Configure the common label
+     *
+     * @param labelName  the label name
+     * @param labelValue the label value
+     * @return {@link SentinelCollector}
+     */
+    public SentinelCollector commonLabel(String labelName, String labelValue) {
+        this.commonLabelNames.add(labelName);
+        this.commonLabelValues.add(labelValue);
+        return this;
+    }
+
     private List<String> buildLabelNames() {
         List<String> commonLabelNames = this.commonLabelNames;
         List<String> labelNames = newArrayList(commonLabelNames.size() + 4);
@@ -235,32 +165,18 @@ public class SentinelCollector extends Collector implements ProcessorSlotEntryCa
     }
 
     private Map<String, List<MetricNode>> getContextMetricNodesMap() {
-        MetricSearcher metricSearcher = this.getMetricSearcher();
-        long endTimeMs = currentTimeMillis();
-        long beginTimeMs = endTimeMs - interval;
-        List<MetricNode> metricNodes = null;
-        try {
-            metricNodes = metricSearcher.findByTimeAndResource(beginTimeMs, endTimeMs, null);
-        } catch (Exception e) {
-            if (logger.isErrorEnabled()) {
-                logger.error("MetricSearcher can't find any MetricNode at {}", beginTimeMs, e);
+        SentinelMetricsRepository sentinelMetricsRepository = getSentinelMetricsRepository();
+        if (sentinelMetricsRepository == null) {
+            if (logger.isWarnEnabled()) {
+                logger.warn("SentinelMetricsRepository is not ready, please check whether it is configured");
             }
-        }
-
-        if (isEmpty(metricNodes)) {
             return emptyMap();
         }
 
-        Map<String, List<MetricNode>> contextMetricsNodesMap = new TreeMap<>();
+        long endTimeMs = currentTimeMillis();
+        long beginTimeMs = endTimeMs - interval;
 
-        for (MetricNode metricNode : metricNodes) {
-            String resource = metricNode.getResource();
-            String context = getContext(resource);
-            List<MetricNode> resourceMetricNodes = contextMetricsNodesMap.computeIfAbsent(context, r -> new LinkedList<>());
-            resourceMetricNodes.add(metricNode);
-        }
-
-        return contextMetricsNodesMap;
+        return sentinelMetricsRepository.findContextMetricNodesMap(beginTimeMs, endTimeMs);
     }
 
     private Sample createSample(String metricSuffix, String context,
