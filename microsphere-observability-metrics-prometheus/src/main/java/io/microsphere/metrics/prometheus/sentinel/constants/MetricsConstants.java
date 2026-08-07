@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.constants;
+package io.microsphere.metrics.prometheus.sentinel.constants;
 
 import com.alibaba.csp.sentinel.node.DefaultNode;
 
@@ -57,4 +57,39 @@ public interface MetricsConstants {
      * The Label name for Sentinel Version
      */
     String VERSION_LABEL_NAME = PREFIX + "version";
+
+    /**
+     * The Metric suffix for Response Time (RT)
+     */
+    String RT_METRIC_SUFFIX = "rt";
+
+    /**
+     * The Metric suffix for Concurrency
+     */
+    String CONCURRENCY_METRIC_SUFFIX = "concurrency";
+
+    /**
+     * The Metric suffix for Success QPS
+     */
+    String SUCCESS_QPS_METRIC_SUFFIX = "success_qps";
+
+    /**
+     * The Metric suffix for Pass QPS
+     */
+    String PASS_QPS_METRIC_SUFFIX = "pass_qps";
+
+    /**
+     * The Metric suffix for Occupied Pass QPS
+     */
+    String OCCUPIED_PASS_QPS_METRIC_SUFFIX = "occupied_pass_qps";
+
+    /**
+     * The Metric suffix for Block QPS
+     */
+    String BLOCK_QPS_METRIC_SUFFIX = "block_qps";
+
+    /**
+     * The Metric suffix for Exception QPS
+     */
+    String EXCEPTION_QPS_METRIC_SUFFIX = "exception_qps";
 }
