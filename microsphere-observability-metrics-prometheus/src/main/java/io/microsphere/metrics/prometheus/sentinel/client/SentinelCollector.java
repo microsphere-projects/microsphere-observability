@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.microsphere.metrics.prometheus.client.sentinel;
+package io.microsphere.metrics.prometheus.sentinel.client;
 
 import com.alibaba.csp.sentinel.node.ClusterNode;
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
@@ -34,12 +34,19 @@ import static io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetrics
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.CONTEXT_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.ORIGIN_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.PREFIX;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.RESOURCE_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.TYPE_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.constants.MetricsConstants.VERSION_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.BLOCK_QPS_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.CONCURRENCY_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.CONTEXT_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.EXCEPTION_QPS_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.OCCUPIED_PASS_QPS_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.ORIGIN_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.PASS_QPS_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.PREFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.RESOURCE_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.RT_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.SUCCESS_QPS_METRIC_SUFFIX;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.TYPE_LABEL_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.VERSION_LABEL_NAME;
 import static io.microsphere.util.ClassUtils.getSimpleName;
 import static io.prometheus.client.Collector.Type.GAUGE;
 import static java.lang.System.currentTimeMillis;
@@ -98,13 +105,13 @@ public class SentinelCollector extends Collector {
                 List<Sample> samples = newArrayList(size * 7);
                 for (int i = 0; i < size; i++) {
                     MetricNode metricNode = metricNodes.get(i);
-                    samples.add(createSample("rt", context, labelNames, metricNode, MetricNode::getRt));
-                    samples.add(createSample("concurrency", context, labelNames, metricNode, MetricNode::getConcurrency));
-                    samples.add(createSample("success_qps", context, labelNames, metricNode, MetricNode::getSuccessQps));
-                    samples.add(createSample("pass_qps", context, labelNames, metricNode, MetricNode::getPassQps));
-                    samples.add(createSample("occupied_pass_qps", context, labelNames, metricNode, MetricNode::getOccupiedPassQps));
-                    samples.add(createSample("block_qps", context, labelNames, metricNode, MetricNode::getBlockQps));
-                    samples.add(createSample("exception_qps", context, labelNames, metricNode, MetricNode::getExceptionQps));
+                    samples.add(createSample(RT_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getRt));
+                    samples.add(createSample(CONCURRENCY_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getConcurrency));
+                    samples.add(createSample(SUCCESS_QPS_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getSuccessQps));
+                    samples.add(createSample(PASS_QPS_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getPassQps));
+                    samples.add(createSample(OCCUPIED_PASS_QPS_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getOccupiedPassQps));
+                    samples.add(createSample(BLOCK_QPS_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getBlockQps));
+                    samples.add(createSample(EXCEPTION_QPS_METRIC_SUFFIX, context, labelNames, metricNode, MetricNode::getExceptionQps));
                 }
 
                 metricFamilySamplesList.add(new MetricFamilySamples(metric, GAUGE, "Sentinel Context : " + context, samples));
