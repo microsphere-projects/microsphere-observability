@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.client.sentinel;
+package io.microsphere.metrics.prometheus.sentinel.client;
 
 
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;

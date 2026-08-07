@@ -41,10 +41,17 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Prometheus -->
+        <!-- Alibaba Sentinel -->
         <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Prometheus Metrics Core -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>prometheus-metrics-core</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -56,23 +63,24 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Alibaba Sentinel -->
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-transport-simple-http</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Prometheus Metrics Instrumentation JVM -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>prometheus-metrics-instrumentation-jvm</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Prometheus Metrics Exporter HTTPServer -->
+        <dependency>
+            <groupId>io.prometheus</groupId>
+            <artifactId>prometheus-metrics-exporter-httpserver</artifactId>
             <scope>test</scope>
         </dependency>
 
