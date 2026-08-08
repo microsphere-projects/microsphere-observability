@@ -11,12 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-metrics-micrometer</artifactId>
+    <artifactId>microsphere-observability-metrics-commons</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Metrics :: Micrometer</name>
-    <description>Microsphere Observability Metrics for Micrometer</description>
+    <name>Microsphere :: Observability :: Metrics :: Commons</name>
+    <description>Microsphere Observability Metrics Commons</description>
 
     <dependencies>
 
@@ -31,54 +31,6 @@
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-java-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Microsphere Observability Metrics Alibaba Sentinel -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <!-- Microsphere Alibaba Sentinel Commons -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-alibaba-sentinel-commons</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Micrometer -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Prometheus -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Alibaba Sentinel -->
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-transport-simple-http</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- P6spy -->
-        <dependency>
-            <groupId>p6spy</groupId>
-            <artifactId>p6spy</artifactId>
             <optional>true</optional>
         </dependency>
 
