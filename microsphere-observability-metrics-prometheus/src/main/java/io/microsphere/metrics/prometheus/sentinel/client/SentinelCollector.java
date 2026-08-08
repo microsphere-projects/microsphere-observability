@@ -21,7 +21,7 @@ import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
 import com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot;
 import io.microsphere.logging.Logger;
-import io.microsphere.metrics.prometheus.sentinel.MetricFamily;
+import io.microsphere.metrics.commons.MetricFamily;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 
@@ -34,13 +34,13 @@ import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
 import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILY_SIZE;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.buildMetricName;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getLabels;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getLabels;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.StringUtils.EMPTY_STRING;
 import static io.prometheus.client.Collector.Type.valueOf;
 import static java.util.Collections.emptyList;
@@ -84,7 +84,7 @@ public class SentinelCollector extends Collector {
             return emptyList();
         }
 
-        int size = METRIC_FAMILY_SIZE;
+        int size = METRIC_FAMILIES_SIZE;
 
         List<MetricFamilySamples> metricFamilySamplesList = newArrayList(size);
         Map<Integer, List<Sample>> samplesMap = newLinkedHashMap(size);

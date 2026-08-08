@@ -15,18 +15,17 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.sentinel.constants;
+package io.microsphere.metrics.sentinel.constants;
 
-import com.alibaba.csp.sentinel.node.DefaultNode;
 
 /**
- * The constants for Metrics
+ * The constants for Alibaba Sentinel Metrics
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see DefaultNode
+ * @see com.alibaba.csp.sentinel.node.DefaultNode
  * @since 1.0.0
  */
-public interface MetricsConstants {
+public interface SentinelMetricsConstants {
 
     /**
      * The prefix : "sentinel_"
@@ -34,32 +33,32 @@ public interface MetricsConstants {
     String PREFIX = "sentinel_";
 
     /**
-     * The Label name of the metrics origin : "origin"
+     * The Label name of the metrics origin : "sentinel_origin"
      */
-    String ORIGIN_LABEL_NAME = "origin";
+    String ORIGIN_LABEL_NAME = PREFIX + "origin";
 
     /**
-     * The Label name for Sentinel Resource
+     * The Label name for Sentinel Resource : "sentinel_resource"
      */
     String RESOURCE_LABEL_NAME = PREFIX + "resource";
 
     /**
-     * The Label name for Sentinel Context
+     * The Label name for Sentinel Context : "sentinel_context"
      */
     String CONTEXT_LABEL_NAME = PREFIX + "context";
 
     /**
-     * The Label name for Sentinel Resource Type
+     * The Label name for Sentinel Resource Type : "sentinel_resource_type"
      */
-    String TYPE_LABEL_NAME = PREFIX + "resource_type";
+    String RESOURCE_TYPE_LABEL_NAME = PREFIX + "resource_type";
 
     /**
-     * The Label name for Sentinel Version
+     * The Label name for Sentinel Version : "sentinel_version"
      */
     String VERSION_LABEL_NAME = PREFIX + "version";
 
     /**
-     * The Label name of the metrics Timestamp : "timestamp"
+     * The Label name of the metrics Timestamp : "sentinel_timestamp"
      */
     String TIMESTAMP_LABEL_NAME = PREFIX + "timestamp";
 

@@ -19,6 +19,7 @@ package io.microsphere.metrics.prometheus.sentinel;
 
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import io.microsphere.logging.Logger;
+import io.microsphere.metrics.commons.MetricFamily;
 import io.prometheus.metrics.model.registry.MetricType;
 import io.prometheus.metrics.model.registry.MultiCollector;
 import io.prometheus.metrics.model.snapshots.GaugeSnapshot;
@@ -40,11 +41,11 @@ import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILY_SIZE;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getLabels;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getLabels;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.StringUtils.isNotBlank;
 import static io.prometheus.metrics.model.registry.MetricType.valueOf;
 import static io.prometheus.metrics.model.snapshots.MetricFamilyDescriptor.of;
@@ -145,7 +146,7 @@ public class SentinelMultiCollector implements MultiCollector {
     }
 
     private List<MetricFamilyDescriptor> buildMetricFamilyDescriptors() {
-        int size = METRIC_FAMILY_SIZE;
+        int size = METRIC_FAMILIES_SIZE;
         List<MetricFamilyDescriptor> metricFamilyDescriptors = newArrayList(size);
         for (int i = 0; i < size; i++) {
             MetricFamily metricFamily = getMetricFamily(i);

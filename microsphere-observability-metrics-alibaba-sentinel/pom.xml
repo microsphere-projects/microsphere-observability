@@ -11,12 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-metrics-prometheus</artifactId>
+    <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Metrics :: Prometheus</name>
-    <description>Microsphere Observability Metrics for Prometheus</description>
+    <name>Microsphere :: Observability :: Metrics :: Alibaba Sentinel</name>
+    <description>Microsphere Observability Metrics for Alibaba Sentinel</description>
 
     <dependencies>
 
@@ -34,10 +34,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Microsphere Observability Metrics Alibaba Sentinel -->
+        <!-- Microsphere Observability Metrics Commons -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
+            <artifactId>microsphere-observability-metrics-commons</artifactId>
             <version>${revision}</version>
         </dependency>
 
@@ -55,39 +55,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Prometheus Metrics Core -->
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>prometheus-metrics-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Prometheus Simpleclient(Legacy) -->
-        <!-- https://prometheus.github.io/client_java/migration/simpleclient/ -->
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>simpleclient</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Prometheus Metrics Instrumentation JVM -->
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>prometheus-metrics-instrumentation-jvm</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Prometheus Metrics Exporter HTTPServer -->
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>prometheus-metrics-exporter-httpserver</artifactId>
             <scope>test</scope>
         </dependency>
 

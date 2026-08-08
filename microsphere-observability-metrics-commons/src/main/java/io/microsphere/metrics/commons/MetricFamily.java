@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.sentinel;
+package io.microsphere.metrics.commons;
 
 import java.util.Set;
 

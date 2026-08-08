@@ -15,12 +15,12 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.sentinel.util;
+package io.microsphere.metrics.sentinel.util;
 
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository;
 import io.microsphere.logging.Logger;
-import io.microsphere.metrics.prometheus.sentinel.MetricFamily;
+import io.microsphere.metrics.commons.MetricFamily;
 import io.microsphere.util.Utils;
 
 import java.util.List;
@@ -35,20 +35,20 @@ import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResou
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.sentinel.MetricFamily.builder;
-import static io.microsphere.metrics.prometheus.sentinel.MetricType.GAUGE;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.BLOCK_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.CONCURRENCY_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.CONTEXT_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.EXCEPTION_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.OCCUPIED_PASS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.PASS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.RESOURCE_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.RT_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.SUCCESS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.TIMESTAMP_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.TYPE_LABEL_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.VERSION_LABEL_NAME;
+import static io.microsphere.metrics.commons.MetricFamily.builder;
+import static io.microsphere.metrics.commons.MetricType.GAUGE;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.BLOCK_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONCURRENCY_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONTEXT_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.EXCEPTION_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.OCCUPIED_PASS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.PASS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_TYPE_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RT_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.SUCCESS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.TIMESTAMP_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.VERSION_LABEL_NAME;
 import static io.microsphere.util.StringUtils.isBlank;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
@@ -68,7 +68,7 @@ public abstract class SentinelMetricUtitls implements Utils {
     private static final Map<String, BiFunction<String, MetricNode, String>> LABEL_NAME_TO_VALUE_FUNCTION_MAP = Map.of(
             RESOURCE_LABEL_NAME, (context, metricNode) -> metricNode.getResource(),
             CONTEXT_LABEL_NAME, (context, metricNode) -> context,
-            TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),
+            RESOURCE_TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),
             TIMESTAMP_LABEL_NAME, (timestamp, metricNode) -> valueOf(metricNode.getTimestamp()),
             VERSION_LABEL_NAME, (version, metricNode) -> SENTINEL_VERSION
     );
@@ -107,7 +107,7 @@ public abstract class SentinelMetricUtitls implements Utils {
     /**
      * The size of {@link #METRIC_FAMILIES}
      */
-    public static final int METRIC_FAMILY_SIZE = METRIC_FAMILIES.size();
+    public static final int METRIC_FAMILIES_SIZE = METRIC_FAMILIES.size();
 
     /**
      * Get the {@link MetricFamily} by index
@@ -140,7 +140,6 @@ public abstract class SentinelMetricUtitls implements Utils {
         name = isBlank(unit) ? name : name + "_" + unit;
         return name;
     }
-
 
     /**
      * Get the {@link Map} of {@link MetricNode} by time interval
