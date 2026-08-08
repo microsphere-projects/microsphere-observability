@@ -58,7 +58,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     @Override
     protected boolean supports(MeterRegistry registry) {
         if (!exists(memoryDirectoryPath)) {
-            logger.info("The CGroup memory directory[path: '{}'] does not exist!", memoryDirectoryPath);
+            logger.warn("The CGroup memory directory[path: '{}'] does not exist!", memoryDirectoryPath);
             return false;
         }
         return true;
