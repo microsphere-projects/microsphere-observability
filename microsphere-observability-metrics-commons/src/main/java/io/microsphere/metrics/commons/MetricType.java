@@ -15,26 +15,31 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.sentinel.util;
-
-
-import org.junit.jupiter.api.Test;
-
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static java.util.Collections.emptyMap;
-import static org.junit.jupiter.api.Assertions.assertSame;
+package io.microsphere.metrics.commons;
 
 /**
- * {@link SentinelMetricUtitls} Test
+ * The enumeration of Metric Type
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see SentinelMetricUtitls
+ * @see <a href="https://prometheus.io/docs/concepts/metric_types/">Metric Types</a>
+ * @see io.prometheus.metrics.model.registry.MetricType
+ * @see io.prometheus.client.Collector.Type
  * @since 1.0.0
  */
-class SentinelMetricUtitlsTest {
+public enum MetricType {
 
-    @Test
-    void testGetContextMetricNodesMapOnSentinelMetricsRepositoryNotReady() {
-        assertSame(emptyMap(), getContextMetricNodesMap(1000));
-    }
+    COUNTER,
+
+    GAUGE,
+
+    HISTOGRAM,
+
+    SUMMARY,
+
+    INFO,
+
+    STATESET,
+
+    UNKNOWN
+
 }

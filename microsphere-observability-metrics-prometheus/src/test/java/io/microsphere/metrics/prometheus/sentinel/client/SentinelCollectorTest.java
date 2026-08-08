@@ -18,7 +18,7 @@
 package io.microsphere.metrics.prometheus.sentinel.client;
 
 
-import io.microsphere.metrics.prometheus.sentinel.MetricFamily;
+import io.microsphere.metrics.commons.MetricFamily;
 import io.microsphere.metrics.prometheus.sentinel.SentinelMetricsTestHelper;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.CollectorRegistry;
@@ -30,8 +30,8 @@ import java.util.List;
 
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.Maps.ofMap;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.buildMetricName;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.ArrayUtils.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
