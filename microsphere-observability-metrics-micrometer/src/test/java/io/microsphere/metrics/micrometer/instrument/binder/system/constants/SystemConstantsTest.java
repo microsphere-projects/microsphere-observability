@@ -52,6 +52,6 @@ class SystemConstantsTest {
         assertEquals("system.network.stats.file", NETWORK_STATS_FILE_PATH_PROPERTY_NAME);
 
         assertEquals("60000", DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE);
-        assertEquals("system.metrics.micrometer.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
+        assertEquals("system.metrics.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
     }
 }

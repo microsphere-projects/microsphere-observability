@@ -91,7 +91,7 @@ public class SystemMetricsAutoConfiguration {
     public static final String NETWORK_STATS_FILE_LOCATION_PLACEHOLDER = "${" + NETWORK_STATS_FILE_PATH_PROPERTY_NAME + ":file://" + DEFAULT_NETWORK_STATS_FILE_PATH + "}";
 
     /**
-     * The Property Placeholder of metrics collection interval : "${system.metrics.micrometer.collection.interval:60000}"
+     * The Property Placeholder of metrics collection interval : "${system.metrics.collection.interval:60000}"
      */
     public static final String METRICS_COLLECTION_INTERVAL_PLACEHOLDER = "${" + METRICS_COLLECTION_INTERVAL_PROPERTY_NAME + ":" + DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE + "}";
 

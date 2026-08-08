@@ -46,13 +46,6 @@
             <artifactId>microsphere-logback</artifactId>
         </dependency>
 
-        <!-- Microsphere I18n Core -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-i18n-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Servlet API -->
         <dependency>
             <groupId>jakarta.servlet</groupId>
