@@ -15,52 +15,45 @@
  * limitations under the License.
  */
 
-package io.microsphere.metrics.prometheus.sentinel.client;
+package io.microsphere.metrics.prometheus.sentinel;
 
 
-import io.microsphere.metrics.prometheus.sentinel.SentinelMetricsTestHelper;
-import io.prometheus.client.Collector.MetricFamilySamples;
-import io.prometheus.client.CollectorRegistry;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import io.prometheus.metrics.model.snapshots.MetricSnapshots;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Enumeration;
-
-import static io.microsphere.collection.Maps.ofMap;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static io.prometheus.metrics.model.registry.PrometheusRegistry.defaultRegistry;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * {@link SentinelCollector} Test
+ * {@link SentinelMultiCollector} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see SentinelCollector
+ * @see SentinelMultiCollector
  * @since 1.0.0
  */
-class SentinelCollectorTest {
+class SentinelMultiCollectorTest {
 
-    private CollectorRegistry registry;
+    private SentinelMultiCollector sentinelMultiCollector;
 
-    private SentinelCollector sentinelCollector;
+    private PrometheusRegistry registry;
 
     private SentinelMetricsTestHelper testHelper;
 
     @BeforeEach
     void setUp() {
-        this.registry = new CollectorRegistry();
-        this.sentinelCollector = new SentinelCollector(60000, ofMap("test-label", "test-value"));
-        this.sentinelCollector.register(registry);
+        this.sentinelMultiCollector = new SentinelMultiCollector(60000);
+        this.registry = defaultRegistry;
+        this.registry.register(this.sentinelMultiCollector);
         this.testHelper = new SentinelMetricsTestHelper();
     }
 
     @Test
     void testCollect() throws Throwable {
         this.testHelper.doInSentinelMetrics(() -> {
-            Enumeration<MetricFamilySamples> metricFamilySamples = this.registry.metricFamilySamples();
-
-            while (metricFamilySamples.hasMoreElements()) {
-                MetricFamilySamples samples = metricFamilySamples.nextElement();
-                assertFalse(samples.samples.isEmpty());
-            }
+            MetricSnapshots metricSnapshots = this.sentinelMultiCollector.collect();
+            assertEquals(7, metricSnapshots.size());
         });
     }
 }
