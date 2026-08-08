@@ -42,7 +42,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         },
         webEnvironment = NONE,
         properties = {
-                "system.network.stats.file=file://${user.dir}/../microsphere-observability-micrometer/src/test/resources/test-data/memory/network.stats"
+                "system.network.stats.file=file://${user.dir}/../microsphere-observability-metrics-micrometer/src/test/resources/test-data/memory/network.stats"
         }
 )
 @EnableAutoConfiguration
