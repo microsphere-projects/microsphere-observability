@@ -59,37 +59,42 @@ public interface MetricsConstants {
     String VERSION_LABEL_NAME = PREFIX + "version";
 
     /**
-     * The Metric suffix for Response Time (RT)
+     * The Label name of the metrics Timestamp : "timestamp"
      */
-    String RT_METRIC_SUFFIX = "rt";
+    String TIMESTAMP_LABEL_NAME = PREFIX + "timestamp";
 
     /**
-     * The Metric suffix for Concurrency
+     * The Metric name for Response Time (RT): "sentinel_rt"
      */
-    String CONCURRENCY_METRIC_SUFFIX = "concurrency";
+    String RT_METRIC_NAME = PREFIX + "rt";
 
     /**
-     * The Metric suffix for Success QPS
+     * The Metric name for Concurrency : "sentinel_concurrency"
      */
-    String SUCCESS_QPS_METRIC_SUFFIX = "success_qps";
+    String CONCURRENCY_METRIC_NAME = PREFIX + "concurrency";
 
     /**
-     * The Metric suffix for Pass QPS
+     * The Metric name for Success QPS : "sentinel_success_qps"
      */
-    String PASS_QPS_METRIC_SUFFIX = "pass_qps";
+    String SUCCESS_QPS_METRIC_NAME = PREFIX + "success_qps";
 
     /**
-     * The Metric suffix for Occupied Pass QPS
+     * The Metric name for Pass QPS : "sentinel_pass_qps"
      */
-    String OCCUPIED_PASS_QPS_METRIC_SUFFIX = "occupied_pass_qps";
+    String PASS_QPS_METRIC_NAME = PREFIX + "pass_qps";
 
     /**
-     * The Metric suffix for Block QPS
+     * The Metric name for Occupied Pass QPS : "sentinel_occupied_pass_qps"
      */
-    String BLOCK_QPS_METRIC_SUFFIX = "block_qps";
+    String OCCUPIED_PASS_QPS_METRIC_NAME = PREFIX + "occupied_pass_qps";
 
     /**
-     * The Metric suffix for Exception QPS
+     * The Metric name for Block QPS : "sentinel_block_qps"
      */
-    String EXCEPTION_QPS_METRIC_SUFFIX = "exception_qps";
+    String BLOCK_QPS_METRIC_NAME = PREFIX + "block_qps";
+
+    /**
+     * The Metric name for Exception QPS : "sentinel_exception_qps"
+     */
+    String EXCEPTION_QPS_METRIC_NAME = PREFIX + "exception_qps";
 }
