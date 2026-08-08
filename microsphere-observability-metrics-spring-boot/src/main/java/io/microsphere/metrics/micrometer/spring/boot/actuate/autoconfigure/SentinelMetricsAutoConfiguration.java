@@ -17,20 +17,30 @@
 
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
+import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
+import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.time.Duration;
+import java.util.Map;
+
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
+import static io.microsphere.collection.Maps.ofMap;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.SENTINEL_METRICS_ENABLED_PROPERTY_NAME;
+import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PLACEHOLDER;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 
 /**
@@ -63,20 +73,21 @@ public class SentinelMetricsAutoConfiguration {
     )
     public static final String SENTINEL_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "alibaba-sentinel" + DOT + ENABLED_PROPERTY_NAME;
 
-//        @Bean
-//        @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
-//        public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
-//                                                   @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
-//                                                   @Value("${spring.application.name:default}") String applicationName) {
-//            SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
-//            sentinelCollector.commonLabel("application", applicationName);
-//            PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
-//            sentinelCollector.register(collectorRegistry);
-//            return sentinelCollector;
-//        }
+    @Bean
+    @ConditionalOnBean(type = "io.micrometer.prometheusmetrics.PrometheusMeterRegistry")
+    public SentinelMultiCollector sentinelMultiCollector(PrometheusMeterRegistry registry,
+                                                         @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
+                                                         @Value("${spring.application.name:default}") String applicationName) {
+        Map<String, String> commonLabels = ofMap("application", applicationName);
+        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis(), commonLabels);
+        PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
+        prometheusRegistry.register(sentinelMultiCollector);
+        return sentinelMultiCollector;
+    }
 
     @Bean
     @ConditionalOnMissingBean
+    @ConditionalOnBean(SentinelMultiCollector.class)
     public SentinelMetrics sentinelMetrics() {
         return new SentinelMetrics();
     }

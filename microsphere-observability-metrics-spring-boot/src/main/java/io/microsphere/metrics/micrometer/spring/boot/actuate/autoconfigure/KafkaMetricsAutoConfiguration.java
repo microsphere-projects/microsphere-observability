@@ -102,12 +102,11 @@ public class KafkaMetricsAutoConfiguration {
         KafkaAppender kafkaAppender = findAppender(loggerName);
         Producer producer = null;
         if (kafkaAppender != null) {
-            KafkaManager kafkaManager = getFieldValue(kafkaAppender, "manager", KafkaManager.class);
+            KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
             if (kafkaManager != null) {
-                producer = getFieldValue(kafkaManager, "producer", Producer.class);
+                producer = getFieldValue(true, kafkaManager, "producer", Producer.class);
             }
         }
         return producer;
     }
-
 }

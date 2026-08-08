@@ -62,8 +62,8 @@ class SystemMetricsAutoConfigurationTest extends AutoConfigurationTest<SystemMet
     void testConstants() {
         assertEquals("microsphere.metrics.micrometer.system.enabled", SYSTEM_METRICS_ENABLED_PROPERTY_NAME);
         assertEquals("60000", DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE);
-        assertEquals("system.metrics.micrometer.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
-        assertEquals("${system.metrics.micrometer.collection.interval:60000}", METRICS_COLLECTION_INTERVAL_PLACEHOLDER);
+        assertEquals("system.metrics.collection.interval", METRICS_COLLECTION_INTERVAL_PROPERTY_NAME);
+        assertEquals("${system.metrics.collection.interval:60000}", METRICS_COLLECTION_INTERVAL_PLACEHOLDER);
     }
 
     @Override

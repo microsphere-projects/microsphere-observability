@@ -82,13 +82,13 @@ public interface SystemConstants {
     String DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE = "60000";
 
     /**
-     * The Property Name of metrics collection interval(unit : millisecond) : "system.metrics.micrometer.collection.interval"
+     * The Property Name of metrics collection interval(unit : millisecond) : "system.metrics.collection.interval"
      */
     @ConfigurationProperty(
             type = long.class,
             defaultValue = DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE,
             source = APPLICATION_SOURCE
     )
-    String METRICS_COLLECTION_INTERVAL_PROPERTY_NAME = PREFIX + "metrics.micrometer.collection.interval";
+    String METRICS_COLLECTION_INTERVAL_PROPERTY_NAME = PREFIX + "metrics.collection.interval";
 
 }
