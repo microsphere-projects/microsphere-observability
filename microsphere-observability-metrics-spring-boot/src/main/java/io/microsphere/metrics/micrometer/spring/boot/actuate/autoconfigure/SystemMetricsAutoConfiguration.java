@@ -32,8 +32,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.time.Duration;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
@@ -46,7 +46,6 @@ import static io.microsphere.metrics.micrometer.instrument.binder.system.constan
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_STATS_FILE_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.SYSTEM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
-import static java.nio.file.Paths.get;
 
 /**
  * The Auto-Configuration class for System Metrics
@@ -104,8 +103,8 @@ public class SystemMetricsAutoConfiguration {
             @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
             ResourceLoader resourceLoader) throws IOException {
         Resource resource = resourceLoader.getResource(networkStatsFileLocation);
-        URI uri = resource.getURI();
-        return new NetworkStatisticsMetrics(get(uri), interval.toMillis());
+        File file = resource.getFile();
+        return new NetworkStatisticsMetrics(file.toPath(), interval.toMillis());
     }
 
     @Bean

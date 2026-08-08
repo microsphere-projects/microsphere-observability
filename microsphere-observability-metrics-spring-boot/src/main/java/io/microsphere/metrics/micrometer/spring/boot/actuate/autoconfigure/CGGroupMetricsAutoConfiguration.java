@@ -31,8 +31,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
+import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
@@ -40,7 +40,6 @@ import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.CGGroupMetricsAutoConfiguration.CGROUP_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnCGroupAvailable.CGROUP_DIRECTORY_LOCATION_PLACEHOLDER;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
-import static java.nio.file.Paths.get;
 
 /**
  * The Auto-Configuration class for CGroup Metrics
@@ -86,7 +85,7 @@ public class CGGroupMetricsAutoConfiguration {
     public CGroupMemoryMetrics cgroupMemoryMetrics(@Value(CGROUP_DIRECTORY_LOCATION_PLACEHOLDER) String cgroupDirectoryLocation,
                                                    ResourceLoader resourceLoader) throws IOException {
         Resource resource = resourceLoader.getResource(cgroupDirectoryLocation);
-        URI uri = resource.getURI();
-        return new CGroupMemoryMetrics(get(uri));
+        File dir = resource.getFile();
+        return new CGroupMemoryMetrics(dir.toPath());
     }
 }
