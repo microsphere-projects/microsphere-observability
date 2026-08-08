@@ -23,7 +23,6 @@ import io.prometheus.metrics.model.snapshots.MetricSnapshots;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static io.prometheus.metrics.model.registry.PrometheusRegistry.defaultRegistry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -44,7 +43,7 @@ class SentinelMultiCollectorTest {
     @BeforeEach
     void setUp() {
         this.sentinelMultiCollector = new SentinelMultiCollector(60000);
-        this.registry = defaultRegistry;
+        this.registry = new PrometheusRegistry();
         this.registry.register(this.sentinelMultiCollector);
         this.testHelper = new SentinelMetricsTestHelper();
     }
