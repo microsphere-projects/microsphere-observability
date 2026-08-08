@@ -60,7 +60,7 @@ class SentinelMetricsAutoConfigurationIntegrationTest {
             });
         }
 
-        List<Meter> meters = registry.getMeters();
+        List<Meter> meters = this.registry.getMeters();
 
         long count = meters.stream()
                 .map(Meter::getId)

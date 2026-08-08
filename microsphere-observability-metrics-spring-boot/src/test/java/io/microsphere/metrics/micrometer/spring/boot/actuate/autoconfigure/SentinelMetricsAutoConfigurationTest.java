@@ -22,7 +22,6 @@ import com.alibaba.csp.sentinel.SphU;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelPlugin;
-import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -64,7 +63,6 @@ class SentinelMetricsAutoConfigurationTest extends AutoConfigurationTest<Sentine
 
     @Override
     protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
-        autoConfiguredClasses.add(SentinelMetrics.class);
     }
 
     @Override
