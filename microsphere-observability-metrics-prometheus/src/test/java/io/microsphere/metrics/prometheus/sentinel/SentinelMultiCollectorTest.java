@@ -53,7 +53,17 @@ class SentinelMultiCollectorTest {
     void testCollect() throws Throwable {
         this.testHelper.doInSentinelMetrics(() -> {
             MetricSnapshots metricSnapshots = this.sentinelMultiCollector.collect();
-            assertEquals(7, metricSnapshots.size());
+            assertMetricSnapshots(metricSnapshots);
         });
+    }
+
+    @Test
+    void testCollectOnSentinelMetricsRepositoryNotReady() {
+        MetricSnapshots metricSnapshots = this.sentinelMultiCollector.collect();
+        assertEquals(0, metricSnapshots.size());
+    }
+
+    void assertMetricSnapshots(MetricSnapshots metricSnapshots) {
+        assertEquals(7, metricSnapshots.size());
     }
 }

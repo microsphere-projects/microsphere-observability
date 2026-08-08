@@ -49,6 +49,7 @@ import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConsta
 import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.TIMESTAMP_LABEL_NAME;
 import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.TYPE_LABEL_NAME;
 import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.VERSION_LABEL_NAME;
+import static io.microsphere.util.StringUtils.isBlank;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
@@ -107,6 +108,39 @@ public abstract class SentinelMetricUtitls implements Utils {
      * The size of {@link #METRIC_FAMILIES}
      */
     public static final int METRIC_FAMILY_SIZE = METRIC_FAMILIES.size();
+
+    /**
+     * Get the {@link MetricFamily} by index
+     *
+     * @param index the index of {@link MetricFamily}
+     * @return non-null {@link MetricFamily}
+     */
+    public static MetricFamily getMetricFamily(int index) {
+        return METRIC_FAMILIES.get(index);
+    }
+
+    /**
+     * Build the metric name of the given {@link MetricFamily}
+     *
+     * @param metricFamily the {@link MetricFamily} instance
+     * @return the metric name
+     */
+    public static String buildMetricName(MetricFamily metricFamily) {
+        return buildMetricName(metricFamily.getName(), metricFamily.getUnit());
+    }
+
+    /**
+     * Build the metric name of the given name and unit
+     *
+     * @param name the name of metric
+     * @param unit the unit of metric
+     * @return the metric name
+     */
+    public static String buildMetricName(String name, String unit) {
+        name = isBlank(unit) ? name : name + "_" + unit;
+        return name;
+    }
+
 
     /**
      * Get the {@link Map} of {@link MetricNode} by time interval

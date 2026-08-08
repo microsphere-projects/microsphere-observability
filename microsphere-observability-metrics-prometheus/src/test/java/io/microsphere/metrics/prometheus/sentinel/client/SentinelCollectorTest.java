@@ -18,6 +18,7 @@
 package io.microsphere.metrics.prometheus.sentinel.client;
 
 
+import io.microsphere.metrics.prometheus.sentinel.MetricFamily;
 import io.microsphere.metrics.prometheus.sentinel.SentinelMetricsTestHelper;
 import io.prometheus.client.Collector.MetricFamilySamples;
 import io.prometheus.client.CollectorRegistry;
@@ -25,9 +26,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Enumeration;
+import java.util.List;
 
+import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.Maps.ofMap;
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.buildMetricName;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.util.ArrayUtils.contains;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link SentinelCollector} Test
@@ -56,11 +63,31 @@ class SentinelCollectorTest {
     void testCollect() throws Throwable {
         this.testHelper.doInSentinelMetrics(() -> {
             Enumeration<MetricFamilySamples> metricFamilySamples = this.registry.metricFamilySamples();
-
-            while (metricFamilySamples.hasMoreElements()) {
-                MetricFamilySamples samples = metricFamilySamples.nextElement();
-                assertFalse(samples.samples.isEmpty());
-            }
+            List<MetricFamilySamples> metricFamilySamplesList = newArrayList(metricFamilySamples);
+            assertMetricFamilySamplesList(metricFamilySamplesList);
         });
+    }
+
+    @Test
+    void testCollectOnSentinelMetricsRepositoryNotReady() {
+        Enumeration<MetricFamilySamples> metricFamilySamples = this.registry.metricFamilySamples();
+        List<MetricFamilySamples> metricFamilySamplesList = newArrayList(metricFamilySamples);
+        assertTrue(metricFamilySamplesList.isEmpty());
+    }
+
+    void assertMetricFamilySamplesList(List<MetricFamilySamples> metricFamilySamplesList) {
+        assertEquals(7, metricFamilySamplesList.size());
+        for (int i = 0; i < metricFamilySamplesList.size(); i++) {
+            MetricFamilySamples samples = metricFamilySamplesList.get(i);
+            assertMetricFamilySamples(samples, i);
+        }
+    }
+
+    void assertMetricFamilySamples(MetricFamilySamples samples, int index) {
+        MetricFamily metricFamily = getMetricFamily(index);
+        assertTrue(contains(samples.getNames(), buildMetricName(metricFamily)));
+        assertEquals(buildMetricName(metricFamily), samples.name);
+        assertEquals(metricFamily.getType().name(), samples.type.name());
+        assertEquals(metricFamily.getHelp(), samples.help);
     }
 }

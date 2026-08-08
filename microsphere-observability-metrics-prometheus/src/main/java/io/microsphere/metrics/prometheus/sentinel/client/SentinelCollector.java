@@ -21,25 +21,28 @@ import com.alibaba.csp.sentinel.node.metric.MetricNode;
 import com.alibaba.csp.sentinel.node.metric.MetricTimerListener;
 import com.alibaba.csp.sentinel.slots.clusterbuilder.ClusterBuilderSlot;
 import io.microsphere.logging.Logger;
+import io.microsphere.metrics.prometheus.sentinel.MetricFamily;
 import io.prometheus.client.Collector;
 import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Function;
 
 import static io.microsphere.collection.ListUtils.newArrayList;
+import static io.microsphere.collection.ListUtils.newLinkedList;
+import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.BLOCK_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.CONCURRENCY_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.EXCEPTION_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.OCCUPIED_PASS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.PASS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.RT_METRIC_NAME;
-import static io.microsphere.metrics.prometheus.sentinel.constants.MetricsConstants.SUCCESS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILY_SIZE;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.buildMetricName;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getLabels;
-import static io.prometheus.client.Collector.Type.GAUGE;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.util.StringUtils.EMPTY_STRING;
+import static io.prometheus.client.Collector.Type.valueOf;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
@@ -80,30 +83,47 @@ public class SentinelCollector extends Collector {
         if (resourceMetricsNodesMap.isEmpty()) {
             return emptyList();
         }
-        List<MetricFamilySamples> metricFamilySamplesList = newArrayList(resourceMetricsNodesMap.size());
-        for (Map.Entry<String, List<MetricNode>> entry : resourceMetricsNodesMap.entrySet()) {
+
+        int size = METRIC_FAMILY_SIZE;
+
+        List<MetricFamilySamples> metricFamilySamplesList = newArrayList(size);
+        Map<Integer, List<Sample>> samplesMap = newLinkedHashMap(size);
+
+        for (Entry<String, List<MetricNode>> entry : resourceMetricsNodesMap.entrySet()) {
+            String context = entry.getKey();
             List<MetricNode> metricNodes = entry.getValue();
-            int size = metricNodes.size();
-            if (size > 0) {
-                String context = entry.getKey();
-                String metric = context;
-
-                List<Sample> samples = newArrayList(size * 7);
-                for (int i = 0; i < size; i++) {
-                    MetricNode metricNode = metricNodes.get(i);
-                    samples.add(createSample(RT_METRIC_NAME, context, metricNode, MetricNode::getRt));
-                    samples.add(createSample(CONCURRENCY_METRIC_NAME, context, metricNode, MetricNode::getConcurrency));
-                    samples.add(createSample(SUCCESS_QPS_METRIC_NAME, context, metricNode, MetricNode::getSuccessQps));
-                    samples.add(createSample(PASS_QPS_METRIC_NAME, context, metricNode, MetricNode::getPassQps));
-                    samples.add(createSample(OCCUPIED_PASS_QPS_METRIC_NAME, context, metricNode, MetricNode::getOccupiedPassQps));
-                    samples.add(createSample(BLOCK_QPS_METRIC_NAME, context, metricNode, MetricNode::getBlockQps));
-                    samples.add(createSample(EXCEPTION_QPS_METRIC_NAME, context, metricNode, MetricNode::getExceptionQps));
-                }
-
-                metricFamilySamplesList.add(new MetricFamilySamples(metric, GAUGE, "Sentinel Context : " + context, samples));
+            for (MetricNode metricNode : metricNodes) {
+                addSamples(context, metricNode, samplesMap, size);
             }
         }
+
+        for (int i = 0; i < size; i++) {
+            List<Sample> samples = samplesMap.get(i);
+            MetricFamily metricFamily = METRIC_FAMILIES.get(i);
+            String name = metricFamily.getName();
+            String unit = metricFamily.getUnit() == null ? EMPTY_STRING : metricFamily.getUnit();
+            Type type = valueOf(metricFamily.getType().name());
+            String help = metricFamily.getHelp();
+            name = buildMetricName(name, unit);
+            MetricFamilySamples metricFamilySamples = new MetricFamilySamples(name, unit, type, help, samples);
+            metricFamilySamplesList.add(metricFamilySamples);
+        }
+
         return metricFamilySamplesList;
+    }
+
+    private void addSamples(String context, MetricNode metricNode, Map<Integer, List<Sample>> samplesMap, int size) {
+        for (int i = 0; i < size; i++) {
+            addSample(context, metricNode, samplesMap, i);
+        }
+    }
+
+    private void addSample(String context, MetricNode metricNode, Map<Integer, List<Sample>> samplesMap, int index) {
+        MetricFamily metricFamily = getMetricFamily(index);
+        Function<MetricNode, Number> metricNodeNumberFunction = METRIC_NODE_TO_VALUE_FUNCTIONS.get(index);
+        List<Sample> samples = samplesMap.computeIfAbsent(index, k -> newLinkedList());
+        Sample sample = createSample(metricFamily.getName(), context, metricNode, metricNodeNumberFunction);
+        samples.add(sample);
     }
 
     private Sample createSample(String metricName, String context, MetricNode metricNode,

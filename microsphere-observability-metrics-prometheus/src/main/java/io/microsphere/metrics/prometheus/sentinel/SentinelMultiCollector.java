@@ -40,11 +40,11 @@ import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
-import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_FAMILY_SIZE;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getLabels;
+import static io.microsphere.metrics.prometheus.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.StringUtils.isNotBlank;
 import static io.prometheus.metrics.model.registry.MetricType.valueOf;
 import static io.prometheus.metrics.model.snapshots.MetricFamilyDescriptor.of;
@@ -145,11 +145,10 @@ public class SentinelMultiCollector implements MultiCollector {
     }
 
     private List<MetricFamilyDescriptor> buildMetricFamilyDescriptors() {
-        List<MetricFamily> metricFamilies = METRIC_FAMILIES;
         int size = METRIC_FAMILY_SIZE;
         List<MetricFamilyDescriptor> metricFamilyDescriptors = newArrayList(size);
         for (int i = 0; i < size; i++) {
-            MetricFamily metricFamily = metricFamilies.get(i);
+            MetricFamily metricFamily = getMetricFamily(i);
             MetricFamilyDescriptor metricFamilyDescriptor = buildMetricFamilyDescriptor(metricFamily);
             metricFamilyDescriptors.add(metricFamilyDescriptor);
         }
