@@ -57,9 +57,11 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
         // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration",
         // Spring Boot Actuator API [4.0, )
         "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration"
+        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration"
 })
 public class SentinelMetricsAutoConfiguration {
 
@@ -86,8 +88,7 @@ public class SentinelMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean
-    @ConditionalOnBean(SentinelMultiCollector.class)
+    @ConditionalOnMissingBean(SentinelMultiCollector.class)
     public SentinelMetrics sentinelMetrics() {
         return new SentinelMetrics();
     }
