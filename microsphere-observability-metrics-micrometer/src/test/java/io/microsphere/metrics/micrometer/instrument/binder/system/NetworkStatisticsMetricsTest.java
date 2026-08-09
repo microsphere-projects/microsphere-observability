@@ -54,21 +54,21 @@ class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkStatistics
         assertFalse(registry.getMeters().isEmpty());
         File statsFile = new File(getNetworkStatsFilePath());
 
-        StandardFileWatchService fileWatchService = new StandardFileWatchService();
+        try (StandardFileWatchService fileWatchService = new StandardFileWatchService()) {
+            CountDownLatch countDownLatch = new CountDownLatch(1);
 
-        CountDownLatch countDownLatch = new CountDownLatch(1);
+            fileWatchService.watch(statsFile, new FileChangedListener() {
+                @Override
+                public void onFileModified(FileChangedEvent event) {
+                    assertFalse(registry.getMeters().isEmpty());
+                    countDownLatch.countDown();
+                }
+            }, MODIFIED);
 
-        fileWatchService.watch(statsFile, new FileChangedListener() {
-            @Override
-            public void onFileModified(FileChangedEvent event) {
-                assertFalse(registry.getMeters().isEmpty());
-                countDownLatch.countDown();
-            }
-        }, MODIFIED);
+            fileWatchService.start();
 
-        fileWatchService.start();
-
-        statsFile.setLastModified(currentTimeMillis());
-        countDownLatch.await();
+            statsFile.setLastModified(currentTimeMillis());
+            countDownLatch.await();
+        }
     }
 }
