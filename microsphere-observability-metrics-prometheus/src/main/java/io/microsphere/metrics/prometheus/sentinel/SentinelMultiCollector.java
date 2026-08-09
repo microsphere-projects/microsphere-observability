@@ -40,6 +40,7 @@ import java.util.function.Function;
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
+import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
@@ -50,7 +51,6 @@ import static io.microsphere.util.StringUtils.isNotBlank;
 import static io.prometheus.metrics.model.registry.MetricType.valueOf;
 import static io.prometheus.metrics.model.snapshots.MetricFamilyDescriptor.of;
 import static io.prometheus.metrics.model.snapshots.PrometheusNaming.sanitizeMetricName;
-import static java.util.Collections.emptyMap;
 
 /**
  * Prometheus {@link MultiCollector} based on ALibaba Sentinel Metrics
@@ -74,19 +74,21 @@ public class SentinelMultiCollector implements MultiCollector {
     private final List<MetricFamilyDescriptor> metricFamilyDescriptors;
 
     public SentinelMultiCollector(long interval) {
-        this(interval, emptyMap());
+        this.interval = interval;
+        this.commonLabels = newLinkedHashMap();
+        this.metricFamilyDescriptors = buildMetricFamilyDescriptors();
     }
 
-    public SentinelMultiCollector(long interval, Map<String, String> commonLabels) {
-        this.interval = interval;
-        this.commonLabels = commonLabels;
-        this.metricFamilyDescriptors = buildMetricFamilyDescriptors();
+    public SentinelMultiCollector commonLabel(String name, String value) {
+        this.commonLabels.put(name, value);
+        return this;
     }
 
     @Override
     public MetricSnapshots collect() {
         Map<String, List<MetricNode>> contextMetricsNodesMap = getContextMetricNodesMap(this.interval);
         if (contextMetricsNodesMap.isEmpty()) {
+            logger.warn("No metrics collected");
             return new MetricSnapshots();
         }
 
