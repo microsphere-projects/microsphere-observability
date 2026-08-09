@@ -19,11 +19,19 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestClassOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.List;
 
@@ -39,35 +47,73 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @see SentinelMetricsAutoConfiguration
  * @since 1.0.0
  */
-@SpringBootTest(
-        classes = {
-                SentinelMetricsAutoConfigurationIntegrationTest.class
-        },
-        webEnvironment = NONE
-)
-@EnableAutoConfiguration
+@TestClassOrder(ClassOrderer.OrderAnnotation.class)
 class SentinelMetricsAutoConfigurationIntegrationTest {
 
-    @Autowired
-    private MeterRegistry registry;
+    @Order(1)
+    @Nested
+    @DisplayName("Default Test")
+    @SpringBootTest(
+            classes = {
+                    SentinelMetricsAutoConfigurationIntegrationTest.class
+            },
+            webEnvironment = NONE
+    )
+    @DirtiesContext
+    @EnableAutoConfiguration
+    class DefaultTest {
 
-    @Test
-    void test() throws Throwable {
-        SentinelTemplate sentinelTemplate = new SentinelTemplate();
-        for (int i = 0; i < 100; i++) {
-            sentinelTemplate.call("test-resource-" + (i + 1), () -> {
-                sleep(10L);
-            });
+        @BeforeEach
+        void setUp() throws Throwable {
+            SentinelTemplate sentinelTemplate = new SentinelTemplate();
+            for (int i = 0; i < 100; i++) {
+                sentinelTemplate.call("test-resource-" + (i + 1), () -> {
+                    sleep(10L);
+                });
+            }
         }
 
-        List<Meter> meters = this.registry.getMeters();
+        @Autowired
+        private MeterRegistry registry;
 
-        long count = meters.stream()
-                .map(Meter::getId)
-                .map(Meter.Id::getName)
-                .filter(name -> name.startsWith(PREFIX))
-                .count();
+        @Test
+        void test() throws Throwable {
 
-        assertTrue(count > 0);
+            List<Meter> meters = this.registry.getMeters();
+
+            long count = meters.stream()
+                    .map(Meter::getId)
+                    .map(Meter.Id::getName)
+                    .filter(name -> name.startsWith(PREFIX))
+                    .count();
+
+            assertTrue(count > 0);
+        }
+    }
+
+    @Order(2)
+    @Nested
+    @DisplayName("Prometheus Test")
+    @SpringBootTest(
+            classes = {
+                    SentinelMetricsAutoConfigurationIntegrationTest.class
+            },
+            webEnvironment = NONE,
+            properties = {
+                    "management.prometheus.metrics.export.enabled=true"
+            }
+    )
+    @DirtiesContext
+    @EnableAutoConfiguration
+    class PrometheusTest {
+
+        @Autowired
+        private PrometheusMeterRegistry registry;
+
+        @Test
+        void test() throws Throwable {
+            String content = registry.scrape();
+            assertTrue(content.contains(PREFIX));
+        }
     }
 }
