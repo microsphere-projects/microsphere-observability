@@ -27,7 +27,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 
-import static io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics.METRIC_PREFIX;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.PREFIX;
 import static java.lang.Thread.sleep;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
@@ -65,7 +65,7 @@ class SentinelMetricsAutoConfigurationIntegrationTest {
         long count = meters.stream()
                 .map(Meter::getId)
                 .map(Meter.Id::getName)
-                .filter(name -> name.startsWith(METRIC_PREFIX))
+                .filter(name -> name.startsWith(PREFIX))
                 .count();
 
         assertTrue(count > 0);
