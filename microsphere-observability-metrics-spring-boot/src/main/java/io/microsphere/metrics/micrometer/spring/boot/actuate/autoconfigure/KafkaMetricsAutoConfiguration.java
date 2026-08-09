@@ -87,19 +87,20 @@ public class KafkaMetricsAutoConfiguration {
     public static final String KAFKA_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + ENABLED_PROPERTY_NAME;
 
     @ConditionalOnLog4j2Available
-    @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
+    @ConditionalOnBean(value = {
+            KafkaAppender.class,
+            Log4j2KafkaAppenderProperties.class,
+    })
     @Bean(destroyMethod = "close")
-    public KafkaClientMetrics kafkaClientMetrics(Log4j2KafkaAppenderProperties properties) {
-        Producer producer = getKafkaProducer(properties);
+    public KafkaClientMetrics kafkaClientMetrics(KafkaAppender kafkaAppender, Log4j2KafkaAppenderProperties properties) {
+        Producer producer = getKafkaProducer(kafkaAppender);
         String clientId = properties.getProperties().get(CLIENT_ID_CONFIG);
         // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
         Iterable<Tag> tags = ofList(of("spring.id", clientId));
         return new KafkaClientMetrics(producer, tags);
     }
 
-    private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
-        String loggerName = properties.getName();
-        KafkaAppender kafkaAppender = findAppender(loggerName);
+    private Producer getKafkaProducer(KafkaAppender kafkaAppender) {
         Producer producer = null;
         if (kafkaAppender != null) {
             KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
