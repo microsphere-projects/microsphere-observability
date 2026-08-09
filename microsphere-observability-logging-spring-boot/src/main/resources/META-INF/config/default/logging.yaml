@@ -16,5 +16,7 @@ microsphere:
         sync-send: false
         send-event-timestamp: false
         properties:
+          bootstrap:
+            servers: ${spring.kafka.bootstrap-servers:localhost:9092}
           client.id: microsphere-kafka-appender-${spring.application.name:default}
           batch.size: 1000
