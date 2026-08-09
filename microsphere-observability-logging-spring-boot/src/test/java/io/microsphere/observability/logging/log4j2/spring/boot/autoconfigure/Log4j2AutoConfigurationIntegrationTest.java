@@ -60,18 +60,9 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
         },
         webEnvironment = NONE,
         properties = {
-                "spring.kafka.bootstrap-servers=127.0.0.1:9092",
+                "spring.kafka.bootstrap-servers=localhost:9092",
                 "microsphere.log4j2.kafka.appender.sync-send=true",
                 "microsphere.log4j2.kafka.appender.send-event-timestamp=true"
-        }
-)
-@EmbeddedKafka(
-        ports = 9092,
-        topics = "${microsphere.log4j2.kafka.appender.topic}",
-        partitions = 1,
-        brokerProperties = {
-                "unclean.leader.election.enable=false",
-                "auto.leader.rebalance.enable=false"
         }
 )
 @EnableAutoConfiguration
