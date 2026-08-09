@@ -29,7 +29,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import static io.microsphere.collection.ListUtils.newArrayList;
-import static io.microsphere.collection.Maps.ofMap;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.ArrayUtils.contains;
@@ -54,7 +53,7 @@ class SentinelCollectorTest {
     @BeforeEach
     void setUp() {
         this.registry = new CollectorRegistry();
-        this.sentinelCollector = new SentinelCollector(60000, ofMap("test-label", "test-value"));
+        this.sentinelCollector = new SentinelCollector(60000).commonLabel("test-label", "test-value");
         this.sentinelCollector.register(registry);
         this.testHelper = new SentinelMetricsTestHelper();
     }
