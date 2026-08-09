@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 
+import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 
 import static java.util.concurrent.Executors.newCachedThreadPool;
@@ -77,6 +78,11 @@ class JvmMetricsAutoConfigurationIntegrationTest {
         @Bean
         public ConcurrentTaskExecutor concurrentTaskExecutor(ExecutorService executorService) {
             return new ConcurrentTaskExecutor(executorService);
+        }
+
+        @Bean
+        public Executor executor() {
+            return Runnable::run;
         }
     }
 

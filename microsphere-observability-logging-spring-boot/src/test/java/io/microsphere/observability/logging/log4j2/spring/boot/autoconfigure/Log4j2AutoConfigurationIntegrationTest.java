@@ -26,8 +26,10 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.core.filter.CompositeFilter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -45,11 +47,13 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET
 import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
+import static org.apache.logging.log4j.core.filter.CompositeFilter.createFilters;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
@@ -148,15 +152,28 @@ public class Log4j2AutoConfigurationIntegrationTest {
     void testGetter() {
         this.properties.setPatternLayout(null);
 
-        this.properties.setFilter("test-filter");
+        String filterBeanName = "testFilter";
+        this.properties.setFilter(filterBeanName);
         Filter filter = this.kafkaAppenderConfiguration.getFilter(this.context);
         assertNull(filter);
 
+        ConfigurableListableBeanFactory beanFactory = this.context.getBeanFactory();
+        CompositeFilter compositeFilter = createFilters(null);
+        beanFactory.registerSingleton(filterBeanName, compositeFilter);
+        filter = this.kafkaAppenderConfiguration.getFilter(this.context);
+        assertSame(compositeFilter, filter);
+
         LoggerContext loggerContext = getLoggerContext();
 
-        this.properties.setLayout("test-layout");
+        String layoutBeanName = "testLayout";
+        this.properties.setLayout(layoutBeanName);
         Layout layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
         assertInstanceOf(DynamicLayout.class, layout);
+
+        Layout newLayout = new DynamicLayout(loggerContext);
+        beanFactory.registerSingleton(layoutBeanName, newLayout);
+        layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
+        assertSame(layout, newLayout);
 
         this.properties.setLayout(null);
         layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
