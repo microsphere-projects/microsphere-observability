@@ -62,6 +62,7 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
         "org.springframework.kafka.core.ProducerFactory",                                                  // Spring Kafka API
         "io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties"            // Microsphere Observability Logging Spring Boot API
 })
+@ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
 @AutoConfigureAfter(name = {
         // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
@@ -87,7 +88,6 @@ public class KafkaMetricsAutoConfiguration {
     public static final String KAFKA_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + ENABLED_PROPERTY_NAME;
 
     @ConditionalOnLog4j2Available
-    @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
     @Bean(destroyMethod = "close")
     public KafkaClientMetrics kafkaClientMetrics(Log4j2KafkaAppenderProperties properties) {
         Producer producer = getKafkaProducer(properties);
