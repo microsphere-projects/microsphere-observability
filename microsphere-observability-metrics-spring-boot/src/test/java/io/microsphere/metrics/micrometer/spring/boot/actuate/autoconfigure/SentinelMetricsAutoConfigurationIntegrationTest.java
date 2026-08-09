@@ -23,6 +23,7 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.ClassOrderer;
+import org.junit.jupiter.api.ClassOrderer.OrderAnnotation;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Order;
@@ -47,7 +48,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
  * @see SentinelMetricsAutoConfiguration
  * @since 1.0.0
  */
-@TestClassOrder(ClassOrderer.OrderAnnotation.class)
+@TestClassOrder(OrderAnnotation.class)
 class SentinelMetricsAutoConfigurationIntegrationTest {
 
     @Order(1)

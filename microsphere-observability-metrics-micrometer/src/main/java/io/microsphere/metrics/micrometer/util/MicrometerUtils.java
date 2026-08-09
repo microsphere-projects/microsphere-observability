@@ -62,4 +62,7 @@ public abstract class MicrometerUtils extends BaseUtils {
     public static ScheduledExecutorService getScheduledExecutor() {
         return scheduledExecutor;
     }
+
+    private MicrometerUtils() {
+    }
 }
