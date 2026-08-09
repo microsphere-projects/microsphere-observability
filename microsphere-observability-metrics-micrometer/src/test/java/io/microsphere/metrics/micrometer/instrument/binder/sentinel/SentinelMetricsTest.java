@@ -91,11 +91,11 @@ class SentinelMetricsTest {
         assertDoesNotThrow(this::init);
         SentinelTemplate sntinelTemplate = new SentinelTemplate();
         this.sentinelMetrics.bindTo(this.registry);
-        String resourceName = "test-resource";
+        String resourceNamePrefix = "test-resource-";
         for (int i = 0; i < 100; i++) {
-            sntinelTemplate.execute(resourceName, () -> {
+            sntinelTemplate.execute(resourceNamePrefix + (i + 1), () -> {
             });
         }
-        assertEquals(12, this.registry.getMeters().size());
+        assertEquals(700, this.registry.getMeters().size());
     }
 }
