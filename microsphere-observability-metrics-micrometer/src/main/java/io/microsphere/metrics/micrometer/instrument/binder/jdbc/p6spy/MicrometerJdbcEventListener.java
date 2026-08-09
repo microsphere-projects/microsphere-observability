@@ -79,10 +79,10 @@ public class MicrometerJdbcEventListener extends LoggingEventListener {
     /**
      * {@link MeterRegistry}
      */
-    private static MeterRegistry registry;
+    private static volatile MeterRegistry registry;
 
     public MicrometerJdbcEventListener(MeterRegistry registry) {
-        MicrometerJdbcEventListener.registry = registry;
+        setRegistry(registry);
     }
 
     public MicrometerJdbcEventListener() {
