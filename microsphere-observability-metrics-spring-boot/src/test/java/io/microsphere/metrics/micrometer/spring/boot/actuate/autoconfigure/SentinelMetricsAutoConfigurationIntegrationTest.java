@@ -102,7 +102,7 @@ class SentinelMetricsAutoConfigurationIntegrationTest {
             },
             webEnvironment = NONE,
             properties = {
-                    "management.prometheus.metrics.export.enabled=true"
+                    "management.metrics.export.prometheus.enabled=true"
             }
     )
     @DirtiesContext
