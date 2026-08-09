@@ -30,7 +30,6 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.util.Map;
 
@@ -61,16 +60,20 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
         },
         webEnvironment = NONE,
         properties = {
+                "spring.kafka.bootstrap-servers=localhost:9092",
                 "microsphere.log4j2.kafka.appender.sync-send=true",
-                "microsphere.log4j2.kafka.appender.send-event-timestamp=true",
-                "microsphere.log4j2.kafka.appender.properties.bootstrap.servers=localhost:9092",
+                "microsphere.log4j2.kafka.appender.send-event-timestamp=true"
         }
 )
 @EmbeddedKafka(
         ports = 9092,
-        topics = "${microsphere.log4j2.kafka.appender.topic}"
+        topics = "${microsphere.log4j2.kafka.appender.topic}",
+        partitions = 1,
+        brokerProperties = {
+                "unclean.leader.election.enable=false",
+                "auto.leader.rebalance.enable=false"
+        }
 )
-@DirtiesContext
 @EnableAutoConfiguration
 public class Log4j2AutoConfigurationIntegrationTest {
 
