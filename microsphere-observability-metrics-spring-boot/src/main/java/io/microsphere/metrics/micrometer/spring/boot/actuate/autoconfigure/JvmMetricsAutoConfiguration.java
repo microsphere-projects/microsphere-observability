@@ -35,6 +35,7 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskExecutor;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Function;
 
 import static io.micrometer.core.instrument.Tags.of;
@@ -126,7 +127,9 @@ public class JvmMetricsAutoConfiguration {
         ConfigurableApplicationContext context = event.getApplicationContext();
         MeterRegistry meterRegistry = context.getBean(MeterRegistry.class);
         registerExecutorServiceMetrics(context, ConcurrentTaskExecutor.class, ConcurrentTaskExecutor::getConcurrentExecutor, meterRegistry);
+        registerExecutorServiceMetrics(context, ScheduledExecutorService.class, e -> e, meterRegistry);
         registerExecutorServiceMetrics(context, ExecutorService.class, e -> e, meterRegistry);
+        registerExecutorServiceMetrics(context, Executor.class, e -> e, meterRegistry);
         registerExecutorServiceMetrics(commonPool(), "ForkJoinPool-commonPool", meterRegistry);
     }
 

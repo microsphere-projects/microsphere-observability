@@ -217,13 +217,12 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Logback -->
+        <!-- Microsphere Log4j2 Test -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-log4j2</artifactId>
             <scope>test</scope>
         </dependency>
-
 
     </dependencies>
 
