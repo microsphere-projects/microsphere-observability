@@ -67,10 +67,6 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration",
-        // Spring Boot Actuator API [4.0, )
-        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration",
         // Microsphere Observability Logging Spring Boot API
         "io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration"
 })

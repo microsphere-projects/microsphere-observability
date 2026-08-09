@@ -34,6 +34,7 @@ import static io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetrics
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
+import static io.microsphere.collection.MapUtils.of;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.commons.MetricFamily.builder;
 import static io.microsphere.metrics.commons.MetricType.GAUGE;
@@ -65,7 +66,7 @@ public abstract class SentinelMetricUtitls implements Utils {
 
     private static final Logger logger = getLogger(SentinelMetricUtitls.class);
 
-    private static final Map<String, BiFunction<String, MetricNode, String>> LABEL_NAME_TO_VALUE_FUNCTION_MAP = Map.of(
+    private static final Map<String, BiFunction<String, MetricNode, String>> LABEL_NAME_TO_VALUE_FUNCTION_MAP = of(
             RESOURCE_LABEL_NAME, (context, metricNode) -> metricNode.getResource(),
             CONTEXT_LABEL_NAME, (context, metricNode) -> context,
             RESOURCE_TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),

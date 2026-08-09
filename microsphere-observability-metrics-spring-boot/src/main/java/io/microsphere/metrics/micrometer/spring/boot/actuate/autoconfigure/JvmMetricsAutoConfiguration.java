@@ -69,11 +69,7 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
         // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration",
-        // Spring Boot Actuator API [4.0, )
-        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration"
+        "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration"
 
 })
 public class JvmMetricsAutoConfiguration {
