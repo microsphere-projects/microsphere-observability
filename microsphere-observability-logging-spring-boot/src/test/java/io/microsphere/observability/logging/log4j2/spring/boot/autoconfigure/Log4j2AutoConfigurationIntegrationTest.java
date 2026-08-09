@@ -18,19 +18,25 @@
 package io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure;
 
 import io.microsphere.logging.Logger;
+import io.microsphere.observability.logging.log4j2.DynamicLayout;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.logging.log4j.core.Filter;
+import org.apache.logging.log4j.core.Layout;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.Map;
 
 import static io.microsphere.collection.MapUtils.newHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.logging.log4j2.util.Log4j2Utils.getLoggerContext;
 import static java.util.Collections.singleton;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
@@ -41,6 +47,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -74,7 +81,13 @@ public class Log4j2AutoConfigurationIntegrationTest {
 //    private EmbeddedKafkaBroker broker;
 
     @Autowired
+    private Log4j2AutoConfiguration.KafkaAppenderConfiguration kafkaAppenderConfiguration;
+
+    @Autowired
     private Log4j2KafkaAppenderProperties properties;
+
+    @Autowired
+    private ConfigurableApplicationContext context;
 
     @Test
     void test() {
@@ -129,5 +142,28 @@ public class Log4j2AutoConfigurationIntegrationTest {
 
         consumer.close();
 
+    }
+
+    @Test
+    void testGetter() {
+        this.properties.setPatternLayout(null);
+
+        this.properties.setFilter("test-filter");
+        Filter filter = this.kafkaAppenderConfiguration.getFilter(this.context);
+        assertNull(filter);
+
+        LoggerContext loggerContext = getLoggerContext();
+
+        this.properties.setLayout("test-layout");
+        Layout layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
+        assertInstanceOf(DynamicLayout.class, layout);
+
+        this.properties.setLayout(null);
+        layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
+        assertInstanceOf(DynamicLayout.class, layout);
+
+        this.properties.setPatternLayout("%m");
+        layout = this.kafkaAppenderConfiguration.getLayout(loggerContext, this.context);
+        assertFalse(layout instanceof DynamicLayout);
     }
 }

@@ -25,6 +25,7 @@ import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender;
+import org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender.Builder;
 import org.apache.logging.log4j.core.config.Property;
 import org.apache.logging.log4j.core.layout.PatternLayout;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -48,7 +49,6 @@ import static io.microsphere.logging.log4j2.util.Log4j2Utils.addAppenderForAllLo
 import static io.microsphere.logging.log4j2.util.Log4j2Utils.getLoggerContext;
 import static io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties.PREFIX;
 import static io.microsphere.spring.beans.BeanUtils.getBeanIfAvailable;
-import static org.apache.logging.log4j.core.appender.mom.kafka.KafkaAppender.newBuilder;
 import static org.apache.logging.log4j.core.config.Property.createProperty;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -111,7 +111,7 @@ public class Log4j2AutoConfiguration {
             LoggerContext loggerContext = getLoggerContext();
             Log4j2KafkaAppenderProperties properties = this.kafkaAppenderProperties;
 
-            KafkaAppender.Builder builder = newBuilder()
+            Builder builder = KafkaAppender.newBuilder()
                     .setName(properties.getName())
                     .setIgnoreExceptions(properties.isIgnoreExceptions())
                     .setKey(properties.getKey())
@@ -126,25 +126,28 @@ public class Log4j2AutoConfiguration {
             return builder.build();
         }
 
-        private Layout<? extends Serializable> getLayout(LoggerContext loggerContext,
-                                                         ConfigurableApplicationContext context) {
+        Layout<? extends Serializable> getLayout(LoggerContext loggerContext,
+                                                 ConfigurableApplicationContext context) {
             String layoutBeanName = this.kafkaAppenderProperties.getLayout();
+            Layout layout = null;
             // First, try to use Spring Bean
             if (hasText(layoutBeanName)) {
-                return getBeanIfAvailable(context, layoutBeanName, Layout.class);
+                layout = getBeanIfAvailable(context, layoutBeanName, Layout.class);
             }
 
-            // Second, try to use the pattern
-            String patternLayout = this.kafkaAppenderProperties.getPatternLayout();
-            if (hasText(patternLayout)) {
-                return PatternLayout.newBuilder().withPattern(patternLayout).build();
+            if (layout == null) {
+                // Second, try to use the pattern
+                String patternLayout = this.kafkaAppenderProperties.getPatternLayout();
+                if (hasText(patternLayout)) {
+                    layout = PatternLayout.newBuilder().withPattern(patternLayout).build();
+                }
             }
 
-            // Finally, use DynamicLayout
-            return new DynamicLayout(loggerContext);
+            // Finally, use DynamicLayout if no layout is found
+            return layout == null ? new DynamicLayout(loggerContext) : layout;
         }
 
-        private Filter getFilter(ConfigurableApplicationContext context) {
+        Filter getFilter(ConfigurableApplicationContext context) {
             String filterBeanName = this.kafkaAppenderProperties.getFilter();
             if (hasText(filterBeanName)) {
                 return getBeanIfAvailable(context, filterBeanName, Filter.class);
