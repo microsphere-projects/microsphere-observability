@@ -17,12 +17,15 @@
 package io.microsphere.metrics.micrometer.util;
 
 import io.micrometer.core.instrument.util.NamedThreadFactory;
+import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.util.BaseUtils;
 
 import java.util.concurrent.ScheduledExecutorService;
 
+import static io.microsphere.annotation.ConfigurationProperty.SYSTEM_PROPERTIES_SOURCE;
 import static io.microsphere.concurrent.ExecutorUtils.shutdownOnExit;
 import static java.lang.Integer.getInteger;
+import static java.lang.Integer.parseInt;
 import static java.util.concurrent.Executors.newScheduledThreadPool;
 
 /**
@@ -33,9 +36,30 @@ import static java.util.concurrent.Executors.newScheduledThreadPool;
  */
 public abstract class MicrometerUtils extends BaseUtils {
 
-    public static final int DEFAULT_SCHEDULED_EXECUTOR_SIZE = 1;
+    /**
+     * The property name of scheduled executor core size: "microsphere.metrics.micrometer.scheduled-executor.core-size"
+     */
+    public static final String MICROETER_SCHEDULED_EXECUTOR_SIZE_PROPERTY_NAME = "microsphere.metrics.micrometer.scheduled-executor.core-size";
 
-    public static final int SCHEDULED_EXECUTOR_SIZE = getInteger("microsphere.metrics.micrometer.scheduled-executor.core-size", DEFAULT_SCHEDULED_EXECUTOR_SIZE);
+    /**
+     * The default property value of scheduled executor core size: "1"
+     */
+    public static final String DEFAULT_SCHEDULED_EXECUTOR_SIZE_PROPERTY_VALUE = "1";
+
+    /**
+     * The default scheduled executor core size of Micrometer : 1
+     */
+    public static final int DEFAULT_SCHEDULED_EXECUTOR_SIZE = parseInt(DEFAULT_SCHEDULED_EXECUTOR_SIZE_PROPERTY_VALUE);
+
+    /**
+     * The scheduled executor core size of Micrometer
+     */
+    @ConfigurationProperty(
+            name = MICROETER_SCHEDULED_EXECUTOR_SIZE_PROPERTY_NAME,
+            defaultValue = DEFAULT_SCHEDULED_EXECUTOR_SIZE_PROPERTY_VALUE,
+            source = SYSTEM_PROPERTIES_SOURCE
+    )
+    public static final int SCHEDULED_EXECUTOR_SIZE = getInteger(MICROETER_SCHEDULED_EXECUTOR_SIZE_PROPERTY_NAME, DEFAULT_SCHEDULED_EXECUTOR_SIZE);
 
     private static final ScheduledExecutorService scheduledExecutor = newScheduledThreadPool(SCHEDULED_EXECUTOR_SIZE, new NamedThreadFactory("Micrometer-Async-"));
 
