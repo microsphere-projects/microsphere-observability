@@ -217,13 +217,6 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Microsphere Log4j2 Test -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-log4j2</artifactId>
-            <scope>test</scope>
-        </dependency>
-
     </dependencies>
 
 </project>
