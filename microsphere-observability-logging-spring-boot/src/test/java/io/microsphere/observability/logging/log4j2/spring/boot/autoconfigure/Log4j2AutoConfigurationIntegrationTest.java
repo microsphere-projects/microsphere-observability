@@ -19,19 +19,13 @@ package io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure;
 
 import io.microsphere.logging.Logger;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import java.util.Map;
 
@@ -51,7 +45,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
-import static org.springframework.kafka.test.utils.KafkaTestUtils.consumerProps;
 import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 
 /**
@@ -83,13 +76,10 @@ public class Log4j2AutoConfigurationIntegrationTest {
     @Autowired
     private Log4j2KafkaAppenderProperties properties;
 
-    @Value("${spring.kafka.bootstrap-servers}")
-    private String bootstrapServers;
-
-
-
     @Test
     void test() {
+        String bootstrapServers = properties.getProperties().get(BOOTSTRAP_SERVERS_CONFIG);
+
         assertTrue(this.properties.isEnabled());
         assertEquals("java-app-logs", this.properties.getTopic());
         assertEquals("java-app-logs-default", this.properties.getKey());
@@ -120,10 +110,9 @@ public class Log4j2AutoConfigurationIntegrationTest {
         consumerProps.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
         // ConsumerFactory<String, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
         // Consumer<String, String> consumer = cf.createConsumer();
+        // this.broker.consumeFromAnEmbeddedTopic(consumer, true, this.properties.getTopic());
 
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
-
-        // this.broker.consumeFromAnEmbeddedTopic(consumer, true, this.properties.getTopic());
 
         consumer.subscribe(singleton(this.properties.getTopic()));
 
