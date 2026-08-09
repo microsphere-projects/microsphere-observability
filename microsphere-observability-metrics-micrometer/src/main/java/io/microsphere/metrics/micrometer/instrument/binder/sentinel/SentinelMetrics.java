@@ -59,11 +59,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 public class SentinelMetrics extends AbstractMeterBinder implements ClusterNodeAddedEventListener {
 
     /**
-     * The Metric prefix : "sentinel."
-     */
-    public static final String METRIC_PREFIX = "sentinel.";
-
-    /**
      * The {@link Tag} key for Sentinel Resource
      */
     public static final String RESOURCE_TAG_KEY = RESOURCE_LABEL_NAME;
