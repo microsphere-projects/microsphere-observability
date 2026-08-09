@@ -42,7 +42,7 @@ class SentinelMultiCollectorTest {
 
     @BeforeEach
     void setUp() {
-        this.sentinelMultiCollector = new SentinelMultiCollector(60000);
+        this.sentinelMultiCollector = new SentinelMultiCollector(60000).commonLabel("application", "test");
         this.registry = new PrometheusRegistry();
         this.registry.register(this.sentinelMultiCollector);
         this.testHelper = new SentinelMetricsTestHelper();
