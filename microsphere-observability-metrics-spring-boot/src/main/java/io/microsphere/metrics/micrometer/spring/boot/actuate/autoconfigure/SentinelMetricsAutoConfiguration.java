@@ -33,11 +33,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
-import java.util.Map;
 
 import static com.alibaba.csp.sentinel.init.InitExecutor.doInit;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
-import static io.microsphere.collection.Maps.ofMap;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.SENTINEL_METRICS_ENABLED_PROPERTY_NAME;
@@ -85,8 +83,8 @@ public class SentinelMetricsAutoConfiguration {
     public SentinelMultiCollector sentinelMultiCollector(PrometheusMeterRegistry registry,
                                                          @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
                                                          @Value("${spring.application.name:default}") String applicationName) {
-        Map<String, String> commonLabels = ofMap("application", applicationName);
-        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis(), commonLabels);
+        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis())
+                .commonLabel("application", applicationName);
         PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
         prometheusRegistry.register(sentinelMultiCollector);
         return sentinelMultiCollector;

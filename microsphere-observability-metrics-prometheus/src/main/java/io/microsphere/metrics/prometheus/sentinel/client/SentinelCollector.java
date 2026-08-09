@@ -44,7 +44,6 @@ import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetri
 import static io.microsphere.util.StringUtils.EMPTY_STRING;
 import static io.prometheus.client.Collector.Type.valueOf;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.emptyMap;
 
 /**
  * Prometheus {@link Collector} based on ALibaba Sentinel Metrics
@@ -69,18 +68,20 @@ public class SentinelCollector extends Collector {
     private final Map<String, String> commonLabels;
 
     public SentinelCollector(long interval) {
-        this(interval, emptyMap());
+        this.interval = interval;
+        this.commonLabels = newLinkedHashMap();
     }
 
-    public SentinelCollector(long interval, Map<String, String> commonLabels) {
-        this.interval = interval;
-        this.commonLabels = commonLabels;
+    public SentinelCollector commonLabel(String name, String value) {
+        this.commonLabels.put(name, value);
+        return this;
     }
 
     @Override
     public List<MetricFamilySamples> collect() {
         Map<String, List<MetricNode>> resourceMetricsNodesMap = getContextMetricNodesMap(this.interval);
         if (resourceMetricsNodesMap.isEmpty()) {
+            logger.warn("No metrics collected");
             return emptyList();
         }
 
