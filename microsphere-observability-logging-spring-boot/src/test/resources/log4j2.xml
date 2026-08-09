@@ -14,7 +14,7 @@
         <Root level="INFO" additivity="false">
             <AppenderRef ref="STDOUT"/>
         </Root>
-        <Logger name="io.microsphere.observability.logging" additivity="false" level="TRACE">
+        <Logger name="io.microsphere.observability" additivity="false" level="TRACE">
             <AppenderRef ref="STDOUT"/>
         </Logger>
     </Loggers>
