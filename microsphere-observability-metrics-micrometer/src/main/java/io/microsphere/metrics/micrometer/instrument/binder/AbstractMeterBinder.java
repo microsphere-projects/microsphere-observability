@@ -24,14 +24,14 @@ public abstract class AbstractMeterBinder implements MeterBinder {
 
     protected final Logger logger = getLogger(getClass());
 
-    protected final Iterable<Tag> tags;
+    protected final Iterable<Tag> commonTags;
 
     public AbstractMeterBinder() {
         this(emptyList());
     }
 
-    public AbstractMeterBinder(Iterable<Tag> tags) {
-        this.tags = concat(tags, ORIGIN_TAG_KEY, getOriginTagValue());
+    public AbstractMeterBinder(Iterable<Tag> commonTags) {
+        this.commonTags = concat(commonTags, ORIGIN_TAG_KEY, getOriginTagValue());
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class AbstractMeterBinder implements MeterBinder {
     }
 
     protected Iterable<Tag> combine(String... tags) {
-        return concat(this.tags, tags);
+        return concat(this.commonTags, tags);
     }
 
     protected abstract boolean supports(MeterRegistry registry);

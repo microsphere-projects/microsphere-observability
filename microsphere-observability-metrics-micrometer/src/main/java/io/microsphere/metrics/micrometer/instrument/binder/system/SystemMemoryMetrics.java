@@ -19,12 +19,12 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 import com.sun.management.OperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
 import java.lang.management.PlatformManagedObject;
 
 import static io.micrometer.core.instrument.Gauge.builder;
+import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
 import static io.microsphere.lang.function.ThrowableSupplier.execute;
 import static io.microsphere.management.JmxUtils.getOperatingSystemMXBean;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.PREFIX;
@@ -71,39 +71,34 @@ public class SystemMemoryMetrics extends AbstractMeterBinder {
 
         OperatingSystemMXBean operatingSystemBean = (OperatingSystemMXBean) getOperatingSystemMXBean();
 
-        builder(METRIC_PREFIX + "memory.swap.space.total", operatingSystemBean, OperatingSystemMXBean::getTotalSwapSpaceSize)
-                .tags(tags)
+        builder(METRIC_PREFIX + "memory.swap.space.total", operatingSystemBean::getTotalSwapSpaceSize)
+                .tags(commonTags)
                 .description("Total swap space size")
-                .baseUnit(BaseUnits.BYTES)
-                .strongReference(true)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "memory.swap.space.free", operatingSystemBean, OperatingSystemMXBean::getFreeSwapSpaceSize)
-                .tags(tags)
+        builder(METRIC_PREFIX + "memory.swap.space.free", operatingSystemBean::getFreeSwapSpaceSize)
+                .tags(commonTags)
                 .description("Free swap space size")
-                .baseUnit(BaseUnits.BYTES)
-                .strongReference(true)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "memory.committed.virtual", operatingSystemBean, OperatingSystemMXBean::getCommittedVirtualMemorySize)
-                .tags(tags)
+        builder(METRIC_PREFIX + "memory.committed.virtual", operatingSystemBean::getCommittedVirtualMemorySize)
+                .tags(commonTags)
                 .description("Committed virtual memory size")
-                .baseUnit(BaseUnits.BYTES)
-                .strongReference(true)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "memory.physical.total", operatingSystemBean, OperatingSystemMXBean::getTotalPhysicalMemorySize)
-                .tags(tags)
+        builder(METRIC_PREFIX + "memory.physical.total", operatingSystemBean::getTotalPhysicalMemorySize)
+                .tags(commonTags)
                 .description("Total physical memory size")
-                .baseUnit(BaseUnits.BYTES)
-                .strongReference(true)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "memory.physical.free", operatingSystemBean, OperatingSystemMXBean::getFreePhysicalMemorySize)
-                .tags(tags)
+        builder(METRIC_PREFIX + "memory.physical.free", operatingSystemBean::getFreePhysicalMemorySize)
+                .tags(commonTags)
                 .description("Free physical memory size")
-                .baseUnit(BaseUnits.BYTES)
-                .strongReference(true)
+                .baseUnit(BYTES)
                 .register(registry);
     }
 }

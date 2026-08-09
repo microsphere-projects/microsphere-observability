@@ -16,23 +16,22 @@
  */
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
+import io.microsphere.io.StandardFileWatchService;
+import io.microsphere.io.event.FileChangedEvent;
+import io.microsphere.io.event.FileChangedListener;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.WatchEvent;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.util.concurrent.CountDownLatch;
 
+import static io.microsphere.io.event.FileChangedEvent.Kind.MODIFIED;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_STATS_FILE_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getNetworkStatsFilePath;
 import static java.lang.System.currentTimeMillis;
 import static java.lang.System.setProperty;
-import static java.nio.file.FileSystems.getDefault;
 import static java.nio.file.Paths.get;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
@@ -44,47 +43,32 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 class NetworkStatisticsMetricsTest extends AbstractMetricsTest<NetworkStatisticsMetrics> {
 
     @BeforeAll
-    public static void prepare() throws Throwable {
+    static void prepare() throws Throwable {
         ClassLoader classLoader = NetworkStatisticsMetricsTest.class.getClassLoader();
         String testFile = get(classLoader.getResource("test-data/memory/network.stats").toURI()).toAbsolutePath().toString();
         setProperty(NETWORK_STATS_FILE_PATH_PROPERTY_NAME, testFile);
     }
 
     @Test
-    public void test() throws Throwable {
+    void test() throws Throwable {
         assertFalse(registry.getMeters().isEmpty());
+        File statsFile = new File(getNetworkStatsFilePath());
 
-        WatchService watchService = getDefault().newWatchService();
-        Path statsFilePath = get(getNetworkStatsFilePath());
-        Path dir = statsFilePath.getParent();
-        dir.register(watchService, ENTRY_MODIFY);
+        StandardFileWatchService fileWatchService = new StandardFileWatchService();
 
-        Thread thread = new Thread(() -> {
-            WatchKey key;
-            while (true) {
-                try {
-                    key = watchService.take();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                if (key == null) {
-                    continue;
-                }
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    Path path = (Path) event.context();
-                    if (statsFilePath.equals(dir.resolve(path))) {
-                        assertFalse(registry.getMeters().isEmpty());
-                    }
-                }
+        CountDownLatch countDownLatch = new CountDownLatch(1);
+
+        fileWatchService.watch(statsFile, new FileChangedListener() {
+            @Override
+            public void onFileModified(FileChangedEvent event) {
+                assertFalse(registry.getMeters().isEmpty());
+                countDownLatch.countDown();
             }
-        });
+        }, MODIFIED);
 
-        thread.start();
+        fileWatchService.start();
 
-
-        File statsFile = statsFilePath.toFile();
         statsFile.setLastModified(currentTimeMillis());
-
-        thread.join(5000);
+        countDownLatch.await();
     }
 }
