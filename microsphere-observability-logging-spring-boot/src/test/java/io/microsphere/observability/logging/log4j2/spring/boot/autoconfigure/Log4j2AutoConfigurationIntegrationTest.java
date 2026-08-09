@@ -21,9 +21,11 @@ import io.microsphere.logging.Logger;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -33,9 +35,14 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import java.util.Map;
 
+import static io.microsphere.collection.MapUtils.newHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static java.util.Collections.singleton;
+import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
+import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.AUTO_OFFSET_RESET_CONFIG;
+import static org.apache.kafka.clients.consumer.ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -70,11 +77,16 @@ public class Log4j2AutoConfigurationIntegrationTest {
 
     private static final Logger logger = getLogger(Log4j2AutoConfigurationIntegrationTest.class);
 
-    @Autowired
-    private EmbeddedKafkaBroker broker;
+//    @Autowired
+//    private EmbeddedKafkaBroker broker;
 
     @Autowired
     private Log4j2KafkaAppenderProperties properties;
+
+    @Value("${spring.kafka.bootstrap-servers}")
+    private String bootstrapServers;
+
+
 
     @Test
     void test() {
@@ -98,13 +110,22 @@ public class Log4j2AutoConfigurationIntegrationTest {
             logger.trace("Hello, Log4j2!");
         }
 
-        Map<String, Object> consumerProps = consumerProps("testGroup", "true", this.broker);
+        // Map<String, Object> consumerProps = consumerProps("testGroup", "true", this.broker);
+        Map<String, Object> consumerProps = newHashMap();
+        consumerProps.put(BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        consumerProps.put(GROUP_ID_CONFIG, "testGroup");
+        consumerProps.put(ENABLE_AUTO_COMMIT_CONFIG, "true");
         consumerProps.put(KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(AUTO_OFFSET_RESET_CONFIG, "earliest");
-        ConsumerFactory<String, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
-        Consumer<String, String> consumer = cf.createConsumer();
-        this.broker.consumeFromAnEmbeddedTopic(consumer, true, this.properties.getTopic());
+        // ConsumerFactory<String, String> cf = new DefaultKafkaConsumerFactory<>(consumerProps);
+        // Consumer<String, String> consumer = cf.createConsumer();
+
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(consumerProps);
+
+        // this.broker.consumeFromAnEmbeddedTopic(consumer, true, this.properties.getTopic());
+
+        consumer.subscribe(singleton(this.properties.getTopic()));
 
         ConsumerRecords<String, String> records = getRecords(consumer);
 
