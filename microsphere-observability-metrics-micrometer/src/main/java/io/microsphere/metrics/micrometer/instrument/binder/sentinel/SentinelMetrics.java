@@ -33,7 +33,17 @@ import static io.micrometer.core.instrument.Tags.concat;
 import static io.micrometer.core.instrument.TimeGauge.builder;
 import static io.microsphere.alibaba.sentinel.common.util.SentinelUtils.getResourceTypeAsString;
 import static io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher.getSentinelNodeEventPublisher;
-import static io.microsphere.constants.SymbolConstants.DOT;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.BLOCK_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONCURRENCY_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONTEXT_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.EXCEPTION_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.OCCUPIED_PASS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.PASS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_TYPE_LABEL_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RT_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.SUCCESS_QPS_METRIC_NAME;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.VERSION_LABEL_NAME;
 import static java.util.Collections.emptyList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -56,22 +66,22 @@ public class SentinelMetrics extends AbstractMeterBinder implements ClusterNodeA
     /**
      * The {@link Tag} key for Sentinel Resource
      */
-    public static final String RESOURCE_TAG_KEY = METRIC_PREFIX + "resource";
+    public static final String RESOURCE_TAG_KEY = RESOURCE_LABEL_NAME;
 
     /**
      * The {@link Tag} key for Sentinel Context
      */
-    public static final String CONTEXT_TAG_KEY = METRIC_PREFIX + "context";
+    public static final String CONTEXT_TAG_KEY = CONTEXT_LABEL_NAME;
 
     /**
      * The {@link Tag} key for Sentinel Resource Type
      */
-    public static final String TYPE_TAG_KEY = METRIC_PREFIX + "resource-type";
+    public static final String TYPE_TAG_KEY = RESOURCE_TYPE_LABEL_NAME;
 
     /**
      * The {@link Tag} key for Sentinel Version
      */
-    public static final String VERSION_TAG_KEY = METRIC_PREFIX + "version";
+    public static final String VERSION_TAG_KEY = VERSION_LABEL_NAME;
 
     MeterRegistry registry;
 
@@ -104,72 +114,43 @@ public class SentinelMetrics extends AbstractMeterBinder implements ClusterNodeA
     }
 
     private void addMetrics(String contextName, String resourceName, ClusterNode clusterNode, MeterRegistry registry) {
-        String metricNamePrefix = METRIC_PREFIX + resourceName + DOT;
 
         Iterable<Tag> tags = buildTags(resourceName, contextName, clusterNode);
 
-        builder(metricNamePrefix + "rt", clusterNode, MILLISECONDS, ClusterNode::avgRt)
+        builder(RT_METRIC_NAME, clusterNode, MILLISECONDS, ClusterNode::avgRt)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "total", clusterNode::totalRequest)
-                .strongReference(true)
+        Gauge.builder(CONCURRENCY_METRIC_NAME, clusterNode::totalRequest)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "success", clusterNode::totalSuccess)
-                .strongReference(true)
+        Gauge.builder(SUCCESS_QPS_METRIC_NAME, clusterNode::successQps)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "pass", clusterNode::totalPass)
-                .strongReference(true)
+        Gauge.builder(PASS_QPS_METRIC_NAME, clusterNode::passQps)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "block", clusterNode::blockRequest)
-                .strongReference(true)
+        Gauge.builder(OCCUPIED_PASS_QPS_METRIC_NAME, clusterNode::occupiedPassQps)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "exception", clusterNode::totalException)
-                .strongReference(true)
+        Gauge.builder(BLOCK_QPS_METRIC_NAME, clusterNode::blockQps)
                 .tags(tags)
                 .register(registry);
 
-        Gauge.builder(metricNamePrefix + "total-qps", clusterNode::totalQps)
-                .strongReference(true)
-                .tags(tags)
-                .register(registry);
-
-        Gauge.builder(metricNamePrefix + "success-qps", clusterNode::successQps)
-                .strongReference(true)
-                .tags(tags)
-                .register(registry);
-
-        Gauge.builder(metricNamePrefix + "max-success-qps", clusterNode::maxSuccessQps)
-                .strongReference(true)
-                .tags(tags)
-                .register(registry);
-
-        Gauge.builder(metricNamePrefix + "pass-qps", clusterNode::passQps)
-                .strongReference(true)
-                .tags(tags)
-                .register(registry);
-
-        Gauge.builder(metricNamePrefix + "block-qps", clusterNode::blockQps)
-                .strongReference(true)
-                .tags(tags)
-                .register(registry);
-
-        Gauge.builder(metricNamePrefix + "exception-qps", clusterNode::exceptionQps)
-                .strongReference(true)
+        Gauge.builder(EXCEPTION_QPS_METRIC_NAME, clusterNode::exceptionQps)
                 .tags(tags)
                 .register(registry);
     }
 
     private Iterable<Tag> buildTags(String resourceName, String contextName, ClusterNode clusterNode) {
-        return combine(RESOURCE_TAG_KEY, resourceName, CONTEXT_TAG_KEY, contextName, TYPE_TAG_KEY,
-                getResourceTypeAsString(clusterNode.getResourceType()));
+        return combine(
+                RESOURCE_TAG_KEY, resourceName,
+                CONTEXT_TAG_KEY, contextName,
+                TYPE_TAG_KEY, getResourceTypeAsString(clusterNode.getResourceType())
+        );
     }
 }

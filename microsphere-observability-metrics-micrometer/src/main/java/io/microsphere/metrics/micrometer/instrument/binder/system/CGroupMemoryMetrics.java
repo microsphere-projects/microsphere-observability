@@ -124,7 +124,7 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
 
     private void buildBytesGauge(String name, Supplier<Number> supplier, MeterRegistry registry) {
         builder(name, supplier)
-                .tags(tags)
+                .tags(commonTags)
                 .baseUnit(BYTES)
                 .register(registry);
     }

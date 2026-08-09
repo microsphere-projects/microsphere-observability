@@ -2,7 +2,6 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
-import io.micrometer.core.instrument.binder.BaseUnits;
 import io.microsphere.annotation.Nullable;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 import io.microsphere.metrics.micrometer.util.MicrometerUtils;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 
 import static io.micrometer.core.instrument.Gauge.builder;
-import static io.micrometer.core.instrument.Tags.concat;
+import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_PREFIX;
@@ -109,52 +108,50 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     }
 
     private void bindStats(Stats stats) {
-        Iterable<Tag> newTags = concat(tags, "interface", stats.name);
+        Iterable<Tag> newTags = combine("interface", stats.name);
 
-        builder(METRIC_PREFIX + "receive.bytes", stats, Stats::getReceiveBytes)
+        builder(METRIC_PREFIX + "receive.bytes", stats::getReceiveBytes)
                 .tags(newTags)
                 .description("Number of good received bytes")
-                .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "receive.packets", stats, Stats::getReceivePackets)
+        builder(METRIC_PREFIX + "receive.packets", stats::getReceivePackets)
                 .tags(newTags)
                 .description("Number of good packets received by the interface")
                 .strongReference(true)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "receive.errors", stats, Stats::getReceiveErrors)
+        builder(METRIC_PREFIX + "receive.errors", stats::getReceiveErrors)
                 .tags(newTags)
                 .description("Total number of bad packets received on this network device")
                 .strongReference(true)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "receive.drop", stats, Stats::getReceiveDrop)
+        builder(METRIC_PREFIX + "receive.drop", stats::getReceiveDrop)
                 .tags(newTags)
                 .description("Number of packets received but not processed")
                 .strongReference(true)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "transmit.bytes", stats, Stats::getTransmitBytes)
+        builder(METRIC_PREFIX + "transmit.bytes", stats::getTransmitBytes)
                 .tags(newTags)
                 .description("Number of good transmitted bytes")
-                .strongReference(true)
-                .baseUnit(BaseUnits.BYTES)
+                .baseUnit(BYTES)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "transmit.packets", stats, Stats::getTransmitPackets)
+        builder(METRIC_PREFIX + "transmit.packets", stats::getTransmitPackets)
                 .tags(newTags)
                 .description("Number of packets successfully transmitted")
                 .strongReference(true)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "transmit.errors", stats, Stats::getTransmitErrors)
+        builder(METRIC_PREFIX + "transmit.errors", stats::getTransmitErrors)
                 .tags(newTags).description("Total number of transmit problems")
                 .strongReference(true)
                 .register(registry);
 
-        builder(METRIC_PREFIX + "transmit.drop", stats, Stats::getTransmitDrop)
+        builder(METRIC_PREFIX + "transmit.drop", stats::getTransmitDrop)
                 .tags(newTags).description("Number of packets dropped on their way to transmission")
                 .strongReference(true)
                 .register(registry);
@@ -166,7 +163,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     }
 
     @Override
-    protected void doBindTo(MeterRegistry registry) throws Throwable {
+    protected void doBindTo(MeterRegistry registry) {
         this.registry = registry;
         bindStats();
         bindStatsOnSchedule();
