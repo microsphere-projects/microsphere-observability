@@ -1,9 +1,3 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-io.microsphere.observability.logging.spring.boot.autoconfigure.ApplicationLoggingAutoConfiguration,\
-io.microsphere.observability.logging.spring.boot.autoconfigure.WebMvcLoggingAutoConfiguration,\
-io.microsphere.observability.logging.spring.boot.autoconfigure.WebServerLoggingAutoConfiguration,\
-io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration
-
 org.springframework.context.ApplicationListener=\
 io.microsphere.observability.logging.log4j2.spring.boot.listener.AddingInMemoryAppenderListener,\
 io.microsphere.observability.logging.log4j2.spring.boot.listener.RemovingInMemoryAppenderListener

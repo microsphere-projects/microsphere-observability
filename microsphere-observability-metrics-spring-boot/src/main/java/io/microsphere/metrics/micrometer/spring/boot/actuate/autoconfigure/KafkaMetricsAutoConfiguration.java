@@ -47,7 +47,12 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
  * The Auto-Configuration class for Apache Kafka Metrics
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
+ * @see org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration
  * @see org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration
  * @see io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration
  * @since 1.0.0
