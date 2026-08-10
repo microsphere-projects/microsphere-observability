@@ -15,37 +15,39 @@
  * limitations under the License.
  */
 
-package io.microsphere.observability.logging.spring.boot.autoconfigure;
+package io.microsphere.metrics.micrometer.instrument.binder;
 
 
-import io.microsphere.spring.boot.test.WebAutoConfigurationTest;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Set;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
+import org.junit.jupiter.api.Test;
 
 /**
- * {@link WebServerLoggingAutoConfiguration} Test
+ * {@link AbstractMeterBinder} Test
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see WebServerLoggingAutoConfiguration
+ * @see AbstractMeterBinder
  * @since 1.0.0
  */
-@SpringBootTest(
-        classes = {
-                WebServerLoggingAutoConfigurationTest.class
-        }
-)
-class WebServerLoggingAutoConfigurationTest extends WebAutoConfigurationTest<WebServerLoggingAutoConfiguration> {
+class AbstractMeterBinderTest extends AbstractMeterBinder {
 
-    @Override
-    protected void configureAutoConfiguredClasses(Set<Class<?>> autoConfiguredClasses) {
+    public AbstractMeterBinderTest() {
+        super();
     }
 
     @Override
-    protected void configureGlobalDisabledPropertyValues(Set<String> globalDisabledPropertyValues) {
+    protected boolean supports(MeterRegistry registry) {
+        return true;
     }
 
     @Override
-    protected void configureGlobalMissingClasses(Set<Class<?>> globalMissingClasses) {
+    protected void doBindTo(MeterRegistry registry) throws Throwable {
+        throw new Throwable("For testing");
+    }
+
+    @Test
+    void testBindTo() {
+        MeterRegistry registry = new SimpleMeterRegistry();
+        super.bindTo(registry);
     }
 }

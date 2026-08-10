@@ -116,7 +116,7 @@ public class Log4j2AutoConfiguration {
                     .setIgnoreExceptions(properties.isIgnoreExceptions())
                     .setKey(properties.getKey())
                     .setSyncSend(properties.isSyncSend())
-                    .setSendEventTimestamp(properties.isSendEventTimestamp())
+                    // .setSendEventTimestamp(properties.isSendEventTimestamp())
                     .setTopic(properties.getTopic())
                     .setLayout(getLayout(loggerContext, context))
                     .setFilter(getFilter(context))

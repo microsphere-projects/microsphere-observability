@@ -11,9 +11,9 @@ inactive_anon 0
 active_anon 912367616
 inactive_file 186671104
 active_file 1275523072
-unevictable 0
+unevictable for_test
 hierarchical_memory_limit 6442450944
-hierarchical_memsw_limit 6442450944
+
 total_cache 1462194176
 total_rss 912412672
 total_rss_huge 0

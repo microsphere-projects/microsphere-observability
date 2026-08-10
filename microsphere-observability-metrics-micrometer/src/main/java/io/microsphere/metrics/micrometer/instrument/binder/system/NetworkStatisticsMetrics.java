@@ -2,14 +2,13 @@ package io.microsphere.metrics.micrometer.instrument.binder.system;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tag;
+import io.microsphere.annotation.Nonnull;
 import io.microsphere.annotation.Nullable;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 import io.microsphere.metrics.micrometer.util.MicrometerUtils;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -20,12 +19,13 @@ import static io.microsphere.collection.MapUtils.newConcurrentHashMap;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_PREFIX;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getMetricsCollectionInterval;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getNetworkStatsFilePath;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.readLines;
 import static io.microsphere.util.ObjectUtils.defaultIfNull;
 import static io.microsphere.util.StringUtils.split;
+import static java.lang.Character.isDigit;
+import static java.lang.Character.isWhitespace;
 import static java.lang.Long.parseLong;
-import static java.nio.charset.StandardCharsets.US_ASCII;
 import static java.nio.file.Files.exists;
-import static java.nio.file.Files.readAllLines;
 import static java.nio.file.Paths.get;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
@@ -40,11 +40,13 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
     private final ConcurrentMap<String, Stats> statsMap = newConcurrentHashMap(8);
 
+    @Nonnull
     private final ScheduledExecutorService scheduledExecutorService;
 
     /**
      * The stats file path
      */
+    @Nonnull
     private final Path statsFilePath;
 
     /**
@@ -74,36 +76,19 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     }
 
     private void bindStats() {
-        List<String> lines = null;
-        try {
-            lines = readAllLines(this.statsFilePath, US_ASCII);
-        } catch (IOException e) {
-            if (logger.isErrorEnabled()) {
-                logger.error("Network stats file[path : '{}'] can't be read", this.statsFilePath);
-            }
-            return;
-        }
-
-        int linesCount = lines.size();
-
-        for (int i = 2; i < linesCount; i++) {
-            String statsLine = lines.get(i);
+        String[] lines = readLines(this.statsFilePath);
+        for (int i = 2; i < lines.length; i++) {
+            String statsLine = lines[i];
             Stats stats = parseStats(statsLine);
             if (stats == null) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("The Stats can't be parsed by the line {} : {}", i + 1, statsLine);
-                }
+                logger.warn("The Stats can't be parsed by the line {} : {}", i + 1, statsLine);
                 continue;
             }
             Stats boundStats = statsMap.computeIfAbsent(stats.name, name -> {
                 bindStats(stats);
                 return stats;
             });
-            if (boundStats.update(stats)) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace("The Stats has been updated : {}", stats);
-                }
-            }
+            boundStats.update(stats);
         }
     }
 
@@ -170,10 +155,7 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
     }
 
     private void bindStatsOnSchedule() {
-        ScheduledExecutorService scheduledExecutorService = this.scheduledExecutorService;
-        if (scheduledExecutorService != null && !scheduledExecutorService.isShutdown()) {
-            scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, this.interval, MILLISECONDS);
-        }
+        this.scheduledExecutorService.scheduleAtFixedRate(this::bindStats, 0, this.interval, MILLISECONDS);
     }
 
     private Stats parseStats(String statsLine) {
@@ -192,11 +174,11 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
 
             for (int i = 0; i < length; i++) {
                 char c = chars[i];
-                boolean isDigit = Character.isDigit(c);
+                boolean isDigit = isDigit(c);
                 if (isDigit && startIndex == -1) {
                     startIndex = i;
                 }
-                if (Character.isWhitespace(c)) {
+                if (isWhitespace(c)) {
                     endIndex = i;
                 }
                 if (isDigit && i == length - 1) {
@@ -290,9 +272,9 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
             return transmitDrop;
         }
 
-        private boolean update(Stats stats) {
+        private void update(Stats stats) {
             if (this == stats) {
-                return false;
+                return;
             }
             synchronized (this) {
                 this.receiveBytes = stats.receiveBytes;
@@ -305,35 +287,23 @@ public class NetworkStatisticsMetrics extends AbstractMeterBinder {
                 this.transmitErrors = stats.transmitErrors;
                 this.transmitDrop = stats.transmitDrop;
             }
-            return true;
+            logger.trace("The Stats has been updated : {}", stats);
+            return;
         }
 
         @Override
         public String toString() {
             return "Stats{" +
                     "name='" + name + '\'' +
-                    ", receiveBytes=" + receiveBytes +
-                    ", receivePackets=" + receivePackets +
-                    ", receiveErrors=" + receiveErrors +
-                    ", receiveDrop=" + receiveDrop +
-                    ", transmitBytes=" + transmitBytes +
-                    ", transmitPackets=" + transmitPackets +
-                    ", transmitErrors=" + transmitErrors +
-                    ", transmitDrop=" + transmitDrop +
+                    ", receiveBytes=" + getReceiveBytes() +
+                    ", receivePackets=" + getReceivePackets() +
+                    ", receiveErrors=" + getReceiveErrors() +
+                    ", receiveDrop=" + getReceiveDrop() +
+                    ", transmitBytes=" + getTransmitBytes() +
+                    ", transmitPackets=" + getTransmitPackets() +
+                    ", transmitErrors=" + getTransmitErrors() +
+                    ", transmitDrop=" + getTransmitDrop() +
                     '}';
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-            Stats stats = (Stats) o;
-            return Objects.equals(name, stats.name);
-        }
-
-        @Override
-        public int hashCode() {
-            return name.hashCode();
         }
     }
 }

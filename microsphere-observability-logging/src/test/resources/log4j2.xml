@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration xmlns="https://logging.apache.org/xml/ns"
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:schemaLocation="
+                   https://logging.apache.org/xml/ns
+                   https://logging.apache.org/xml/ns/log4j-config-2.xsd">
+    <Appenders>
+        <Console name="STDOUT">
+            <PatternLayout pattern="%d [%t] %p %c - %m%n"/>
+        </Console>
+        <File name="FILE" fileName="test-file.log">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+        </File>
+        <RollingFile name="ROLLING" fileName="test-rolling-file.log"
+                     filePattern="logs/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}-%i.log.gz">
+            <PatternLayout>
+                <Pattern>%d %p %c{1.} [%t] %m%n</Pattern>
+            </PatternLayout>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="10 MB"/>
+            </Policies>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="INFO" additivity="false">
+            <AppenderRef ref="STDOUT"/>
+        </Root>
+        <Logger name="io.microsphere" additivity="false" level="TRACE">
+            <AppenderRef ref="FILE"/>
+        </Logger>
+        <Logger name="io.microsphere.observability" additivity="false" level="TRACE">
+            <AppenderRef ref="ROLLING"/>
+        </Logger>
+    </Loggers>
+</Configuration>

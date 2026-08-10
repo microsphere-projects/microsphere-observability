@@ -58,7 +58,7 @@ class CGGroupMetricsAutoConfigurationIntegrationTest {
     @Test
     void test() {
         assertNotNull(cgroupMemoryMetrics);
-        assertEquals(16, this.meterRegistry.getMeters()
+        assertEquals(14, this.meterRegistry.getMeters()
                 .stream()
                 .map(Meter::getId)
                 .map(Meter.Id::getName)

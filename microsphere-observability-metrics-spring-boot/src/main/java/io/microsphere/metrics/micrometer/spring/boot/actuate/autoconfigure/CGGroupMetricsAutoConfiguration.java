@@ -49,8 +49,6 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  * @see CGroupMemoryMetrics
  * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
- * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
- * @see org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -61,12 +59,8 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
         "io.microsphere.metrics.micrometer.instrument.binder.system.CGroupMemoryMetrics"                    // Microsphere Observability Micrometer API
 })
 @AutoConfigureAfter(name = {
-        // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
-        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
-        // Spring Boot Actuator API [4.0, )
-        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration"
+        "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration"
 })
 public class CGGroupMetricsAutoConfiguration {
 
