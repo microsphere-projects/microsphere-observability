@@ -29,7 +29,6 @@ import static io.microsphere.metrics.micrometer.instrument.binder.system.constan
 import static io.microsphere.util.ClassLoaderUtils.getDefaultClassLoader;
 import static java.lang.System.getProperties;
 import static java.lang.System.setProperty;
-import static java.nio.file.Path.of;
 import static java.nio.file.Paths.get;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -80,7 +79,7 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
 
     @Test
     void testOnNotFound() {
-        CGroupMemoryMetrics cGroupMemoryMetrics = new CGroupMemoryMetrics(of("not-found"));
+        CGroupMemoryMetrics cGroupMemoryMetrics = new CGroupMemoryMetrics(get("not-found"));
         assertFalse(cGroupMemoryMetrics.supports(this.registry));
     }
 
