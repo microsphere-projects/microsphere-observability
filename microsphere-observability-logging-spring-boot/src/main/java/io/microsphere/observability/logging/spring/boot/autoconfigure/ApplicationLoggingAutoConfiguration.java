@@ -20,6 +20,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
 import java.lang.Thread.UncaughtExceptionHandler;
@@ -36,6 +37,7 @@ import static org.springframework.util.StringUtils.arrayToDelimitedString;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
+@Configuration(proxyBeanMethods = false)
 public class ApplicationLoggingAutoConfiguration {
 
     @EventListener(ApplicationStartedEvent.class)
