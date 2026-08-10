@@ -21,13 +21,18 @@ package io.microsphere.observability.logging.spring.boot.autoconfigure;
 import io.microsphere.observability.logging.spring.boot.autoconfigure.ApplicationLoggingAutoConfiguration.LoggingUncaughtExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.WebApplicationType;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
 import static java.lang.Thread.currentThread;
 import static java.lang.Thread.getDefaultUncaughtExceptionHandler;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
 /**
@@ -56,9 +61,29 @@ class ApplicationLoggingAutoConfigurationTest {
         LoggingUncaughtExceptionHandler uncaughtExceptionHandler = new LoggingUncaughtExceptionHandler(null);
         assertUncaughtExceptionHandler(uncaughtExceptionHandler);
         assertUncaughtExceptionHandler(getDefaultUncaughtExceptionHandler());
+
+        testApplicationFailedEvent();
+    }
+
+    void testApplicationFailedEvent() {
+        assertThrows(IllegalStateException.class, () -> {
+            new SpringApplicationBuilder(ApplicationLoggingAutoConfiguration.class, ErrorConfig.class)
+                    .web(WebApplicationType.NONE)
+                    .run();
+        });
     }
 
     void assertUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
         uncaughtExceptionHandler.uncaughtException(currentThread(), new Throwable("For testing"));
+    }
+
+    static class ErrorConfig {
+
+        @Bean
+        public ApplicationRunner runner() {
+            return args -> {
+                throw new IllegalStateException("For testing");
+            };
+        }
     }
 }
