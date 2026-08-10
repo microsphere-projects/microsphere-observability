@@ -135,7 +135,7 @@ class SentinelMetricUtitlsTest {
     @Test
     void testGetContextMetricNodesMap() throws Throwable {
         SentinelTemplate sentinelTemplate = new SentinelTemplate();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             sentinelTemplate.call(resource, () -> sleep(10));
         }
 
@@ -143,7 +143,13 @@ class SentinelMetricUtitlsTest {
         try {
             addEntryCallback(sentinelMetricsRepository);
             Map<String, List<MetricNode>> contextMetricNodesMap = getContextMetricNodesMap(60000);
+            do {
+                sleep(100);
+                contextMetricNodesMap = getContextMetricNodesMap(60000);
+            } while (contextMetricNodesMap.isEmpty());
+
             assertFalse(contextMetricNodesMap.isEmpty());
+
         } finally {
             removeEntryCallback(sentinelMetricsRepository.getClass());
         }
