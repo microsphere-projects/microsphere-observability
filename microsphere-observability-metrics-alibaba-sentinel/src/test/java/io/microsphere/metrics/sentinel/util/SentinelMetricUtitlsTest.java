@@ -19,11 +19,19 @@ package io.microsphere.metrics.sentinel.util;
 
 
 import com.alibaba.csp.sentinel.node.metric.MetricNode;
+import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
+import io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+import java.util.Map;
+
 import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
 import static com.alibaba.csp.sentinel.ResourceTypeConstants.COMMON_WEB;
+import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
+import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.removeEntryCallback;
+import static io.microsphere.collection.MapUtils.of;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.BLOCK_QPS_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONCURRENCY_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONTEXT_LABEL_NAME;
@@ -41,13 +49,17 @@ import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_F
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.REQUIRED_LABEL_NAMES;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricValue;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getRequiredLabelValue;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getRequiredLabels;
 import static java.lang.String.valueOf;
+import static java.lang.Thread.sleep;
 import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -121,13 +133,41 @@ class SentinelMetricUtitlsTest {
     }
 
     @Test
-    void testGetContextMetricNodesMap() {
+    void testGetContextMetricNodesMap() throws Throwable {
+        SentinelTemplate sentinelTemplate = new SentinelTemplate();
+        for (int i = 0; i < 10; i++) {
+            sentinelTemplate.call(resource, () -> sleep(10));
+        }
 
+        SentinelMetricsRepository sentinelMetricsRepository = new SentinelMetricsRepository();
+        try {
+            addEntryCallback(sentinelMetricsRepository);
+            Map<String, List<MetricNode>> contextMetricNodesMap = getContextMetricNodesMap(60000);
+            assertFalse(contextMetricNodesMap.isEmpty());
+        } finally {
+            removeEntryCallback(sentinelMetricsRepository.getClass());
+        }
     }
 
     @Test
     void testGetContextMetricNodesMapOnSentinelMetricsRepositoryNotReady() {
         assertSame(emptyMap(), getContextMetricNodesMap(1000));
+    }
+
+    @Test
+    void testCombineLabels() {
+        Map<String, String> commonLabels = of("key1", "value1");
+        Map<String, String> labels = combineLabels(context, metricNode, commonLabels);
+        assertEquals(6, labels.size());
+        assertEquals("value1", labels.get("key1"));
+        assertRequiredLabels(labels);
+    }
+
+    @Test
+    void testGetRequiredLabels() {
+        Map<String, String> requiredLabels = getRequiredLabels(context, metricNode);
+        assertEquals(5, requiredLabels.size());
+        assertRequiredLabels(requiredLabels);
     }
 
     @Test
@@ -154,5 +194,17 @@ class SentinelMetricUtitlsTest {
         assertThrows(IndexOutOfBoundsException.class, () -> getMetricValue(metricNode, -1));
         assertThrows(IndexOutOfBoundsException.class, () -> getMetricValue(metricNode, 7));
         assertThrows(NullPointerException.class, () -> getMetricValue(null, 0));
+    }
+
+    void assertRequiredLabels(Map<String, String> requiredLabels) {
+        assertRequiredLabel(requiredLabels, RESOURCE_LABEL_NAME, resource);
+        assertRequiredLabel(requiredLabels, CONTEXT_LABEL_NAME, context);
+        assertRequiredLabel(requiredLabels, RESOURCE_TYPE_LABEL_NAME, "COMMON_WEB");
+        assertRequiredLabel(requiredLabels, TIMESTAMP_LABEL_NAME, valueOf(timestamp));
+        assertRequiredLabel(requiredLabels, VERSION_LABEL_NAME, SENTINEL_VERSION);
+    }
+
+    void assertRequiredLabel(Map<String, String> requiredLabels, String name, String value) {
+        assertEquals(value, requiredLabels.get(name));
     }
 }

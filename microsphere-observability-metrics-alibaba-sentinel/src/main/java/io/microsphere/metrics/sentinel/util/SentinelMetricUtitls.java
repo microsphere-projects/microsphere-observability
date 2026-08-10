@@ -54,6 +54,7 @@ import static io.microsphere.util.StringUtils.isBlank;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * The utilities class of Sentinel Metrics
@@ -178,11 +179,24 @@ public abstract class SentinelMetricUtitls implements Utils {
     public static Map<String, String> combineLabels(String context, MetricNode metricNode, Map<String, String> commonLabels) {
         Map<String, String> labels = newFixedLinkedHashMap(REQUIRED_LABEL_NAMES_SIZE + commonLabels.size());
         labels.putAll(commonLabels);
+        labels.putAll(getRequiredLabels(context, metricNode));
+        return labels;
+    }
+
+    /**
+     * Get the required labels of the given {@link MetricNode}
+     *
+     * @param context    the context
+     * @param metricNode the {@link MetricNode} instance
+     * @return non-null read-only {@link Map}
+     */
+    public static Map<String, String> getRequiredLabels(String context, MetricNode metricNode) {
+        Map<String, String> labels = newFixedLinkedHashMap(REQUIRED_LABEL_NAMES_SIZE);
         REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP.forEach((labelName, function) -> {
             String value = function.apply(context, metricNode);
             labels.put(labelName, value);
         });
-        return labels;
+        return unmodifiableMap(labels);
     }
 
     /**
