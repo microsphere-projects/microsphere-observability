@@ -15,8 +15,8 @@ import static io.microsphere.observability.logging.util.LoggerUtils.trace;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @since 1.0.0
  */
-@ConditionalOnWebApplication
 @Configuration(proxyBeanMethods = false)
+@ConditionalOnWebApplication
 public class WebServerLoggingAutoConfiguration implements ApplicationListener<WebServerInitializedEvent> {
 
     @Override
