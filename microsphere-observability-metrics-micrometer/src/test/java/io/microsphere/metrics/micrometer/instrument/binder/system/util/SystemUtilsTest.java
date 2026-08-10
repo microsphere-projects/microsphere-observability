@@ -20,6 +20,8 @@ package io.microsphere.metrics.micrometer.instrument.binder.system.util;
 
 import org.junit.jupiter.api.Test;
 
+import java.net.URL;
+import java.nio.file.Path;
 import java.util.function.Supplier;
 
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
@@ -31,10 +33,14 @@ import static io.microsphere.metrics.micrometer.instrument.binder.system.constan
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getCGroupDirectoryPath;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getMetricsCollectionInterval;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getNetworkStatsFilePath;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.readLines;
+import static io.microsphere.util.ClassLoaderUtils.getResource;
+import static io.microsphere.util.StringUtils.EMPTY_STRING_ARRAY;
 import static java.lang.Long.parseLong;
 import static java.lang.String.valueOf;
 import static java.lang.System.getProperties;
 import static java.lang.System.setProperty;
+import static java.nio.file.Paths.get;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
@@ -63,6 +69,21 @@ class SystemUtilsTest {
     void testGetMetricsCollectionInterval() {
         assertSystemPropertyValue(METRICS_COLLECTION_INTERVAL_PROPERTY_NAME, 1000, SystemUtils::getMetricsCollectionInterval);
         assertEquals(parseLong(DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE), getMetricsCollectionInterval());
+    }
+
+    @Test
+    void testReadLines() throws Throwable {
+        URL resource = getResource("test-data/memory/network.stats");
+        Path filePath = get(resource.toURI());
+        String[] lines = readLines(filePath);
+        assertEquals(11, lines.length);
+    }
+
+    @Test
+    void testReadLinesOnIOException() throws Throwable {
+        URL resource = getResource("test-data/memory");
+        Path filePath = get(resource.toURI());
+        assertSame(EMPTY_STRING_ARRAY, readLines(filePath));
     }
 
     <V> void assertSystemPropertyValue(String name, V value, Supplier<V> propertyValueSupplier) {

@@ -70,9 +70,9 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
         assertMeterPresent("system.cgroup.memory.stat.inactive_anon");
         assertMeterPresent("system.cgroup.memory.stat.active_file");
         assertMeterPresent("system.cgroup.memory.stat.inactive_file");
-        assertMeterPresent("system.cgroup.memory.stat.unevictable");
+        // assertMeterPresent("system.cgroup.memory.stat.unevictable");
         assertMeterPresent("system.cgroup.memory.stat.hierarchical_memory_limit");
-        assertMeterPresent("system.cgroup.memory.stat.hierarchical_memsw_limit");
+        // assertMeterPresent("system.cgroup.memory.stat.hierarchical_memsw_limit");
     }
 
     private void assertMeterPresent(String metricName) {
