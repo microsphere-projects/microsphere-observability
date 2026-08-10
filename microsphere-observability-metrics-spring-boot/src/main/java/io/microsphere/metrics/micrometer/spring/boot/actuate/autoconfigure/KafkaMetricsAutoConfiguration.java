@@ -94,13 +94,8 @@ public class KafkaMetricsAutoConfiguration {
     }
 
     private Producer getKafkaProducer(KafkaAppender kafkaAppender) {
-        Producer producer = null;
-        if (kafkaAppender != null) {
-            KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
-            if (kafkaManager != null) {
-                producer = getFieldValue(true, kafkaManager, "producer", Producer.class);
-            }
-        }
+        KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
+        Producer producer = getFieldValue(true, kafkaManager, "producer", Producer.class);
         return producer;
     }
 }
