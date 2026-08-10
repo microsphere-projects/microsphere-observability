@@ -35,7 +35,6 @@ import io.prometheus.metrics.model.snapshots.Unit;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
@@ -43,9 +42,8 @@ import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
 import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricValue;
 import static io.microsphere.util.StringUtils.isNotBlank;
