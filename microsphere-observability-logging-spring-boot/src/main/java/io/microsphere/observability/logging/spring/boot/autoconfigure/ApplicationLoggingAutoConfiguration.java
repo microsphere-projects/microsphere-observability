@@ -16,16 +16,17 @@
  */
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
-import io.microsphere.logging.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.context.event.ApplicationFailedEvent;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.observability.logging.util.LoggerUtils.error;
+import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 import static java.lang.Thread.getDefaultUncaughtExceptionHandler;
 import static java.lang.Thread.setDefaultUncaughtExceptionHandler;
 import static org.springframework.util.StringUtils.arrayToDelimitedString;
@@ -36,9 +37,8 @@ import static org.springframework.util.StringUtils.arrayToDelimitedString;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 1.0.0
  */
+@Configuration(proxyBeanMethods = false)
 public class ApplicationLoggingAutoConfiguration {
-
-    private static final Logger logger = getLogger(ApplicationLoggingAutoConfiguration.class);
 
     @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent(ApplicationStartedEvent event) {
@@ -53,12 +53,12 @@ public class ApplicationLoggingAutoConfiguration {
 
     private void loggingApplicationEvent(SpringApplication springApplication, String[] args,
                                          ConfigurableApplicationContext context, Throwable exception) {
-        if (logger.isTraceEnabled()) {
+        trace(logger -> {
             String status = exception == null ? "Success" : "Failure";
             Class<?> mainClass = springApplication.getMainApplicationClass();
             String options = arrayToDelimitedString(args, " ");
             logger.trace("Spring Boot startup's status : {} , bootstrap: {} , args : {} , context : {}", status, mainClass, options, context, exception);
-        }
+        });
     }
 
     private void registerLoggingUncaughtExceptionHandlerAsDefault() {
@@ -80,9 +80,7 @@ public class ApplicationLoggingAutoConfiguration {
             if (parent != null) {
                 parent.uncaughtException(t, e);
             }
-            if (logger.isErrorEnabled()) {
-                logger.error("Thread[name : {}] uncaught exception : {}", t.getName(), e.getLocalizedMessage(), e);
-            }
+            error(logger -> logger.error("Thread[name : {}] uncaught exception : {}", t.getName(), e.getMessage(), e));
         }
     }
 }

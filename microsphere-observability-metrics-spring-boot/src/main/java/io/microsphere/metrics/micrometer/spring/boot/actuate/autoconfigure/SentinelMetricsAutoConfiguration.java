@@ -17,13 +17,14 @@
 
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
-import io.prometheus.metrics.model.registry.PrometheusRegistry;
+import io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector;
+import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -46,6 +47,9 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  * The Auto-Configuration class for Alibaba Sentinel Metrics
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -53,14 +57,9 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
 @ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = SENTINEL_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
-        // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration",
-        // Spring Boot Actuator API [4.0, )
-        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration"
+        "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration"
 })
 public class SentinelMetricsAutoConfiguration {
 
@@ -79,15 +78,15 @@ public class SentinelMetricsAutoConfiguration {
     public static final String SENTINEL_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "alibaba-sentinel" + DOT + ENABLED_PROPERTY_NAME;
 
     @Bean
-    @ConditionalOnBean(type = "io.micrometer.prometheusmetrics.PrometheusMeterRegistry")
-    public SentinelMultiCollector sentinelMultiCollector(PrometheusMeterRegistry registry,
-                                                         @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
-                                                         @Value("${spring.application.name:default}") String applicationName) {
-        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis())
+    @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
+    public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
+                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
+                                               @Value("${spring.application.name:default}") String applicationName) {
+        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis())
                 .commonLabel("application", applicationName);
-        PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
-        prometheusRegistry.register(sentinelMultiCollector);
-        return sentinelMultiCollector;
+        CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
+        sentinelCollector.register(prometheusRegistry);
+        return sentinelCollector;
     }
 
     @Bean

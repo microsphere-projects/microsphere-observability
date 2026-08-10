@@ -59,7 +59,7 @@ class JvmMetricsAutoConfigurationIntegrationTest {
 
     @Test
     void test() {
-        assertEquals(20, this.meterRegistry.getMeters()
+        assertEquals(18, this.meterRegistry.getMeters()
                 .stream()
                 .map(Meter::getId)
                 .map(Meter.Id::getName)

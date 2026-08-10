@@ -38,7 +38,6 @@ import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE
 import static io.microsphere.collection.Lists.ofList;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.logging.log4j2.util.Log4j2Utils.findAppender;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.KafkaMetricsAutoConfiguration.KAFKA_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.reflect.FieldUtils.getFieldValue;
@@ -49,7 +48,6 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration
- * @see org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration
  * @see io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration
  * @since 1.0.0
  */
@@ -63,14 +61,9 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
         "io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties"            // Microsphere Observability Logging Spring Boot API
 })
 @AutoConfigureAfter(name = {
-        // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.KafkaMetricsAutoConfiguration",
-        // Spring Boot Actuator API [4.0, )
-        "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
-        "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
-        "org.springframework.boot.kafka.autoconfigure.metrics.KafkaMetricsAutoConfiguration",
         // Microsphere Observability Logging Spring Boot API
         "io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure.Log4j2AutoConfiguration"
 })
@@ -87,26 +80,22 @@ public class KafkaMetricsAutoConfiguration {
     public static final String KAFKA_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "kafka" + DOT + ENABLED_PROPERTY_NAME;
 
     @ConditionalOnLog4j2Available
-    @ConditionalOnBean(Log4j2KafkaAppenderProperties.class)
+    @ConditionalOnBean(value = {
+            KafkaAppender.class,
+            Log4j2KafkaAppenderProperties.class,
+    })
     @Bean(destroyMethod = "close")
-    public KafkaClientMetrics kafkaClientMetrics(Log4j2KafkaAppenderProperties properties) {
-        Producer producer = getKafkaProducer(properties);
+    public KafkaClientMetrics kafkaClientMetrics(KafkaAppender kafkaAppender, Log4j2KafkaAppenderProperties properties) {
+        Producer producer = getKafkaProducer(kafkaAppender);
         String clientId = properties.getProperties().get(CLIENT_ID_CONFIG);
         // Keep the same behavior of org.springframework.kafka.core.MicrometerProducerListener
         Iterable<Tag> tags = ofList(of("spring.id", clientId));
         return new KafkaClientMetrics(producer, tags);
     }
 
-    private Producer getKafkaProducer(Log4j2KafkaAppenderProperties properties) {
-        String loggerName = properties.getName();
-        KafkaAppender kafkaAppender = findAppender(loggerName);
-        Producer producer = null;
-        if (kafkaAppender != null) {
-            KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
-            if (kafkaManager != null) {
-                producer = getFieldValue(true, kafkaManager, "producer", Producer.class);
-            }
-        }
+    private Producer getKafkaProducer(KafkaAppender kafkaAppender) {
+        KafkaManager kafkaManager = getFieldValue(true, kafkaAppender, "manager", KafkaManager.class);
+        Producer producer = getFieldValue(true, kafkaManager, "producer", Producer.class);
         return producer;
     }
 }

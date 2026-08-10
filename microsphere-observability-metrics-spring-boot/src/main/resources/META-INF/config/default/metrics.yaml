@@ -39,6 +39,5 @@ microsphere:
 ### Microsphere Metrics Collection Internal
 system:
   metrics:
-    micrometer:
-      collection:
-        interval: ${management.metrics.export.prometheus.pushgateway.push-rate:60000}
+    collection:
+      interval: ${management.metrics.export.prometheus.pushgateway.push-rate:60000}
