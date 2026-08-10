@@ -16,6 +16,7 @@
  */
 package io.microsphere.metrics.micrometer.instrument.binder.system;
 
+import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMetricsTest;
 import org.junit.jupiter.api.AfterAll;
@@ -28,8 +29,10 @@ import static io.microsphere.metrics.micrometer.instrument.binder.system.constan
 import static io.microsphere.util.ClassLoaderUtils.getDefaultClassLoader;
 import static java.lang.System.getProperties;
 import static java.lang.System.setProperty;
+import static java.nio.file.Path.of;
 import static java.nio.file.Paths.get;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
@@ -75,12 +78,22 @@ class CGroupMemoryMetricsTest extends AbstractMetricsTest<CGroupMemoryMetrics> {
         // assertMeterPresent("system.cgroup.memory.stat.hierarchical_memsw_limit");
     }
 
+    @Test
+    void testOnNotFound() {
+        CGroupMemoryMetrics cGroupMemoryMetrics = new CGroupMemoryMetrics(of("not-found"));
+        assertFalse(cGroupMemoryMetrics.supports(this.registry));
+    }
+
     private void assertMeterPresent(String metricName) {
         List<Meter> meters = registry.getMeters();
         boolean present = false;
         for (Meter meter : meters) {
             if (metricName.equals(meter.getId().getName())) {
                 present = true;
+                Iterable<Measurement> measure = meter.measure();
+                for (Measurement measurement : measure) {
+                    assertNotNull(measurement.getValue());
+                }
                 break;
             }
         }
