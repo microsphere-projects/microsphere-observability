@@ -17,7 +17,6 @@
 
 package io.microsphere.observability.logging.log4j2.spring.boot.autoconfigure;
 
-import io.microsphere.logging.Logger;
 import io.microsphere.observability.logging.log4j2.DynamicLayout;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -37,8 +36,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import java.util.Map;
 
 import static io.microsphere.collection.MapUtils.newHashMap;
-import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.logging.log4j2.util.Log4j2Utils.getLoggerContext;
+import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 import static java.util.Collections.singleton;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
@@ -79,8 +78,6 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 @EnableAutoConfiguration
 public class Log4j2AutoConfigurationIntegrationTest {
 
-    private static final Logger logger = getLogger(Log4j2AutoConfigurationIntegrationTest.class);
-
 //    @Autowired
 //    private EmbeddedKafkaBroker broker;
 
@@ -114,7 +111,7 @@ public class Log4j2AutoConfigurationIntegrationTest {
         assertEquals("1000", kafkaProperties.get("batch.size"));
 
         for (int i = 0; i < 10; i++) {
-            logger.trace("Hello, Log4j2!");
+            trace(logger -> logger.trace("Hello, Log4j2!"));
         }
 
         // Map<String, Object> consumerProps = consumerProps("testGroup", "true", this.broker);
@@ -141,11 +138,10 @@ public class Log4j2AutoConfigurationIntegrationTest {
             assertEquals(this.properties.getKey(), record.key());
             assertEquals(this.properties.getTopic(), record.topic());
             assertNotNull(record);
-            logger.trace(record.toString());
+            trace(logger -> logger.trace(record.toString()));
         });
 
         consumer.close();
-
     }
 
     @Test

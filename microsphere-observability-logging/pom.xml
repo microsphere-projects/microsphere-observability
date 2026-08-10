@@ -73,6 +73,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Logback -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <optional>true</optional>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -87,10 +94,10 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Logback -->
+        <!-- Microsphere Logging Test -->
         <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-logging-test</artifactId>
             <scope>test</scope>
         </dependency>
 

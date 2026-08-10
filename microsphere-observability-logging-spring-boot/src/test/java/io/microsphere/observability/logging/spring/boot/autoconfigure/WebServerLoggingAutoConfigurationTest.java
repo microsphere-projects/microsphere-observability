@@ -18,7 +18,6 @@
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
 
-import io.microsphere.logging.test.jupiter.LoggingLevelsClass;
 import io.microsphere.spring.boot.test.WebAutoConfigurationTest;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -34,16 +33,6 @@ import java.util.Set;
 @SpringBootTest(
         classes = {
                 WebServerLoggingAutoConfigurationTest.class
-        }
-)
-@LoggingLevelsClass(
-        loggingClasses = {
-                WebServerLoggingAutoConfiguration.class
-        },
-        levels = {
-                "TRACE",
-                "INFO",
-                "ERROR"
         }
 )
 class WebServerLoggingAutoConfigurationTest extends WebAutoConfigurationTest<WebServerLoggingAutoConfiguration> {
