@@ -1,12 +1,11 @@
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
-import io.microsphere.logging.Logger;
 import io.microsphere.spring.boot.webmvc.autoconfigure.condition.ConditionalOnWebMvcAvailable;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.context.ApplicationListener;
 import org.springframework.web.context.support.ServletRequestHandledEvent;
 
-import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 
 /**
  * Web MVC Auto-Configuration
@@ -26,12 +25,8 @@ import static io.microsphere.logging.LoggerFactory.getLogger;
 )
 public class WebMvcLoggingAutoConfiguration implements ApplicationListener<ServletRequestHandledEvent> {
 
-    private static final Logger logger = getLogger(WebMvcLoggingAutoConfiguration.class);
-
     @Override
     public void onApplicationEvent(ServletRequestHandledEvent event) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("{}", event);
-        }
+        trace(logger -> logger.trace("{}", event));
     }
 }

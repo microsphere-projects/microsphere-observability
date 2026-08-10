@@ -157,9 +157,7 @@ public abstract class SentinelMetricUtitls implements Utils {
     public static Map<String, List<MetricNode>> getContextMetricNodesMap(long interval) {
         SentinelMetricsRepository sentinelMetricsRepository = getSentinelMetricsRepository();
         if (sentinelMetricsRepository == null) {
-            if (logger.isWarnEnabled()) {
-                logger.warn("SentinelMetricsRepository is not ready, please check whether it is configured");
-            }
+            logger.warn("SentinelMetricsRepository is not ready, please check whether it is configured");
             return emptyMap();
         }
 

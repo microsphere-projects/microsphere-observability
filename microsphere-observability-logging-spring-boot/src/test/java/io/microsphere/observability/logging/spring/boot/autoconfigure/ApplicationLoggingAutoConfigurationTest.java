@@ -18,11 +18,15 @@
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
 
-import io.microsphere.logging.test.jupiter.LoggingLevelsClass;
+import io.microsphere.observability.logging.spring.boot.autoconfigure.ApplicationLoggingAutoConfiguration.LoggingUncaughtExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.lang.Thread.UncaughtExceptionHandler;
+
+import static java.lang.Thread.currentThread;
+import static java.lang.Thread.getDefaultUncaughtExceptionHandler;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE;
 
@@ -40,16 +44,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         },
         webEnvironment = NONE
 )
-@LoggingLevelsClass(
-        loggingClasses = {
-                ApplicationLoggingAutoConfiguration.class
-        },
-        levels = {
-                "TRACE",
-                "INFO",
-                "ERROR"
-        }
-)
 class ApplicationLoggingAutoConfigurationTest {
 
     @Autowired
@@ -58,5 +52,13 @@ class ApplicationLoggingAutoConfigurationTest {
     @Test
     void test() {
         assertNotNull(applicationLoggingAutoConfiguration);
+
+        LoggingUncaughtExceptionHandler uncaughtExceptionHandler = new LoggingUncaughtExceptionHandler(null);
+        assertUncaughtExceptionHandler(uncaughtExceptionHandler);
+        assertUncaughtExceptionHandler(getDefaultUncaughtExceptionHandler());
+    }
+
+    void assertUncaughtExceptionHandler(UncaughtExceptionHandler uncaughtExceptionHandler) {
+        uncaughtExceptionHandler.uncaughtException(currentThread(), new Throwable("For testing"));
     }
 }
