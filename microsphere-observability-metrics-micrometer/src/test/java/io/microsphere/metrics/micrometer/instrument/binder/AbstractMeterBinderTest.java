@@ -31,6 +31,10 @@ import org.junit.jupiter.api.Test;
  */
 class AbstractMeterBinderTest extends AbstractMeterBinder {
 
+    public AbstractMeterBinderTest() {
+        super();
+    }
+
     @Override
     protected boolean supports(MeterRegistry registry) {
         return true;
@@ -44,6 +48,6 @@ class AbstractMeterBinderTest extends AbstractMeterBinder {
     @Test
     void testBindTo() {
         MeterRegistry registry = new SimpleMeterRegistry();
-        bindTo(registry);
+        super.bindTo(registry);
     }
 }
