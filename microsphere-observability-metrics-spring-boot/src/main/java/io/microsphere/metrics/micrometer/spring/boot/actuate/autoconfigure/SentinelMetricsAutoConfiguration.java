@@ -18,8 +18,6 @@
 package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.micrometer.prometheus.PrometheusMeterRegistry;
-import io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository;
-import io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher;
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
@@ -38,7 +36,6 @@ import org.springframework.context.annotation.Configuration;
 import java.time.Duration;
 
 import static com.alibaba.csp.sentinel.init.InitExecutor.doInit;
-import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
