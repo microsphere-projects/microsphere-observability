@@ -28,7 +28,6 @@ import io.prometheus.client.Collector.MetricFamilySamples.Sample;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
 
 import static io.microsphere.collection.ListUtils.newArrayList;
 import static io.microsphere.collection.ListUtils.newLinkedList;
@@ -36,11 +35,11 @@ import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricValue;
 import static io.microsphere.util.StringUtils.EMPTY_STRING;
 import static io.prometheus.client.Collector.Type.valueOf;
 import static java.util.Collections.emptyList;
@@ -121,19 +120,18 @@ public class SentinelCollector extends Collector {
 
     private void addSample(String context, MetricNode metricNode, Map<Integer, List<Sample>> samplesMap, int index) {
         MetricFamily metricFamily = getMetricFamily(index);
-        Function<MetricNode, Number> metricNodeNumberFunction = METRIC_NODE_TO_VALUE_FUNCTIONS.get(index);
         List<Sample> samples = samplesMap.computeIfAbsent(index, k -> newLinkedList());
-        Sample sample = createSample(metricFamily.getName(), context, metricNode, metricNodeNumberFunction);
+        Sample sample = createSample(metricFamily.getName(), context, metricNode, index);
         samples.add(sample);
     }
 
     private Sample createSample(String metricName, String context, MetricNode metricNode,
-                                Function<MetricNode, Number> metricValueFunction) {
-        Map<String, String> labels = getLabels(context, metricNode, this.commonLabels);
+                                int index) {
+        Map<String, String> labels = combineLabels(context, metricNode, this.commonLabels);
         List<String> labelNames = newArrayList(labels.keySet());
         List<String> labelValues = newArrayList(labels.values());
-        Number value = metricValueFunction.apply(metricNode);
+        double value = getMetricValue(metricNode, index);
         Long timestampMs = metricNode.getTimestamp();
-        return new Sample(metricName, labelNames, labelValues, value.doubleValue(), timestampMs);
+        return new Sample(metricName, labelNames, labelValues, value, timestampMs);
     }
 }

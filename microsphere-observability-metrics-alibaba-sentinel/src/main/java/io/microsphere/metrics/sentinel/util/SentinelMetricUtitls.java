@@ -54,6 +54,7 @@ import static io.microsphere.util.StringUtils.isBlank;
 import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 
 /**
  * The utilities class of Sentinel Metrics
@@ -66,7 +67,7 @@ public abstract class SentinelMetricUtitls implements Utils {
 
     private static final Logger logger = getLogger(SentinelMetricUtitls.class);
 
-    private static final Map<String, BiFunction<String, MetricNode, String>> LABEL_NAME_TO_VALUE_FUNCTION_MAP = of(
+    private static final Map<String, BiFunction<String, MetricNode, String>> REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP = of(
             RESOURCE_LABEL_NAME, (context, metricNode) -> metricNode.getResource(),
             CONTEXT_LABEL_NAME, (context, metricNode) -> context,
             RESOURCE_TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),
@@ -77,7 +78,7 @@ public abstract class SentinelMetricUtitls implements Utils {
     /**
      * The required labels of the Metrics Family
      */
-    public static final Set<String> REQUIRED_LABEL_NAMES = LABEL_NAME_TO_VALUE_FUNCTION_MAP.keySet();
+    public static final Set<String> REQUIRED_LABEL_NAMES = REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP.keySet();
 
     /**
      * The {@link MetricFamily} list of Alibaba Sentinel Metrics
@@ -104,6 +105,11 @@ public abstract class SentinelMetricUtitls implements Utils {
             MetricNode::getBlockQps,
             MetricNode::getExceptionQps
     );
+
+    /**
+     * The size of {@link #REQUIRED_LABEL_NAMES}
+     */
+    public static final int REQUIRED_LABEL_NAMES_SIZE = REQUIRED_LABEL_NAMES.size();
 
     /**
      * The size of {@link #METRIC_FAMILIES}
@@ -164,20 +170,60 @@ public abstract class SentinelMetricUtitls implements Utils {
     }
 
     /**
-     * Get the {@link Map} of Alibaba Sentinel labels from {@link MetricNode}
+     * Combine the {@link Map} of Alibaba Sentinel labels from {@link MetricNode}
      *
      * @param context    the context
      * @param metricNode the {@link MetricNode} instance
      * @return non-null read-only {@link Map}
      */
-    public static Map<String, String> getLabels(String context, MetricNode metricNode, Map<String, String> commonLabels) {
-        Map<String, String> labels = newFixedLinkedHashMap(LABEL_NAME_TO_VALUE_FUNCTION_MAP.size() + commonLabels.size());
+    public static Map<String, String> combineLabels(String context, MetricNode metricNode, Map<String, String> commonLabels) {
+        Map<String, String> labels = newFixedLinkedHashMap(REQUIRED_LABEL_NAMES_SIZE + commonLabels.size());
         labels.putAll(commonLabels);
-        LABEL_NAME_TO_VALUE_FUNCTION_MAP.forEach((labelName, function) -> {
+        labels.putAll(getRequiredLabels(context, metricNode));
+        return labels;
+    }
+
+    /**
+     * Get the required labels of the given {@link MetricNode}
+     *
+     * @param context    the context
+     * @param metricNode the {@link MetricNode} instance
+     * @return non-null read-only {@link Map}
+     */
+    public static Map<String, String> getRequiredLabels(String context, MetricNode metricNode) {
+        Map<String, String> labels = newFixedLinkedHashMap(REQUIRED_LABEL_NAMES_SIZE);
+        REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP.forEach((labelName, function) -> {
             String value = function.apply(context, metricNode);
             labels.put(labelName, value);
         });
-        return labels;
+        return unmodifiableMap(labels);
+    }
+
+    /**
+     * Get the label value of the given {@link MetricNode} by label name
+     *
+     * @param labelName  the name of label
+     * @param context    the context
+     * @param metricNode the {@link MetricNode} instance
+     * @return the label value
+     * @throws NullPointerException if the labelName can not be found in {@link #REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP}
+     */
+    public static String getRequiredLabelValue(String labelName, String context, MetricNode metricNode) {
+        return REQUIRED_LABEL_NAME_TO_VALUE_FUNCTION_MAP.get(labelName).apply(context, metricNode);
+    }
+
+    /**
+     * Get the metric value of the given {@link MetricNode} by index
+     *
+     * @param metricNode the {@link MetricNode} instance
+     * @param index      the index of {@link #METRIC_NODE_TO_VALUE_FUNCTIONS}
+     * @return the metric value
+     * @throws IndexOutOfBoundsException if the index is out of range of {@link #METRIC_NODE_TO_VALUE_FUNCTIONS}
+     * @throws NullPointerException      if the metricNode is null
+     */
+    public static double getMetricValue(MetricNode metricNode, int index) {
+        Function<MetricNode, Number> function = METRIC_NODE_TO_VALUE_FUNCTIONS.get(index);
+        return function.apply(metricNode).doubleValue();
     }
 
     private SentinelMetricUtitls() {
