@@ -5,24 +5,20 @@ import io.micrometer.core.instrument.Tag;
 import io.micrometer.core.instrument.binder.jvm.JvmMemoryMetrics;
 import io.microsphere.metrics.micrometer.instrument.binder.AbstractMeterBinder;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.micrometer.core.instrument.Gauge.builder;
 import static io.micrometer.core.instrument.binder.BaseUnits.BYTES;
-import static io.microsphere.collection.ListUtils.first;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
+import static io.microsphere.constants.SymbolConstants.SPACE_CHAR;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.CGROUP_PREFIX;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.getCGroupDirectoryPath;
+import static io.microsphere.metrics.micrometer.instrument.binder.system.util.SystemUtils.readLines;
 import static io.microsphere.util.StringUtils.isNumeric;
-import static io.microsphere.util.StringUtils.split;
 import static java.lang.Long.parseLong;
-import static java.lang.Long.valueOf;
 import static java.nio.file.Files.exists;
-import static java.nio.file.Files.isReadable;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.emptyList;
 
@@ -95,25 +91,24 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     }
 
     private Map<String, String> loadMemoryStatistics() {
-        List<String> lines = readAllLines(memoryStaFilePath);
-        int size = lines.size();
+        String[] lines = readLines(memoryStaFilePath);
+        int size = lines.length;
         Map<String, String> memoryStatistics = newFixedLinkedHashMap(size);
         for (int i = 0; i < size; i++) {
-            String line = lines.get(i);
-            String[] keyAndValue = split(line, " ");
-            if (keyAndValue.length == 2) {
-                memoryStatistics.put(keyAndValue[0], keyAndValue[1]);
+            String line = lines[i];
+            int spaceIndex = line.indexOf(SPACE_CHAR);
+            if (spaceIndex == -1) {
+                continue;
             }
+            String name = line.substring(0, spaceIndex);
+            String value = line.substring(spaceIndex + 1);
+            memoryStatistics.put(name, value);
         }
         return memoryStatistics;
     }
 
     private void buildMemoryStatsGauge(String statistic, Map<String, String> memoryStatistics, MeterRegistry registry) {
         String value = memoryStatistics.get(statistic);
-        if (value == null) {
-            logger.warn("memory.stat Statistics : {} was not found", statistic);
-            return;
-        }
         if (!isNumeric(value)) {
             logger.warn("memory.stat Statistics : {} is not numeric", statistic);
             return;
@@ -134,26 +129,11 @@ public class CGroupMemoryMetrics extends AbstractMeterBinder {
     }
 
     private Long readFileAsLong(Path file) {
-        if (!exists(file) || !isReadable(file)) {
-            logger.debug("File[path : {}] does not exist !", file);
-            return valueOf(-1L);
-        }
         return parseLong(readFileContent(file));
     }
 
     private String readFileContent(Path filePath) {
-        List<String> lines = readAllLines(filePath);
-        return first(lines);
-    }
-
-    private List<String> readAllLines(Path filePath) {
-        List<String> lines;
-        try {
-            lines = Files.readAllLines(filePath);
-        } catch (Throwable e) {
-            logger.warn("File [path : {}] can't be read", filePath, e);
-            lines = emptyList();
-        }
-        return lines;
+        String[] lines = readLines(filePath);
+        return lines[0];
     }
 }
