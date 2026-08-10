@@ -18,7 +18,6 @@
 package io.microsphere.observability.logging.spring.boot.autoconfigure;
 
 
-import io.microsphere.logging.test.jupiter.LoggingLevelsClass;
 import io.microsphere.spring.boot.test.WebAutoConfigurationTest;
 import io.microsphere.spring.web.method.support.HandlerMethodInterceptor;
 import io.microsphere.spring.webmvc.annotation.EnableWebMvcExtension;
@@ -43,16 +42,6 @@ import java.util.Set;
         classes = {
                 WebMvcLoggingAutoConfiguration.class,
                 WebMvcLoggingAutoConfigurationTest.class
-        }
-)
-@LoggingLevelsClass(
-        loggingClasses = {
-                WebMvcLoggingAutoConfiguration.class
-        },
-        levels = {
-                "TRACE",
-                "INFO",
-                "ERROR"
         }
 )
 class WebMvcLoggingAutoConfigurationTest extends WebAutoConfigurationTest<WebMvcLoggingAutoConfiguration> {
