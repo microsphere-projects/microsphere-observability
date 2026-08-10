@@ -19,7 +19,6 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
-
 import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.common.SentinelTemplate;
 import org.junit.jupiter.api.BeforeEach;

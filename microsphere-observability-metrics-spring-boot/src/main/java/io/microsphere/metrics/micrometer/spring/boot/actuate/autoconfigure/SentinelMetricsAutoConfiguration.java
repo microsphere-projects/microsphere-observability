@@ -37,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
 
+import static com.alibaba.csp.sentinel.init.InitExecutor.doInit;
 import static io.microsphere.alibaba.sentinel.common.util.ProcessorSlotCallbackUtils.addEntryCallback;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
@@ -64,8 +65,7 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
 public class SentinelMetricsAutoConfiguration {
 
     static {
-        addEntryCallback(new SentinelNodeEventPublisher());
-        addEntryCallback(new SentinelMetricsRepository());
+        doInit();
     }
 
     /**
