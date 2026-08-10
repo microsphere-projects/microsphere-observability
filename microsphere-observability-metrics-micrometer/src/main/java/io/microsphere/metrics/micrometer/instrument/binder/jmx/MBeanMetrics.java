@@ -57,7 +57,7 @@ public class MBeanMetrics extends AbstractMeterBinder {
     private final MBeanAttributeMeterBinder[] attributeMeterBinders;
 
     private final int attributeMeterBindersCount;
-    
+
     public MBeanMetrics(@Nonnull ObjectName objectNameToQuery, MBeanAttributeMeterBinder... attributeMeterBinders) {
         this(getPlatformMBeanServer(), objectNameToQuery, attributeMeterBinders);
     }
