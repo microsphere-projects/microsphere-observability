@@ -5,6 +5,7 @@ import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Configuration;
 
 import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 
@@ -14,6 +15,7 @@ import static io.microsphere.observability.logging.util.LoggerUtils.trace;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @since 1.0.0
  */
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnWebApplication
 public class WebServerLoggingAutoConfiguration implements ApplicationListener<WebServerInitializedEvent> {
 
