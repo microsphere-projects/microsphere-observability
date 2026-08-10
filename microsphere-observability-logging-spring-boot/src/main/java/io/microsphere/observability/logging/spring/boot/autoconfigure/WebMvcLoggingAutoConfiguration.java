@@ -18,6 +18,7 @@ import static io.microsphere.observability.logging.util.LoggerUtils.trace;
  * @see org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration
  * @since 1.0.0
  */
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnWebMvcAvailable
 @AutoConfigureAfter(
         name = {
@@ -25,7 +26,6 @@ import static io.microsphere.observability.logging.util.LoggerUtils.trace;
                 "org.springframework.boot.webmvc.autoconfigure.WebMvcAutoConfiguration"             // Spring Boot WebMVC 4.0+ API
         }
 )
-@Configuration(proxyBeanMethods = false)
 public class WebMvcLoggingAutoConfiguration implements ApplicationListener<ServletRequestHandledEvent> {
 
     @Override

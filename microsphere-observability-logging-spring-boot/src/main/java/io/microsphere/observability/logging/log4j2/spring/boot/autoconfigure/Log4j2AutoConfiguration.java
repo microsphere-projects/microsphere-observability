@@ -62,11 +62,11 @@ import static org.springframework.util.StringUtils.hasText;
  * @see KafkaAutoConfiguration
  * @since 1.0.0
  */
+@Configuration(proxyBeanMethods = false)
 @ConditionalOnLog4j2Available
 @Import(value = {
         Log4j2AutoConfiguration.KafkaAppenderConfiguration.class
 })
-@Configuration(proxyBeanMethods = false)
 public class Log4j2AutoConfiguration {
 
     /**
