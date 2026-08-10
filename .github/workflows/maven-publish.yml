@@ -32,6 +32,11 @@ jobs:
             exit 1
           fi
 
+      - name: Docker Setup Compose
+        uses: docker/setup-compose-action@v1.2.0
+        with:
+          version: latest
+
       - name: Checkout Source
         uses: actions/checkout@v5
 
@@ -62,6 +67,10 @@ jobs:
           SIGN_KEY_ID: ${{ secrets.OSS_SIGNING_KEY_ID_LONG }}
           SIGN_KEY: ${{ secrets.OSS_SIGNING_KEY }}
           SIGN_KEY_PASS: ${{ secrets.OSS_SIGNING_PASSWORD }}
+
+      - name: Stop Docker Compose
+        if: always()
+        run: docker compose -f "docker/test-services.yml" down
 
   release:
     runs-on: ubuntu-latest
