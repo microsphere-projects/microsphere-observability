@@ -19,7 +19,6 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.Meter;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.microsphere.logging.Logger;
 import io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -34,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.collection.MapUtils.newHashMap;
-import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 import static java.util.Collections.singleton;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
@@ -73,8 +72,6 @@ import static org.springframework.kafka.test.utils.KafkaTestUtils.getRecords;
 @EnableAutoConfiguration
 class KafkaMetricsAutoConfigurationIntegrationTest {
 
-    private static final Logger logger = getLogger(KafkaMetricsAutoConfigurationIntegrationTest.class);
-
 //    @Autowired
 //    private EmbeddedKafkaBroker broker;
 
@@ -107,7 +104,8 @@ class KafkaMetricsAutoConfigurationIntegrationTest {
         consumer.subscribe(singleton(this.properties.getTopic()));
 
         for (int i = 0; i < 10; i++) {
-            logger.trace("Testing {}", i + 1);
+            int index = i + 1;
+            trace(logger -> logger.trace("Testing {}", index));
         }
 
         ConsumerRecords<String, String> records = getRecords(consumer);

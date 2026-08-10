@@ -18,16 +18,26 @@
 package io.microsphere.metrics.micrometer.instrument.binder.system.util;
 
 import io.microsphere.annotation.Nonnull;
+import io.microsphere.io.IOUtils;
+import io.microsphere.logging.Logger;
 import io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants;
+import io.microsphere.util.StringUtils;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Path;
+
+import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.CGROUP_DIRECTORY_PATH_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_CGROUP_DIRECTORY_PATH_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.DEFAULT_NETWORK_STATS_FILE_PATH;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.METRICS_COLLECTION_INTERVAL_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.instrument.binder.system.constants.SystemConstants.NETWORK_STATS_FILE_PATH_PROPERTY_NAME;
+import static io.microsphere.util.StringUtils.EMPTY_STRING_ARRAY;
 import static java.lang.Long.parseLong;
 import static java.lang.System.getProperty;
+import static java.nio.file.Files.newInputStream;
 
 /**
  * The Utilities of System
@@ -37,6 +47,8 @@ import static java.lang.System.getProperty;
  * @since 1.0.0
  */
 public abstract class SystemUtils {
+
+    private static final Logger logger = getLogger(SystemUtils.class);
 
     /**
      * Get the CGroup Directory Path
@@ -65,6 +77,22 @@ public abstract class SystemUtils {
      */
     public static long getMetricsCollectionInterval() {
         return parseLong(getProperty(METRICS_COLLECTION_INTERVAL_PROPERTY_NAME, DEFAULT_METRICS_COLLECTION_INTERVAL_PROPERTY_VALUE));
+    }
+
+    /**
+     * Read the lines of file
+     *
+     * @param filePath the specified file path
+     * @return the String array of lines , if the file can't be read , return empty String array {@link StringUtils#EMPTY_STRING_ARRAY}
+     */
+    @Nonnull
+    public static String[] readLines(Path filePath) {
+        try (InputStream inputStream = newInputStream(filePath)) {
+            return IOUtils.readLines(inputStream);
+        } catch (IOException e) {
+            logger.error("The file[path : '{}'] can't be read", filePath, e);
+        }
+        return EMPTY_STRING_ARRAY;
     }
 
     private SystemUtils() {
