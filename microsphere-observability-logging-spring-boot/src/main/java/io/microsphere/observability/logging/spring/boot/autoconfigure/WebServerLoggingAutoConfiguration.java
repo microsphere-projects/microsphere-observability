@@ -5,6 +5,7 @@ import org.springframework.boot.web.context.WebServerApplicationContext;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Configuration;
 
 import static io.microsphere.observability.logging.util.LoggerUtils.trace;
 
@@ -15,6 +16,7 @@ import static io.microsphere.observability.logging.util.LoggerUtils.trace;
  * @since 1.0.0
  */
 @ConditionalOnWebApplication
+@Configuration(proxyBeanMethods = false)
 public class WebServerLoggingAutoConfiguration implements ApplicationListener<WebServerInitializedEvent> {
 
     @Override

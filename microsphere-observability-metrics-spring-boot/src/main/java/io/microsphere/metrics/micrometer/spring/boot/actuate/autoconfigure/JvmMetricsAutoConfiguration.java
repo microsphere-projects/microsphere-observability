@@ -54,8 +54,10 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration
  * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration
  * @see org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration
  * @since 1.0.0
  */
