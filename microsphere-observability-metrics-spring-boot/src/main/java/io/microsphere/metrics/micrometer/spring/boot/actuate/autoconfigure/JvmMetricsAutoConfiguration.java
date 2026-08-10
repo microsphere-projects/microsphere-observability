@@ -55,8 +55,6 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration
- * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
- * @see org.springframework.boot.micrometer.metrics.autoconfigure.jvm.JvmMetricsAutoConfiguration
  * @since 1.0.0
  */
 @Configuration(proxyBeanMethods = false)
@@ -66,7 +64,6 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
         "io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics"                                    // Micrometer Core API
 })
 @AutoConfigureAfter(name = {
-        // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.JvmMetricsAutoConfiguration"
