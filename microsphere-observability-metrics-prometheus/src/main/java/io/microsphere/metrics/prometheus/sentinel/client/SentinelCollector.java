@@ -39,7 +39,7 @@ import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_F
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getLabels;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.StringUtils.EMPTY_STRING;
 import static io.prometheus.client.Collector.Type.valueOf;
@@ -129,7 +129,7 @@ public class SentinelCollector extends Collector {
 
     private Sample createSample(String metricName, String context, MetricNode metricNode,
                                 Function<MetricNode, Number> metricValueFunction) {
-        Map<String, String> labels = getLabels(context, metricNode, this.commonLabels);
+        Map<String, String> labels = combineLabels(context, metricNode, this.commonLabels);
         List<String> labelNames = newArrayList(labels.keySet());
         List<String> labelValues = newArrayList(labels.values());
         Number value = metricValueFunction.apply(metricNode);

@@ -18,8 +18,12 @@
 package io.microsphere.metrics.sentinel.util;
 
 
+import com.alibaba.csp.sentinel.node.metric.MetricNode;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static com.alibaba.csp.sentinel.Constants.SENTINEL_VERSION;
+import static com.alibaba.csp.sentinel.ResourceTypeConstants.COMMON_WEB;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.BLOCK_QPS_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONCURRENCY_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.CONTEXT_LABEL_NAME;
@@ -39,9 +43,13 @@ import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.REQUIRED
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.buildMetricName;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricValue;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getRequiredLabelValue;
+import static java.lang.String.valueOf;
 import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -52,6 +60,22 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @since 1.0.0
  */
 class SentinelMetricUtitlsTest {
+
+    String context = "test-context";
+
+    String resource = "test-resource";
+
+    long timestamp = System.currentTimeMillis();
+
+    MetricNode metricNode;
+
+    @BeforeEach
+    void setUp() {
+        metricNode = new MetricNode();
+        metricNode.setResource(resource);
+        metricNode.setClassification(COMMON_WEB);
+        metricNode.setTimestamp(timestamp);
+    }
 
     @Test
     void testConstants() {
@@ -104,5 +128,31 @@ class SentinelMetricUtitlsTest {
     @Test
     void testGetContextMetricNodesMapOnSentinelMetricsRepositoryNotReady() {
         assertSame(emptyMap(), getContextMetricNodesMap(1000));
+    }
+
+    @Test
+    void testGetRequiredLabelValue() {
+        assertEquals(resource, getRequiredLabelValue(RESOURCE_LABEL_NAME, context, metricNode));
+        assertEquals(context, getRequiredLabelValue(CONTEXT_LABEL_NAME, context, metricNode));
+        assertEquals("COMMON_WEB", getRequiredLabelValue(RESOURCE_TYPE_LABEL_NAME, context, metricNode));
+        assertEquals(valueOf(timestamp), getRequiredLabelValue(TIMESTAMP_LABEL_NAME, context, metricNode));
+        assertEquals(SENTINEL_VERSION, getRequiredLabelValue(VERSION_LABEL_NAME, context, metricNode));
+
+        assertThrows(NullPointerException.class, () -> getRequiredLabelValue("not-found", context, metricNode));
+    }
+
+    @Test
+    void testGetMetricValue() {
+        assertEquals(0.0, getMetricValue(metricNode, 0));
+        assertEquals(0.0, getMetricValue(metricNode, 1));
+        assertEquals(0.0, getMetricValue(metricNode, 2));
+        assertEquals(0.0, getMetricValue(metricNode, 3));
+        assertEquals(0.0, getMetricValue(metricNode, 4));
+        assertEquals(0.0, getMetricValue(metricNode, 5));
+        assertEquals(0.0, getMetricValue(metricNode, 6));
+
+        assertThrows(IndexOutOfBoundsException.class, () -> getMetricValue(metricNode, -1));
+        assertThrows(IndexOutOfBoundsException.class, () -> getMetricValue(metricNode, 7));
+        assertThrows(NullPointerException.class, () -> getMetricValue(null, 0));
     }
 }

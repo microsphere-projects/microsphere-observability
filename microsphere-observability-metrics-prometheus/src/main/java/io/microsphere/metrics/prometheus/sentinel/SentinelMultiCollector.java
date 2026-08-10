@@ -45,7 +45,7 @@ import static io.microsphere.logging.LoggerFactory.getLogger;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_NODE_TO_VALUE_FUNCTIONS;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
-import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getLabels;
+import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricFamily;
 import static io.microsphere.util.StringUtils.isNotBlank;
 import static io.prometheus.metrics.model.registry.MetricType.valueOf;
@@ -138,7 +138,7 @@ public class SentinelMultiCollector implements MultiCollector {
     }
 
     public Labels toLabels(String context, MetricNode metricNode) {
-        Map<String, String> labels = getLabels(context, metricNode, this.commonLabels);
+        Map<String, String> labels = combineLabels(context, metricNode, this.commonLabels);
         return Labels.of(newArrayList(labels.keySet()), newArrayList(labels.values()));
     }
 
