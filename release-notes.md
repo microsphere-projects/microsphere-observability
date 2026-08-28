@@ -57,4 +57,17 @@ d6d1963 chore: merge main into dev [skip ci]
 0e08211 Use shared Sentinel metric prefix
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/...0.1.0
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/...0.1.0## v0.1.1
+
+_Release notes generation failed. Raw commits since 0.1.0:_
+
+```
+4b0e6e8 Update version numbers in README.md
+ed9da46 Merge pull request #11 from mercyblitz/dev-1.x
+e22cc36 Fix Sentinel metrics bean backoff condition
+e8c2366 Update README with module and BOM details
+7fca780 chore: merge release-1.x into dev-1.x [skip ci]
+45bc726 chore: bump version to next patch after publishing 0.1.0
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.0...0.1.1
