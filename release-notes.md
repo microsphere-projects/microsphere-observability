@@ -57,4 +57,31 @@ d430548 Replace Map.of with MapUtils.of in sentinel utils
 d0c5693 Add bindTo test for AbstractMeterBinder
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/...0.2.0
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/...0.2.0## v0.2.1
+
+_Release notes generation failed. Raw commits since 0.2.0:_
+
+```
+237807a chore: merge main into release [skip ci]
+39d3c31 Update Maven wrapper distribution
+933cda5 Update version numbers in README.md
+9d22145 chore: merge main into release [skip ci]
+9a8bb89 Merge pull request #10 from microsphere-projects/dependabot/maven/io.opentelemetry.instrumentation-opentelemetry-instrumentation-bom-2.31.1
+1f76022 Bump io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom
+dd2e7f6 chore: merge main into release [skip ci]
+d6c1c59 Merge pull request #7 from microsphere-projects/dependabot/maven/org.apache.maven-apache-maven-3.9.16
+468f819 chore: merge main into release [skip ci]
+280bd2a chore: merge main into release [skip ci]
+6ed81fa Merge pull request #9 from microsphere-projects/dependabot/maven/io.opentelemetry.instrumentation-opentelemetry-instrumentation-bom-2.31.0
+c9a103c Merge branch 'main' into dependabot/maven/org.apache.maven-apache-maven-3.9.16
+b5c6abb Merge pull request #8 from microsphere-projects/dependabot/maven/org.apache.maven.wrapper-maven-wrapper-3.3.4
+1a990be Bump io.opentelemetry.instrumentation:opentelemetry-instrumentation-bom
+e9df4c0 chore: merge main into release [skip ci]
+5c1bf5f Update README.md
+2db8895 Bump org.apache.maven.wrapper:maven-wrapper from 3.1.1 to 3.3.4
+b7eeeb7 Bump org.apache.maven:apache-maven from 3.9.0 to 3.9.16
+5e39d0e chore: merge release into main [skip ci]
+098454e chore: bump version to next patch after publishing 0.2.0
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.0...0.2.1
