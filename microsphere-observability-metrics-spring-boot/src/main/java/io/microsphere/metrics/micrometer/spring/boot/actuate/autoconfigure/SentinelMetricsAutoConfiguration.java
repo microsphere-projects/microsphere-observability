@@ -90,7 +90,7 @@ public class SentinelMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SentinelMultiCollector.class)
+    @ConditionalOnMissingBean(SentinelCollector.class)
     public SentinelMetrics sentinelMetrics() {
         return new SentinelMetrics();
     }
