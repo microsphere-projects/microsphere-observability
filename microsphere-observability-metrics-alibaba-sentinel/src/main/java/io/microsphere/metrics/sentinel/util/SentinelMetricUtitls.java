@@ -71,7 +71,6 @@ public abstract class SentinelMetricUtitls implements Utils {
             RESOURCE_LABEL_NAME, (context, metricNode) -> metricNode.getResource(),
             CONTEXT_LABEL_NAME, (context, metricNode) -> context,
             RESOURCE_TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),
-            TIMESTAMP_LABEL_NAME, (timestamp, metricNode) -> valueOf(metricNode.getTimestamp()),
             VERSION_LABEL_NAME, (version, metricNode) -> SENTINEL_VERSION
     );
 
