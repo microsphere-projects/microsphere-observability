@@ -20,6 +20,7 @@ import io.micrometer.core.instrument.MeterRegistry;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import io.microsphere.spring.cloud.client.service.registry.condition.ConditionalOnAutoServiceRegistrationAvailable;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
@@ -58,16 +59,17 @@ public class ServiceRegistrationMetricsAutoConfiguration {
 
     @Bean
     public MeterRegistryCustomizer commonMeterRegistryCustomizer(
-            ObjectProvider<Registration> registrationProvider) {
+            ObjectProvider<Registration> registrationProvider,
+            @Value("${server.port:-1}") int port) {
         return registry -> {
-            configureCommonTags(registry, registrationProvider);
+            configureCommonTags(registry, registrationProvider, port);
         };
     }
 
-    private void configureCommonTags(MeterRegistry registry, ObjectProvider<Registration> registrationProvider) {
+    private void configureCommonTags(MeterRegistry registry, ObjectProvider<Registration> registrationProvider, int port) {
         registrationProvider.ifAvailable(registration -> {
             String host = registration.getHost();
-            String instance = host + ":" + registration.getPort();
+            String instance = host + ":" + port;
             registry.config().commonTags(INSTANCE_TAG_KEY, instance);
         });
     }
