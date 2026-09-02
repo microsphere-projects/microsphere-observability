@@ -84,4 +84,54 @@ b7eeeb7 Bump org.apache.maven:apache-maven from 3.9.0 to 3.9.16
 098454e chore: bump version to next patch after publishing 0.2.0
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.0...0.2.1
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.0...0.2.1## v0.2.2
+
+_Release notes generation failed. Raw commits since 0.2.1:_
+
+```
+91e35a5 Update version numbers in README.md
+284a883 chore: merge main into release [skip ci]
+80a10fa Use server.port for instance metric tag
+3fc6842 Use application as default metric tag
+5a02abc chore: merge main into release [skip ci]
+065d585 Remove default app label from Sentinel collector
+6db4784 Remove Maven wrapper JAR
+97158fe chore: merge main into release [skip ci]
+75dd517 Merge pull request #12 from microsphere-projects/dependabot/maven/org.apache.maven-apache-maven-3.9.16
+2994741 chore: merge main into release [skip ci]
+ff6651a Add Spring Cloud observability module
+fa73cae Simplify Microsphere Spring Boot dependencies
+e43ece2 chore: merge main into release [skip ci]
+1f82dfb Add Redis test dependency
+47065f4 chore: merge main into release [skip ci]
+d33995b Clean up optional deps in metrics module
+506b9dd Add Spring Cloud metrics auto-configuration
+935ce33 chore: merge main into release [skip ci]
+930ca97 Update LoggerUtils imports in metrics module
+279aabf Guard Sentinel metrics auto-config by classpath
+6c108d4 chore: merge main into release [skip ci]
+ed42422 Fix logger import and clean unused statics
+95fd234 chore: merge main into release [skip ci]
+6f6572f Fix trace LoggerUtils import path
+3c2fc7a chore: merge main into release [skip ci]
+1ad1865 Make logging dependency optional
+71c999a chore: merge main into release [skip ci]
+b9f22f1 Use shared LoggerUtils and drop local copy
+e96e193 chore: merge main into release [skip ci]
+156d82d Move metrics tags under management
+abd8d9e chore: merge main into release [skip ci]
+7616edc Bump microsphere-i18n to 0.2.21
+c54675b chore: merge main into release [skip ci]
+5b8fd4a Add timestamp label to Sentinel metrics
+09b94db chore: merge main into release [skip ci]
+f9dce3d Relax Kafka metrics classpath condition
+cabf3d2 chore: merge main into release [skip ci]
+d5fc8af Bump microsphere-spring-cloud to 0.2.26
+941c60b chore: merge main into release [skip ci]
+ed7d3e9 Remove timestamp from Sentinel metric labels
+95b7443 Bump org.apache.maven:apache-maven from 3.9.15 to 3.9.16
+044ec0a chore: merge release into main [skip ci]
+25f7cc5 chore: bump version to next patch after publishing 0.2.1
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.1...0.2.2
