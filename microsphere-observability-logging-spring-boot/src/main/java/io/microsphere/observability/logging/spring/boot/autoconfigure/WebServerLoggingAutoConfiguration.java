@@ -7,7 +7,7 @@ import org.springframework.boot.web.server.WebServer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Configuration;
 
-import static io.microsphere.observability.logging.util.LoggerUtils.trace;
+import static io.microsphere.logging.LoggerUtils.trace;
 
 /**
  * {@link WebServer} Auto-Configuration
