@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 
 import static io.microsphere.collection.MapUtils.newHashMap;
-import static io.microsphere.observability.logging.util.LoggerUtils.trace;
+import static io.microsphere.logging.LoggerUtils.trace;
 import static java.util.Collections.singleton;
 import static org.apache.kafka.clients.CommonClientConfigs.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.CommonClientConfigs.GROUP_ID_CONFIG;
