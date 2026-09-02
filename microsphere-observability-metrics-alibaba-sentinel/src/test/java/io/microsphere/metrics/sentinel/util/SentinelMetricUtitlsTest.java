@@ -42,7 +42,6 @@ import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_TYPE_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RT_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.SUCCESS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.TIMESTAMP_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.VERSION_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
@@ -91,12 +90,11 @@ class SentinelMetricUtitlsTest {
 
     @Test
     void testConstants() {
-        assertEquals(5, REQUIRED_LABEL_NAMES.size());
+        assertEquals(4, REQUIRED_LABEL_NAMES.size());
         assertTrue(REQUIRED_LABEL_NAMES.contains(RESOURCE_LABEL_NAME));
         assertTrue(REQUIRED_LABEL_NAMES.contains(CONTEXT_LABEL_NAME));
         assertTrue(REQUIRED_LABEL_NAMES.contains(RESOURCE_TYPE_LABEL_NAME));
         assertTrue(REQUIRED_LABEL_NAMES.contains(VERSION_LABEL_NAME));
-        assertTrue(REQUIRED_LABEL_NAMES.contains(TIMESTAMP_LABEL_NAME));
 
         assertEquals(7, METRIC_FAMILIES_SIZE);
         assertEquals(RT_METRIC_NAME, METRIC_FAMILIES.get(0).getName());
@@ -164,7 +162,7 @@ class SentinelMetricUtitlsTest {
     void testCombineLabels() {
         Map<String, String> commonLabels = of("key1", "value1");
         Map<String, String> labels = combineLabels(context, metricNode, commonLabels);
-        assertEquals(6, labels.size());
+        assertEquals(5, labels.size());
         assertEquals("value1", labels.get("key1"));
         assertRequiredLabels(labels);
     }
@@ -172,7 +170,7 @@ class SentinelMetricUtitlsTest {
     @Test
     void testGetRequiredLabels() {
         Map<String, String> requiredLabels = getRequiredLabels(context, metricNode);
-        assertEquals(5, requiredLabels.size());
+        assertEquals(4, requiredLabels.size());
         assertRequiredLabels(requiredLabels);
     }
 
@@ -181,7 +179,6 @@ class SentinelMetricUtitlsTest {
         assertEquals(resource, getRequiredLabelValue(RESOURCE_LABEL_NAME, context, metricNode));
         assertEquals(context, getRequiredLabelValue(CONTEXT_LABEL_NAME, context, metricNode));
         assertEquals("COMMON_WEB", getRequiredLabelValue(RESOURCE_TYPE_LABEL_NAME, context, metricNode));
-        assertEquals(valueOf(timestamp), getRequiredLabelValue(TIMESTAMP_LABEL_NAME, context, metricNode));
         assertEquals(SENTINEL_VERSION, getRequiredLabelValue(VERSION_LABEL_NAME, context, metricNode));
 
         assertThrows(NullPointerException.class, () -> getRequiredLabelValue("not-found", context, metricNode));
@@ -206,7 +203,6 @@ class SentinelMetricUtitlsTest {
         assertRequiredLabel(requiredLabels, RESOURCE_LABEL_NAME, resource);
         assertRequiredLabel(requiredLabels, CONTEXT_LABEL_NAME, context);
         assertRequiredLabel(requiredLabels, RESOURCE_TYPE_LABEL_NAME, "COMMON_WEB");
-        assertRequiredLabel(requiredLabels, TIMESTAMP_LABEL_NAME, valueOf(timestamp));
         assertRequiredLabel(requiredLabels, VERSION_LABEL_NAME, SENTINEL_VERSION);
     }
 

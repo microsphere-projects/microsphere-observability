@@ -54,11 +54,11 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnSentinelAvailable
+@ConditionalOnMicrometerAvailable
 @ConditionalOnClass(name = {
         "io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher",                  // Microsphere Alibaba Sentinel Commons API
         "io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository"       // Microsphere Alibaba Sentinel Commons API
 })
-@ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = SENTINEL_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",

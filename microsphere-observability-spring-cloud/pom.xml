@@ -11,26 +11,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-spring-boot</artifactId>
+    <artifactId>microsphere-observability-spring-cloud</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Spring Boot</name>
-    <description>Microsphere Observability Spring Boot</description>
+    <name>Microsphere :: Observability :: Spring Cloud</name>
+    <description>Microsphere Observability Spring Cloud</description>
 
     <dependencies>
 
-        <!-- Microsphere Observability Logging Spring Boot -->
+        <!-- Microsphere Observability Spring Boot -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-logging-spring-boot</artifactId>
+            <artifactId>microsphere-observability-spring-boot</artifactId>
             <version>${revision}</version>
         </dependency>
 
-        <!-- Microsphere Observability Metrics Spring Boot -->
+        <!-- Microsphere Observability Metrics Spring Cloud -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-metrics-spring-boot</artifactId>
+            <artifactId>microsphere-observability-metrics-spring-cloud</artifactId>
             <version>${revision}</version>
         </dependency>
 
