@@ -27,6 +27,7 @@ import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +54,10 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
  */
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnSentinelAvailable
+@ConditionalOnClass(name = {
+        "io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher",                  // Microsphere Alibaba Sentinel Commons API
+        "io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository"       // Microsphere Alibaba Sentinel Commons API
+})
 @ConditionalOnMicrometerAvailable
 @ConditionalOnProperty(name = SENTINEL_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
