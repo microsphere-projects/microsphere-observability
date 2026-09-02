@@ -54,7 +54,6 @@ import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetri
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getMetricValue;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getRequiredLabelValue;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getRequiredLabels;
-import static java.lang.String.valueOf;
 import static java.lang.Thread.sleep;
 import static java.util.Collections.emptyMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
