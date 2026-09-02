@@ -22,7 +22,6 @@ import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentin
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
-import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
 import io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector;
 import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
