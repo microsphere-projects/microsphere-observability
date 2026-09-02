@@ -1,13 +1,16 @@
 ## Spring Boot Actuator Metrics
 
-microsphere:
-  ## Microsphere Metrics
+management:
+  ## Management Metrics
   metrics:
     ### Metrics Tags
     tags:
       application: ${spring.application.name:default}
       profiles: ${spring.profiles.active:default}
 
+microsphere:
+  ## Microsphere Metrics
+  metrics:
     ### Microsphere Metrics Micrometer
     micrometer:
       enabled: true
