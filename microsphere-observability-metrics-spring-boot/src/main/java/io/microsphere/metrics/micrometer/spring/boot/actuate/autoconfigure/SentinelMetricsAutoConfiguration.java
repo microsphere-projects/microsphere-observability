@@ -84,10 +84,8 @@ public class SentinelMetricsAutoConfiguration {
     @Bean
     @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
     public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
-                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
-                                               @Value("${spring.application.name:default}") String applicationName) {
-        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis())
-                .commonLabel("application", applicationName);
+                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
+        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
         CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
         sentinelCollector.register(prometheusRegistry);
         return sentinelCollector;
