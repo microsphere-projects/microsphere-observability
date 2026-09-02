@@ -21,12 +21,12 @@
     <properties>
         <microsphere-spring-cloud.version>0.1.26</microsphere-spring-cloud.version>
         <microsphere-alibaba-sentinel.version>0.1.4</microsphere-alibaba-sentinel.version>
-        <microsphere-i18n.version>0.1.20</microsphere-i18n.version>
+        <microsphere-i18n.version>0.1.21</microsphere-i18n.version>
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
         <prometheus.version>1.8.0</prometheus.version>
-        <opentelemetry-instrumentation.version>2.30.0</opentelemetry-instrumentation.version>
+        <opentelemetry-instrumentation.version>2.31.1</opentelemetry-instrumentation.version>
     </properties>
 
     <dependencyManagement>

@@ -70,4 +70,33 @@ e8c2366 Update README with module and BOM details
 45bc726 chore: bump version to next patch after publishing 0.1.0
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.0...0.1.1
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.0...0.1.1## v0.1.2
+
+_Release notes generation failed. Raw commits since 0.1.1:_
+
+```
+5ca304d Update README.md
+84655c8 Merge pull request #14 from mercyblitz/dev-1.x
+1b8a3a5 Use server.port for instance metrics tag
+4b53f75 Use application as default metrics tag
+cc3908f Remove app label from Sentinel collector
+7e57b99 Remove unused Sentinel metric imports
+837217f Add spring-cloud module and refresh wrapper
+719aabe Add Spring Cloud metrics auto-config
+e7392d4 Fix LoggerUtils import in Kafka metrics test
+5cb5612 Guard Sentinel metrics auto-config by classpath
+22e1baa Fix imports in observability auto-config tests
+7fac4df Make logging starter optional
+adfe94c Remove LoggerUtils unit test
+2832346 Use shared LoggerUtils, drop local duplicate
+e0d1f5c Restructure metrics config for Boot compatibility
+aa6a716 Merge branch 'dev-1.x' of https://github.com/mercyblitz/microsphere-observability into dev-1.x
+3cadba3 Bump microsphere-i18n to 0.1.21
+ea48386 Merge pull request #13 from mercyblitz/dev-1.x
+eaf1dab Relax Kafka metrics classpath condition
+9b9ef88 Bump microsphere-spring-cloud to 0.1.26
+fa2b965 chore: merge release-1.x into dev-1.x [skip ci]
+cb56703 chore: bump version to next patch after publishing 0.1.1
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.1...0.1.2

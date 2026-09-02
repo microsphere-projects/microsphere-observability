@@ -26,7 +26,6 @@ import io.microsphere.spring.boot.test.AutoConfigurationTest;
 import org.apache.kafka.clients.KafkaClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.kafka.core.ProducerFactory;
 
 import java.util.Set;
 
