@@ -70,7 +70,6 @@ class KafkaMetricsAutoConfigurationTest extends AutoConfigurationTest<KafkaMetri
         globalMissingClasses.add(MeterRegistry.class);
         globalMissingClasses.add(KafkaClientMetrics.class);
         globalMissingClasses.add(KafkaClient.class);
-        globalMissingClasses.add(ProducerFactory.class);
         globalMissingClasses.add(Log4j2KafkaAppenderProperties.class);
     }
 }

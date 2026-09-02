@@ -19,7 +19,7 @@
     <description>Microsphere Observability Parent</description>
 
     <properties>
-        <microsphere-spring-cloud.version>0.1.25</microsphere-spring-cloud.version>
+        <microsphere-spring-cloud.version>0.1.26</microsphere-spring-cloud.version>
         <microsphere-alibaba-sentinel.version>0.1.4</microsphere-alibaba-sentinel.version>
         <microsphere-i18n.version>0.1.20</microsphere-i18n.version>
         <!-- Third-party versions -->
