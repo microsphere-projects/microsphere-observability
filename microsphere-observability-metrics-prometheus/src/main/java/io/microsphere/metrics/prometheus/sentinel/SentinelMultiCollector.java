@@ -41,6 +41,7 @@ import static io.microsphere.collection.ListUtils.newLinkedList;
 import static io.microsphere.collection.MapUtils.newFixedLinkedHashMap;
 import static io.microsphere.collection.MapUtils.newLinkedHashMap;
 import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.TIMESTAMP_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.METRIC_FAMILIES_SIZE;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.combineLabels;
 import static io.microsphere.metrics.sentinel.util.SentinelMetricUtitls.getContextMetricNodesMap;
@@ -50,6 +51,7 @@ import static io.microsphere.util.StringUtils.isNotBlank;
 import static io.prometheus.metrics.model.registry.MetricType.valueOf;
 import static io.prometheus.metrics.model.snapshots.MetricFamilyDescriptor.of;
 import static io.prometheus.metrics.model.snapshots.PrometheusNaming.sanitizeMetricName;
+import static java.lang.String.valueOf;
 
 /**
  * Prometheus {@link MultiCollector} based on ALibaba Sentinel Metrics
@@ -137,6 +139,7 @@ public class SentinelMultiCollector implements MultiCollector {
 
     public Labels toLabels(String context, MetricNode metricNode) {
         Map<String, String> labels = combineLabels(context, metricNode, this.commonLabels);
+        labels.put(TIMESTAMP_LABEL_NAME, valueOf(metricNode.getTimestamp()));
         return Labels.of(newArrayList(labels.keySet()), newArrayList(labels.values()));
     }
 
