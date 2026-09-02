@@ -94,8 +94,7 @@ public class SentinelMetricsAutoConfiguration {
     public SentinelMultiCollector sentinelMultiCollector(PrometheusMeterRegistry registry,
                                                          @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
                                                          @Value("${spring.application.name:default}") String applicationName) {
-        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis())
-                .commonLabel("application", applicationName);
+        SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis());
         PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
         prometheusRegistry.register(sentinelMultiCollector);
         return sentinelMultiCollector;
