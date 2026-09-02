@@ -34,18 +34,19 @@
             <version>${revision}</version>
         </dependency>
 
-        <!-- Microsphere Observability Logging Spring Boot -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-logging-spring-boot</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
         <!-- Microsphere Observability Metrics Prometheus -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-observability-metrics-prometheus</artifactId>
             <version>${revision}</version>
+        </dependency>
+
+        <!-- Microsphere Observability Logging Spring Boot -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-observability-logging-spring-boot</artifactId>
+            <version>${revision}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Spring Boot Core -->
