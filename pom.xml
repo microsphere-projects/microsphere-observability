@@ -67,6 +67,7 @@
         <module>microsphere-observability-logging-spring-boot</module>
         <module>microsphere-observability-metrics-spring-boot</module>
         <module>microsphere-observability-spring-boot</module>
+        <module>microsphere-observability-metrics-spring-cloud</module>
     </modules>
 
 </project>
