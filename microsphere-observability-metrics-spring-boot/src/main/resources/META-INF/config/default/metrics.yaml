@@ -5,7 +5,7 @@ management:
   metrics:
     ### Metrics Tags
     tags:
-      application: ${spring.application.name:default}
+      application: ${spring.application.name:application}
       profiles: ${spring.profiles.active:default}
 
 microsphere:
