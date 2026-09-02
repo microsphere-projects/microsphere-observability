@@ -190,6 +190,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Spring Data Redis -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-redis</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!-- Spring Kafka Test -->
         <dependency>
             <groupId>org.springframework.kafka</groupId>
