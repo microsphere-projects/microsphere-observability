@@ -11,12 +11,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.microsphere-projects</groupId>
-    <artifactId>microsphere-observability-metrics-spring-boot</artifactId>
+    <artifactId>microsphere-observability-metrics-spring-cloud</artifactId>
     <version>${revision}</version>
     <packaging>jar</packaging>
 
-    <name>Microsphere :: Observability :: Metrics Spring Boot</name>
-    <description>Microsphere Observability Metrics Spring Boot</description>
+    <name>Microsphere :: Observability :: Metrics Spring Cloud</name>
+    <description>Microsphere Observability Metrics Spring Cloud</description>
 
     <dependencies>
 
@@ -27,25 +27,17 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Microsphere Observability Micrometer -->
+        <!-- Microsphere Observability Metrics Spring Boot -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-metrics-micrometer</artifactId>
+            <artifactId>microsphere-observability-metrics-spring-boot</artifactId>
             <version>${revision}</version>
         </dependency>
 
-        <!-- Microsphere Observability Metrics Prometheus -->
+        <!-- Microsphere Spring Cloud Commons -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-metrics-prometheus</artifactId>
-            <version>${revision}</version>
-        </dependency>
-
-        <!-- Microsphere Observability Logging Spring Boot -->
-        <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-observability-logging-spring-boot</artifactId>
-            <version>${revision}</version>
+            <artifactId>microsphere-spring-cloud-commons</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -63,17 +55,16 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Microsphere Alibaba Sentinel Spring Boot -->
+        <!-- Spring Cloud -->
         <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-alibaba-sentinel-spring-boot</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-commons</artifactId>
             <optional>true</optional>
         </dependency>
 
-        <!-- Microsphere Redis Spring Boot -->
         <dependency>
-            <groupId>io.github.microsphere-projects</groupId>
-            <artifactId>microsphere-redis-spring-boot</artifactId>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-context</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -98,12 +89,6 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <optional>true</optional>
         </dependency>
@@ -120,66 +105,10 @@
             <optional>true</optional>
         </dependency>
 
-        <!-- Spring Data Redis -->
-        <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-redis</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Spring Kafka -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Third-Party Dependencies -->
-
-        <!-- Alibaba Sentinel -->
-        <dependency>
-            <groupId>com.alibaba.csp</groupId>
-            <artifactId>sentinel-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
         <!-- Micrometer -->
         <dependency>
             <groupId>io.micrometer</groupId>
             <artifactId>micrometer-core</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Prometheus -->
-        <dependency>
-            <groupId>io.micrometer</groupId>
-            <artifactId>micrometer-registry-prometheus</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>io.prometheus</groupId>
-            <artifactId>prometheus-metrics-exporter-pushgateway</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Log4j 1.x -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!-- Log4j 2.x -->
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-api</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.logging.log4j</groupId>
-            <artifactId>log4j-core</artifactId>
             <optional>true</optional>
         </dependency>
 
@@ -204,17 +133,30 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- Spring Kafka Test -->
-        <dependency>
-            <groupId>org.springframework.kafka</groupId>
-            <artifactId>spring-kafka-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
         <!-- Microsphere Spring Boot Test -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-spring-boot-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Micrometer Prometheus Registry -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Log4j 2.x -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
             <scope>test</scope>
         </dependency>
 

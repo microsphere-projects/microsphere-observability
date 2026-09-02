@@ -25,8 +25,8 @@ import org.springframework.context.event.EventListener;
 
 import java.lang.Thread.UncaughtExceptionHandler;
 
-import static io.microsphere.observability.logging.util.LoggerUtils.error;
-import static io.microsphere.observability.logging.util.LoggerUtils.trace;
+import static io.microsphere.logging.LoggerUtils.error;
+import static io.microsphere.logging.LoggerUtils.trace;
 import static java.lang.Thread.getDefaultUncaughtExceptionHandler;
 import static java.lang.Thread.setDefaultUncaughtExceptionHandler;
 import static org.springframework.util.StringUtils.arrayToDelimitedString;

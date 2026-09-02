@@ -22,12 +22,12 @@ import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentin
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
-import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
 import io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector;
 import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -55,6 +55,10 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
 @Configuration(proxyBeanMethods = false)
 @ConditionalOnSentinelAvailable
 @ConditionalOnMicrometerAvailable
+@ConditionalOnClass(name = {
+        "io.microsphere.alibaba.sentinel.event.SentinelNodeEventPublisher",                  // Microsphere Alibaba Sentinel Commons API
+        "io.microsphere.alibaba.sentinel.common.reposistory.SentinelMetricsRepository"       // Microsphere Alibaba Sentinel Commons API
+})
 @ConditionalOnProperty(name = SENTINEL_METRICS_ENABLED_PROPERTY_NAME, matchIfMissing = true)
 @AutoConfigureAfter(name = {
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
@@ -80,10 +84,8 @@ public class SentinelMetricsAutoConfiguration {
     @Bean
     @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
     public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
-                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
-                                               @Value("${spring.application.name:default}") String applicationName) {
-        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis())
-                .commonLabel("application", applicationName);
+                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
+        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
         CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
         sentinelCollector.register(prometheusRegistry);
         return sentinelCollector;

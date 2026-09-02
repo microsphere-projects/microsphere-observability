@@ -57,7 +57,6 @@ import static org.apache.kafka.clients.CommonClientConfigs.CLIENT_ID_CONFIG;
 @ConditionalOnClass(name = {
         "io.micrometer.core.instrument.binder.kafka.KafkaClientMetrics",                                   // Micrometer Core API
         "org.apache.kafka.clients.KafkaClient",                                                            // Kafka Client API
-        "org.springframework.kafka.core.ProducerFactory",                                                  // Spring Kafka API
         "io.microsphere.observability.logging.log4j2.spring.boot.Log4j2KafkaAppenderProperties"            // Microsphere Observability Logging Spring Boot API
 })
 @AutoConfigureAfter(name = {

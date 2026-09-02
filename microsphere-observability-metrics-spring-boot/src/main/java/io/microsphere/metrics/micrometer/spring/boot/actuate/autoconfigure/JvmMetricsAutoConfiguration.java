@@ -20,7 +20,6 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import io.microsphere.annotation.ConfigurationProperty;
-import io.microsphere.logging.Logger;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
@@ -42,7 +41,8 @@ import static io.micrometer.core.instrument.Tags.of;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
 import static io.microsphere.constants.PropertyConstants.ENABLED_PROPERTY_NAME;
 import static io.microsphere.constants.SymbolConstants.DOT;
-import static io.microsphere.logging.LoggerFactory.getLogger;
+import static io.microsphere.logging.LoggerUtils.trace;
+import static io.microsphere.logging.LoggerUtils.warn;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.JvmMetricsAutoConfiguration.JVM_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
 import static io.microsphere.util.ArrayUtils.EMPTY_STRING_ARRAY;
@@ -70,8 +70,6 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
 
 })
 public class JvmMetricsAutoConfiguration {
-
-    private static final Logger logger = getLogger(JvmMetricsAutoConfiguration.class);
 
     /**
      * The Property Name prefix of JVM : "microsphere.metrics.micrometer.jvm."
@@ -130,10 +128,8 @@ public class JvmMetricsAutoConfiguration {
                                                     Function<T, Executor> executorConverter, MeterRegistry meterRegistry) {
         Map<String, T> beansMap = context.getBeansOfType(beanType);
         if (beansMap.isEmpty()) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("No Bean can't be found in the ApplicationContext[id: '{}'] by type : '{}'",
-                        context.getId(), beanType.getName());
-            }
+            trace(logger -> logger.trace("No Bean can't be found in the ApplicationContext[id: '{}'] by type : '{}'",
+                    context.getId(), beanType.getName()));
             return;
         }
         for (Map.Entry<String, T> beanEntry : beansMap.entrySet()) {
@@ -143,8 +139,8 @@ public class JvmMetricsAutoConfiguration {
             if (executor instanceof ExecutorService) {
                 registerExecutorServiceMetrics((ExecutorService) executor, beanName, meterRegistry);
             } else {
-                logger.warn("Spring Bean[name: '{}', type: '{}'] associating Executor[type: '{}'] is not a instance of ExecutorService",
-                        beanName, beanType.getName(), executor.getClass().getName());
+                warn(logger -> logger.warn("Spring Bean[name: '{}', type: '{}'] associating Executor[type: '{}'] is not a instance of ExecutorService",
+                        beanName, beanType.getName(), executor.getClass().getName()));
             }
         }
     }
@@ -156,10 +152,8 @@ public class JvmMetricsAutoConfiguration {
 
     private ExecutorServiceMetrics createExecutorServiceMetrics(ExecutorService executorService, String name) {
         String prefix = executorServiceMetricsPrefix;
-        if (logger.isTraceEnabled()) {
-            logger.trace("ExecutorService[name: '{}', type: '{}'] {} -> ExecutorServiceMetrics[prefix: '{}', tags: {}]",
-                    name, executorService.getClass().getName(), prefix, arrayToString(executorServiceMetricsTags));
-        }
+        trace(logger -> logger.trace("ExecutorService[name: '{}', type: '{}'] {} -> ExecutorServiceMetrics[prefix: '{}', tags: {}]",
+                name, executorService.getClass().getName(), prefix, arrayToString(executorServiceMetricsTags)));
         return new ExecutorServiceMetrics(executorService, name, prefix, of(executorServiceMetricsTags));
     }
 }

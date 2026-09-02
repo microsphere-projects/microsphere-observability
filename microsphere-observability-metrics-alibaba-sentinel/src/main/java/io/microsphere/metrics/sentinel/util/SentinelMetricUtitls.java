@@ -48,10 +48,8 @@ import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RESOURCE_TYPE_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.RT_METRIC_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.SUCCESS_QPS_METRIC_NAME;
-import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.TIMESTAMP_LABEL_NAME;
 import static io.microsphere.metrics.sentinel.constants.SentinelMetricsConstants.VERSION_LABEL_NAME;
 import static io.microsphere.util.StringUtils.isBlank;
-import static java.lang.String.valueOf;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
@@ -71,7 +69,6 @@ public abstract class SentinelMetricUtitls implements Utils {
             RESOURCE_LABEL_NAME, (context, metricNode) -> metricNode.getResource(),
             CONTEXT_LABEL_NAME, (context, metricNode) -> context,
             RESOURCE_TYPE_LABEL_NAME, (type, metricNode) -> getResourceTypeAsString(metricNode.getClassification()),
-            TIMESTAMP_LABEL_NAME, (timestamp, metricNode) -> valueOf(metricNode.getTimestamp()),
             VERSION_LABEL_NAME, (version, metricNode) -> SENTINEL_VERSION
     );
 
