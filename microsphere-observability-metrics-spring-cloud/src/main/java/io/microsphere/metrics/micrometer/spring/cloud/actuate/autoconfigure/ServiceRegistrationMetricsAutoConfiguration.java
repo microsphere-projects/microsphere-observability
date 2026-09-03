@@ -77,14 +77,15 @@ public class ServiceRegistrationMetricsAutoConfiguration {
         return registry -> registry.config().commonTags(INSTANCE_TAG_KEY, instance);
     }
 
-    @ConditionalOnClass(name = {
-            "io.micrometer.prometheus.PrometheusMeterRegistry",
-            "io.prometheus.client.Collector"
+    @ConditionalOnBean(type = {
+            "io.micrometer.prometheus.PrometheusMeterRegistry"
     })
     static class PrometheusConfig {
 
+        @ConditionalOnClass(name = {
+                "io.prometheus.client.Collector"
+        })
         @ConditionalOnBean(type = {
-                "io.micrometer.prometheus.PrometheusMeterRegistry",
                 "io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector"
         })
         @Bean
