@@ -18,15 +18,21 @@ package io.microsphere.metrics.micrometer.spring.cloud.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.MeterRegistry;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
+import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
+import io.microsphere.spring.beans.factory.config.GenericBeanPostProcessorAdapter;
 import io.microsphere.spring.cloud.client.service.registry.condition.ConditionalOnAutoServiceRegistrationAvailable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.serviceregistry.Registration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 ;
 
@@ -37,6 +43,12 @@ import org.springframework.context.annotation.Configuration;
  * @see MeterRegistry
  * @see org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration
  * @see org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration
+ * @see org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration
+ * @see org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration
+ * @see io.microsphere.spring.cloud.client.service.registry.autoconfigure.SimpleAutoServiceRegistrationAutoConfiguration
+ * @see io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration
  * @since 1.0.0
  */
 @ConditionalOnDiscoveryEnabled
@@ -46,31 +58,56 @@ import org.springframework.context.annotation.Configuration;
         // Spring Boot Actuator API [2.0, 4.0)
         "org.springframework.boot.actuate.autoconfigure.metrics.MetricsAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration",
+
         // Spring Boot Actuator API [4.0, )
         "org.springframework.boot.micrometer.metrics.autoconfigure.MetricsAutoConfiguration",
         "org.springframework.boot.micrometer.metrics.autoconfigure.CompositeMeterRegistryAutoConfiguration",
+        "org.springframework.boot.micrometer.metrics.autoconfigure.export.prometheus.PrometheusMetricsExportAutoConfiguration",
 
-        "io.microsphere.spring.cloud.client.service.registry.autoconfigure.SimpleAutoServiceRegistrationAutoConfiguration"
+        "io.microsphere.spring.cloud.client.service.registry.autoconfigure.SimpleAutoServiceRegistrationAutoConfiguration",
+        "io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration"
 })
+@Import(ServiceRegistrationMetricsAutoConfiguration.PrometheusConfig.class)
 @Configuration(proxyBeanMethods = false)
 public class ServiceRegistrationMetricsAutoConfiguration {
 
     public static final String INSTANCE_TAG_KEY = "instance";
 
-    @Bean
-    public MeterRegistryCustomizer commonMeterRegistryCustomizer(
-            ObjectProvider<Registration> registrationProvider,
-            @Value("${server.port:-1}") int port) {
-        return registry -> {
-            configureCommonTags(registry, registrationProvider, port);
-        };
-    }
+    private static String instance;
 
-    private void configureCommonTags(MeterRegistry registry, ObjectProvider<Registration> registrationProvider, int port) {
+    public ServiceRegistrationMetricsAutoConfiguration(ObjectProvider<Registration> registrationProvider, @Value("${server.port:-1}") int port) {
         registrationProvider.ifAvailable(registration -> {
             String host = registration.getHost();
-            String instance = host + ":" + port;
-            registry.config().commonTags(INSTANCE_TAG_KEY, instance);
+            instance = host + ":" + port;
         });
+    }
+
+    @Bean
+    public MeterRegistryCustomizer commonMeterRegistryCustomizer() {
+        return registry -> registry.config().commonTags(INSTANCE_TAG_KEY, instance);
+    }
+
+    @ConditionalOnClass(name = {
+            "io.micrometer.prometheusmetrics.PrometheusMeterRegistry"
+    })
+    static class PrometheusConfig {
+
+        @ConditionalOnClass(name = {
+                "io.prometheus.metrics.model.registry.MultiCollector"
+        })
+        @ConditionalOnBean(type = {
+                "io.micrometer.prometheusmetrics.PrometheusMeterRegistry",
+                "io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector"
+        })
+        @Bean
+        public BeanPostProcessor sentinelMultiCollectorBeanPostProcessor() {
+            return new GenericBeanPostProcessorAdapter<SentinelMultiCollector>() {
+                @Override
+                protected void processBeforeInitialization(SentinelMultiCollector bean, String beanName) {
+                    bean.commonLabel(INSTANCE_TAG_KEY, instance);
+                }
+            };
+        }
     }
 }
