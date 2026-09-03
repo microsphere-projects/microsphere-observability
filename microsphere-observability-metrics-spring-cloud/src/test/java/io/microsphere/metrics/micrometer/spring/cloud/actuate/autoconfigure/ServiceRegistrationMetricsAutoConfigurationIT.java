@@ -43,6 +43,8 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
         },
         webEnvironment = RANDOM_PORT,
         properties = {
+                "management.metrics.export.prometheus.enabled=true",
+                "management.prometheus.metrics.export.enabled=true",
                 "microsphere.spring.cloud.service-registry.auto-registration.simple.enabled=true"
         }
 )
