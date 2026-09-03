@@ -23,6 +23,7 @@ import io.microsphere.spring.beans.factory.config.GenericBeanPostProcessorAdapte
 import io.microsphere.spring.cloud.client.service.registry.condition.ConditionalOnAutoServiceRegistrationAvailable;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -89,7 +90,7 @@ public class ServiceRegistrationMetricsAutoConfiguration {
                 "io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector"
         })
         @Bean
-        public GenericBeanPostProcessorAdapter<SentinelCollector> sentinelCollectorBeanPostProcessor() {
+        public BeanPostProcessor sentinelCollectorBeanPostProcessor() {
             return new GenericBeanPostProcessorAdapter<SentinelCollector>() {
                 @Override
                 protected void processBeforeInitialization(SentinelCollector bean, String beanName) {
