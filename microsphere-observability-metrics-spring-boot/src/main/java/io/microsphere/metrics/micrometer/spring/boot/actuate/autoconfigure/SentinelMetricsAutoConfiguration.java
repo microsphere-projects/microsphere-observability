@@ -32,8 +32,10 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.ConfigurableEnvironment;
 
 import java.time.Duration;
+import java.util.Map;
 
 import static com.alibaba.csp.sentinel.init.InitExecutor.doInit;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
@@ -42,6 +44,7 @@ import static io.microsphere.constants.SymbolConstants.DOT;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration.SENTINEL_METRICS_ENABLED_PROPERTY_NAME;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SystemMetricsAutoConfiguration.METRICS_COLLECTION_INTERVAL_PLACEHOLDER;
 import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerEnabled.PREFIX;
+import static io.microsphere.spring.core.env.PropertySourcesUtils.getSubProperties;
 
 /**
  * The Auto-Configuration class for Alibaba Sentinel Metrics
@@ -93,8 +96,10 @@ public class SentinelMetricsAutoConfiguration {
     @ConditionalOnBean(type = "io.micrometer.prometheusmetrics.PrometheusMeterRegistry")
     public SentinelMultiCollector sentinelMultiCollector(PrometheusMeterRegistry registry,
                                                          @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval,
-                                                         @Value("${spring.application.name:default}") String applicationName) {
+                                                         ConfigurableEnvironment environment) {
         SentinelMultiCollector sentinelMultiCollector = new SentinelMultiCollector(interval.toMillis());
+        Map<String, String> commonTags = (Map) getSubProperties(environment, "management.metrics.tags");
+        commonTags.forEach(sentinelMultiCollector::commonLabel);
         PrometheusRegistry prometheusRegistry = registry.getPrometheusRegistry();
         prometheusRegistry.register(sentinelMultiCollector);
         return sentinelMultiCollector;
