@@ -25,6 +25,7 @@ import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Condition
 import io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector;
 import io.prometheus.client.CollectorRegistry;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -34,6 +35,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.Duration;
+import java.util.Map;
 
 import static com.alibaba.csp.sentinel.init.InitExecutor.doInit;
 import static io.microsphere.annotation.ConfigurationProperty.APPLICATION_SOURCE;
@@ -84,8 +86,12 @@ public class SentinelMetricsAutoConfiguration {
     @Bean
     @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
     public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
+                                               MetricsProperties properties,
                                                @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
         SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
+        // Common tags covert to Prometheus labels
+        Map<String, String> commonTags = properties.getTags();
+        commonTags.forEach(sentinelCollector::commonLabel);
         CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
         sentinelCollector.register(prometheusRegistry);
         return sentinelCollector;
