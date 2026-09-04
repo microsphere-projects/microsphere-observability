@@ -26,7 +26,7 @@ jobs:
         maven-profile-spring-cloud: [ 'spring-cloud-hoxton' , 'spring-cloud-2020' , 'spring-cloud-2021' ]
     steps:
       - name: Docker Setup Compose
-        uses: docker/setup-compose-action@v1.2.0
+        uses: docker/setup-compose-action@v2.3.0
         with:
           version: latest
 

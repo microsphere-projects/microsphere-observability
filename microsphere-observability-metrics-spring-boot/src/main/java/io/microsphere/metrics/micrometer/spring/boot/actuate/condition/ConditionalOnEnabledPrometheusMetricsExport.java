@@ -19,7 +19,6 @@ package io.microsphere.metrics.micrometer.spring.boot.actuate.condition;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.ConditionalOnEnabledMetricsExport;
 import org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.annotation.Conditional;
 
 import java.lang.annotation.Documented;
@@ -41,8 +40,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Documented
-@ConditionalOnBean(name = "io.micrometer.core.instrument.Clock")
 @ConditionalOnEnabledMetricsExport("prometheus")
-@ConditionalOnClass(name = "io.micrometer.prometheus.PrometheusMeterRegistry")
+@ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
 public @interface ConditionalOnEnabledPrometheusMetricsExport {
 }

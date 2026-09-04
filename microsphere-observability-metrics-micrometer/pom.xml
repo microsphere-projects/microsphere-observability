@@ -34,11 +34,19 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Microsphere Observability Metrics Commons -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-observability-metrics-commons</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- Microsphere Observability Metrics Alibaba Sentinel -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
             <version>${revision}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Alibaba Sentinel Commons -->
