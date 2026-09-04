@@ -39,6 +39,7 @@
             <groupId>io.github.microsphere-projects</groupId>
             <artifactId>microsphere-observability-metrics-alibaba-sentinel</artifactId>
             <version>${revision}</version>
+            <optional>true</optional>
         </dependency>
 
         <!-- Microsphere Alibaba Sentinel Commons -->
