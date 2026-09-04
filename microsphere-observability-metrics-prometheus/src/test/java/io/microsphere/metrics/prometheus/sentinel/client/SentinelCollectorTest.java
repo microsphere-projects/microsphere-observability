@@ -42,16 +42,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @see SentinelCollector
  * @since 1.0.0
  */
-class SentinelCollectorTest {
+public class SentinelCollectorTest {
 
     private CollectorRegistry registry;
 
-    private SentinelCollector sentinelCollector;
+    public SentinelCollector sentinelCollector;
 
-    private SentinelMetricsTestHelper testHelper;
+    public SentinelMetricsTestHelper testHelper;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         this.registry = new CollectorRegistry();
         this.sentinelCollector = new SentinelCollector(60000).commonLabel("test-label", "test-value");
         this.sentinelCollector.register(registry);
