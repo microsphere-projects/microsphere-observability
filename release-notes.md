@@ -99,4 +99,29 @@ fa2b965 chore: merge release-1.x into dev-1.x [skip ci]
 cb56703 chore: bump version to next patch after publishing 0.1.1
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.1...0.1.2
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.1...0.1.2## v0.1.3
+
+_Release notes generation failed. Raw commits since 0.1.2:_
+
+```
+fc8f703 Update version numbers in README.md
+bf64565 Merge pull request #17 from mercyblitz/dev-1.x
+20086f4 Avoid duplicate SentinelMetrics beans
+e7c75be Fix Sentinel Prometheus metrics conditions
+1e6f47c Merge pull request #15 from mercyblitz/dev-1.x
+6216101 Bump microsphere-alibaba-sentinel to 0.1.5
+3aca962 Add metrics-commons to metrics modules
+d291d46 Gate service metrics on Prometheus export
+ebabcc9 Use Prometheus registry bean condition
+e3acc82 Add Micrometer binder for Prometheus collector
+9a645c9 Make Sentinel metrics dependency optional
+7c66a60 Align Sentinel bean post-processor type
+133f02e Fix Prometheus service registration metrics
+71e2d42 Update Docker Compose action in workflows
+242de1d Add instance label support for Prometheus
+46f30e0 Apply common metric tags to Sentinel collector
+483736b chore: merge release-1.x into dev-1.x [skip ci]
+850fb20 chore: bump version to next patch after publishing 0.1.2
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.1.2...0.1.3
