@@ -17,6 +17,7 @@
 package io.microsphere.metrics.micrometer.spring.cloud.actuate.autoconfigure;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnEnabledPrometheusMetricsExport;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector;
 import io.microsphere.spring.beans.factory.config.GenericBeanPostProcessorAdapter;
@@ -68,7 +69,7 @@ import org.springframework.context.annotation.Import;
         "io.microsphere.spring.cloud.client.service.registry.autoconfigure.SimpleAutoServiceRegistrationAutoConfiguration",
         "io.microsphere.metrics.micrometer.spring.boot.actuate.autoconfigure.SentinelMetricsAutoConfiguration"
 })
-@Import(ServiceRegistrationMetricsAutoConfiguration.PrometheusConfig.class)
+@Import(ServiceRegistrationMetricsAutoConfiguration.PrometheusConfiguration.class)
 @Configuration(proxyBeanMethods = false)
 public class ServiceRegistrationMetricsAutoConfiguration {
 
@@ -88,18 +89,13 @@ public class ServiceRegistrationMetricsAutoConfiguration {
         return registry -> registry.config().commonTags(INSTANCE_TAG_KEY, instance);
     }
 
-    @ConditionalOnClass(name = {
-            "io.micrometer.prometheusmetrics.PrometheusMeterRegistry"
-    })
-    static class PrometheusConfig {
+    @ConditionalOnEnabledPrometheusMetricsExport
+    static class PrometheusConfiguration {
 
         @ConditionalOnClass(name = {
                 "io.prometheus.metrics.model.registry.MultiCollector"
         })
-        @ConditionalOnBean(type = {
-                "io.micrometer.prometheusmetrics.PrometheusMeterRegistry",
-                "io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector"
-        })
+        @ConditionalOnBean(SentinelMultiCollector.class)
         @Bean
         public BeanPostProcessor sentinelMultiCollectorBeanPostProcessor() {
             return new GenericBeanPostProcessorAdapter<SentinelMultiCollector>() {
