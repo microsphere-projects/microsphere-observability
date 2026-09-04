@@ -134,4 +134,30 @@ ed7d3e9 Remove timestamp from Sentinel metric labels
 25f7cc5 chore: bump version to next patch after publishing 0.2.1
 ```
 
-**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.1...0.2.2
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.1...0.2.2## v0.2.3
+
+_Release notes generation failed. Raw commits since 0.2.2:_
+
+```
+6197618 Update latest version numbers in README
+a8285a5 chore: merge main into release [skip ci]
+3160d7a Use type-based Sentinel bean condition
+7992de9 chore: merge main into release [skip ci]
+7962e00 Merge pull request #16 from microsphere-projects/dependabot/maven/io.github.microsphere-projects-microsphere-alibaba-sentinel-dependencies-0.2.5
+82d3195 chore: merge main into release [skip ci]
+de443e1 Add metrics-commons to metrics modules
+db63341 Tighten Prometheus export conditions
+38aab2e chore: merge main into release [skip ci]
+4230738 Mark Sentinel metrics as optional
+f505338 Bump io.github.microsphere-projects:microsphere-alibaba-sentinel-dependencies
+fed38c8 chore: merge main into release [skip ci]
+0433710 Add instance label to Sentinel Prometheus metrics
+b349d73 chore: merge main into release [skip ci]
+483556a Bump Docker Compose setup action to v2.3.0
+81ddf25 chore: merge main into release [skip ci]
+0acbb9f Apply Micrometer common tags to Sentinel metrics
+2ce3f33 chore: merge release into main [skip ci]
+d941c45 chore: bump version to next patch after publishing 0.2.2
+```
+
+**Full Changelog**: https://github.com/microsphere-projects/microsphere-observability/compare/0.2.2...0.2.3
