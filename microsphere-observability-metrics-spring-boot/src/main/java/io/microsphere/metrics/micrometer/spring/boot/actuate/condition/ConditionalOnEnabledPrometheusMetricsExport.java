@@ -36,13 +36,13 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy<a/>
  * @see ConditionalOnEnabledMetricsExport
  * @see PrometheusMetricsExportAutoConfiguration
+ * @see io.micrometer.prometheusmetrics.PrometheusMeterRegistry
  * @since 1.0.0
  */
 @Target({TYPE, METHOD})
 @Retention(RUNTIME)
 @Documented
-@ConditionalOnBean(name = "io.micrometer.core.instrument.Clock")
 @ConditionalOnEnabledMetricsExport("prometheus")
-@ConditionalOnClass(name = "io.micrometer.prometheus.PrometheusMeterRegistry")
+@ConditionalOnBean(type = "io.micrometer.prometheusmetrics.PrometheusMeterRegistry")
 public @interface ConditionalOnEnabledPrometheusMetricsExport {
 }
