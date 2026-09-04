@@ -85,7 +85,7 @@ public class ServiceRegistrationMetricsAutoConfiguration {
         @ConditionalOnClass(name = {
                 "io.prometheus.client.Collector"
         })
-        @ConditionalOnBean(SentinelCollector.class)
+        @ConditionalOnBean(type = "io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector")
         @Bean
         public BeanPostProcessor sentinelCollectorBeanPostProcessor() {
             return new GenericBeanPostProcessorAdapter<SentinelCollector>() {

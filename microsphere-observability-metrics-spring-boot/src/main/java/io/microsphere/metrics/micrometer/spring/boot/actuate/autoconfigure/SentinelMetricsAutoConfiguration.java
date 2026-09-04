@@ -21,6 +21,7 @@ import io.micrometer.prometheus.PrometheusMeterRegistry;
 import io.microsphere.alibaba.sentinel.spring.boot.condition.ConditionalOnSentinelAvailable;
 import io.microsphere.annotation.ConfigurationProperty;
 import io.microsphere.metrics.micrometer.instrument.binder.sentinel.SentinelMetrics;
+import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnEnabledPrometheusMetricsExport;
 import io.microsphere.metrics.micrometer.spring.boot.actuate.condition.ConditionalOnMicrometerAvailable;
 import io.microsphere.metrics.prometheus.sentinel.client.SentinelCollector;
 import io.prometheus.client.CollectorRegistry;
@@ -33,6 +34,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 
 import java.time.Duration;
 import java.util.Map;
@@ -67,6 +69,7 @@ import static io.microsphere.metrics.micrometer.spring.boot.actuate.condition.Co
         "org.springframework.boot.actuate.autoconfigure.metrics.CompositeMeterRegistryAutoConfiguration",
         "org.springframework.boot.actuate.autoconfigure.metrics.export.prometheus.PrometheusMetricsExportAutoConfiguration"
 })
+@Import(SentinelMetricsAutoConfiguration.PrometheusConfiguration.class)
 public class SentinelMetricsAutoConfiguration {
 
     static {
@@ -83,22 +86,27 @@ public class SentinelMetricsAutoConfiguration {
     )
     public static final String SENTINEL_METRICS_ENABLED_PROPERTY_NAME = PREFIX + "alibaba-sentinel" + DOT + ENABLED_PROPERTY_NAME;
 
-    @Bean
-    @ConditionalOnBean(type = "io.micrometer.prometheus.PrometheusMeterRegistry")
-    public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
-                                               MetricsProperties properties,
-                                               @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
-        SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
-        // Common tags covert to Prometheus labels
-        Map<String, String> commonTags = properties.getTags();
-        commonTags.forEach(sentinelCollector::commonLabel);
-        CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
-        sentinelCollector.register(prometheusRegistry);
-        return sentinelCollector;
+    @ConditionalOnEnabledPrometheusMetricsExport
+    static class PrometheusConfiguration {
+
+        @ConditionalOnClass(name = {
+                "io.prometheus.client.Collector"
+        })
+        @Bean
+        public SentinelCollector sentinelCollector(PrometheusMeterRegistry registry,
+                                                   MetricsProperties properties,
+                                                   @Value(METRICS_COLLECTION_INTERVAL_PLACEHOLDER) Duration interval) {
+            SentinelCollector sentinelCollector = new SentinelCollector(interval.toMillis());
+            // Common tags covert to Prometheus labels
+            Map<String, String> commonTags = properties.getTags();
+            commonTags.forEach(sentinelCollector::commonLabel);
+            CollectorRegistry prometheusRegistry = registry.getPrometheusRegistry();
+            sentinelCollector.register(prometheusRegistry);
+            return sentinelCollector;
+        }
     }
 
     @Bean
-    @ConditionalOnMissingBean(SentinelCollector.class)
     public SentinelMetrics sentinelMetrics() {
         return new SentinelMetrics();
     }
