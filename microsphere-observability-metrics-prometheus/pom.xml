@@ -34,6 +34,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- Microsphere Observability Metrics Commons -->
+        <dependency>
+            <groupId>io.github.microsphere-projects</groupId>
+            <artifactId>microsphere-observability-metrics-commons</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
         <!-- Microsphere Observability Metrics Alibaba Sentinel -->
         <dependency>
             <groupId>io.github.microsphere-projects</groupId>
@@ -67,6 +74,13 @@
         <dependency>
             <groupId>io.prometheus</groupId>
             <artifactId>simpleclient</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- Micrometer -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-core</artifactId>
             <optional>true</optional>
         </dependency>
 
