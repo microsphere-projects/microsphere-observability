@@ -111,7 +111,7 @@ public class SentinelMetricsAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(SentinelMultiCollector.class)
+    @ConditionalOnMissingBean(type = "io.microsphere.metrics.prometheus.sentinel.SentinelMultiCollector")
     public SentinelMetrics sentinelMetrics() {
         return new SentinelMetrics();
     }
