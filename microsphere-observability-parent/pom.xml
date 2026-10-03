@@ -25,7 +25,7 @@
         <!-- Third-party versions -->
         <mybatis-starter.version>3.0.1</mybatis-starter.version>
         <mybatis.version>3.5.11</mybatis.version>
-        <prometheus.version>1.8.0</prometheus.version>
+        <prometheus.version>1.9.0</prometheus.version>
         <opentelemetry-instrumentation.version>2.31.1</opentelemetry-instrumentation.version>
     </properties>
 
