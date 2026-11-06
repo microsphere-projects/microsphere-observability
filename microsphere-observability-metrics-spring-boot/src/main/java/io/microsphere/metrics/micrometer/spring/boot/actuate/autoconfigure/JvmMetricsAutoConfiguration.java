@@ -81,17 +81,41 @@ import static java.util.concurrent.ForkJoinPool.commonPool;
 public class JvmMetricsAutoConfiguration {
 
     /**
-     * The Property Name prefix of JVM : "microsphere.metrics.micrometer.jvm."
+     * The Property Name prefix of JVM metrics collection: "microsphere.metrics.micrometer.jvm."
+     * <p>
+     * All JVM-related configuration properties start with this prefix.
+     * </p>
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     * String prefix = JvmMetricsAutoConfiguration.JVM_METRICS_PROPERTY_NAME_PREFIX;
+     * // Result: "microsphere.metrics.micrometer.jvm."
+     * }</pre>
      */
     public static final String JVM_METRICS_PROPERTY_NAME_PREFIX = PREFIX + "jvm" + DOT;
 
     /**
-     * The Property Name prefix of {@link ExecutorService} Metrics : "microsphere.metrics.micrometer.jvm.executor-service."
+     * The Property Name prefix of {@link ExecutorService} Metrics: "microsphere.metrics.micrometer.jvm.executor-service."
+     * <p>
+     * Used to configure all ExecutorService metric properties including prefix and tags.
+     * </p>
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     * String executorPrefix = JvmMetricsAutoConfiguration.EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX;
+     * // Result: "microsphere.metrics.micrometer.jvm.executor-service."
+     * }</pre>
      */
     public static final String EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX = JVM_METRICS_PROPERTY_NAME_PREFIX + "executor-service" + DOT;
 
     /**
-     * The Property Name of enabling JVM metrics : "microsphere.metrics.micrometer.jvm.enabled"
+     * The Property Name of enabling JVM metrics: "microsphere.metrics.micrometer.jvm.enabled"
+     * <p>
+     * Set to {@code false} to disable automatic JVM metrics registration. Defaults to {@code true}.
+     * </p>
+     * <h3>Example Configuration</h3>
+     * <pre>{@code
+     * // application.properties or application.yml
+     * microsphere.metrics.micrometer.jvm.enabled=false
+     * }</pre>
      */
     @ConfigurationProperty(
             type = boolean.class,
@@ -101,7 +125,15 @@ public class JvmMetricsAutoConfiguration {
     public static final String JVM_METRICS_ENABLED_PROPERTY_NAME = JVM_METRICS_PROPERTY_NAME_PREFIX + ENABLED_PROPERTY_NAME;
 
     /**
-     * The Property Name of {@link ExecutorService} Metrics prefix : "microsphere.metrics.micrometer.jvm.executor-service.prefix"
+     * The Property Name of {@link ExecutorService} Metrics prefix: "microsphere.metrics.micrometer.jvm.executor-service.prefix"
+     * <p>
+     * Configures the base prefix for ExecutorService metrics. If not set, uses Micrometer's default naming.
+     * </p>
+     * <h3>Example Configuration</h3>
+     * <pre>{@code
+     * // application.properties
+     * microsphere.metrics.micrometer.jvm.executor-service.prefix=tomcat-executors
+     * }</pre>
      */
     @ConfigurationProperty(
             source = APPLICATION_SOURCE
@@ -109,19 +141,62 @@ public class JvmMetricsAutoConfiguration {
     public static final String EXECUTOR_SERVICE_METRICS_PREFIX_PROPERTY_NAME = EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX + "prefix";
 
     /**
-     * The Property Name of {@link ExecutorService} Metrics tags : "microsphere.metrics.micrometer.jvm.executor-service.tags"
+     * The Property Name of {@link ExecutorService} Metrics tags: "microsphere.metrics.micrometer.jvm.executor-service.tags"
+     * <p>
+     * Comma-separated list of key=value pairs to attach as common tags to ExecutorService metrics.
+     * </p>
+     * <h3>Example Configuration</h3>
+     * <pre>{@code
+     * // application.properties
+     * microsphere.metrics.micrometer.jvm.executor-service.tags=service=user-service,environment=production
+     * }</pre>
      */
     @ConfigurationProperty(
             source = APPLICATION_SOURCE
     )
     public static final String EXECUTOR_SERVICE_METRICS_TAGS_PROPERTY_NAME = EXECUTOR_SERVICE_METRICS_PROPERTY_NAME_PREFIX + "tags";
 
+    /**
+     * Initializes the executor service metrics prefix configuration value.
+     * <p>
+     * This field is populated from the Spring property {@link #EXECUTOR_SERVICE_METRICS_PREFIX_PROPERTY_NAME}.
+     * </p>
+     */
     @Value("${" + EXECUTOR_SERVICE_METRICS_PREFIX_PROPERTY_NAME + ":}")
     private String executorServiceMetricsPrefix;
 
+    /**
+     * Initializes the executor service metrics tags configuration value.
+     * <p>
+     * This field is populated from the Spring property {@link #EXECUTOR_SERVICE_METRICS_TAGS_PROPERTY_NAME}.
+     * Default value is an empty array if no tags are configured.
+     * </p>
+     */
     @Value("${" + EXECUTOR_SERVICE_METRICS_TAGS_PROPERTY_NAME + ":}")
     private String[] executorServiceMetricsTags = EMPTY_STRING_ARRAY;
 
+    /**
+     * Registers metrics for all ExecutorService beans found in the application context when the application starts.
+     * <p>
+     * This method automatically discovers and binds metrics for:
+     * </p>
+     * <ul>
+     *   <li>{@link ConcurrentTaskExecutor} instances (Spring's task executors)</li>
+     *   <li>{@link ScheduledExecutorService} beans</li>
+     *   <li>{@link ExecutorService} beans</li>
+     *   <li>{@link Executor} beans</li>
+     *   <li>{@link ForkJoinPool#commonPool()} - common thread pool</li>
+     * </ul>
+     * <h3>Example Behavior</h3>
+     * <pre>{@code
+     * // When Spring Boot application starts, automatically registers metrics like:
+     * // - tomcat-api-executor_threads_active
+     * // - myScheduledExecutor_pool_size
+     * // - ForkJoinPool-commonPool_active_count
+     * }</pre>
+     *
+     * @param event the application started event used to trigger registration
+     */
     @EventListener(ApplicationStartedEvent.class)
     public void registerExecutorServiceMetrics(ApplicationStartedEvent event) {
         ConfigurableApplicationContext context = event.getApplicationContext();
@@ -133,6 +208,27 @@ public class JvmMetricsAutoConfiguration {
         registerExecutorServiceMetrics(commonPool(), "ForkJoinPool-commonPool", meterRegistry);
     }
 
+    /**
+     * Registers ExecutorService metrics from discovered beans in the application context.
+     * <p>
+     * This internal method searches for beans of the specified type, converts them to {@link Executor} instances,
+     * and binds their metrics to the provided meter registry if they are {@link ExecutorService} instances.
+     * </p>
+     * <p>
+     * Skips logging warnings for empty contexts (trace level) and warns when executors don't implement ExecutorService.
+     * </p>
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     * // Automatically called during application startup
+     * // Searches for ScheduledExecutorService beans and binds metrics
+     * }</pre>
+     *
+     * @param context           the Spring application context to search for beans
+     * @param beanType          the type of beans to search for (e.g., {@code ScheduledExecutorService.class})
+     * @param executorConverter function to extract or convert bean to {@link Executor} instance
+     * @param meterRegistry     the Micrometer meter registry to bind metrics to
+     * @param <T>               the type of beans being searched
+     */
     private <T> void registerExecutorServiceMetrics(ConfigurableApplicationContext context, Class<T> beanType,
                                                     Function<T, Executor> executorConverter, MeterRegistry meterRegistry) {
         Map<String, T> beansMap = context.getBeansOfType(beanType);
@@ -154,11 +250,45 @@ public class JvmMetricsAutoConfiguration {
         }
     }
 
+    /**
+     * Binds ExecutorService metrics to the provided meter registry.
+     * <p>
+     * Creates an {@link ExecutorServiceMetrics} binder instance and registers it with the given registry.
+     * </p>
+     * <h3>Example Metrics Registered</h3>
+     * <pre>{@code
+     * - threads_active      : Number of threads currently active
+     * - threads_daemon      : Number of daemon threads
+     * - threads_live        : Total number of live threads
+     * - pool_sizes          : Size of the thread pool
+     * }</pre>
+     *
+     * @param executorService  the ExecutorService instance to bind metrics for
+     * @param name             the identifier/name for this ExecutorService
+     * @param meterRegistry    the Micrometer meter registry to bind metrics to
+     */
     private <T> void registerExecutorServiceMetrics(ExecutorService executorService, String name, MeterRegistry meterRegistry) {
         ExecutorServiceMetrics executorServiceMetrics = createExecutorServiceMetrics(executorService, name);
         executorServiceMetrics.bindTo(meterRegistry);
     }
 
+    /**
+     * Creates an {@link ExecutorServiceMetrics} binder instance for the given ExecutorService.
+     * <p>
+     * Applies the configured prefix and tags to the metrics if they are set in the properties.
+     * Logs trace information about the created metrics binder.
+     * </p>
+     * <h3>Example Usage</h3>
+     * <pre>{@code
+     * ExecutorServiceMetrics metricsBinder = createExecutorServiceMetrics(executorService, "myPool");
+     * metricsBinder.bindTo(meterRegistry);
+     * // Result: Creates metrics like mypool_threads_active with configured tags
+     * }</pre>
+     *
+     * @param executorService the ExecutorService instance to create metrics for
+     * @param name            the identifier/name for this ExecutorService
+     * @return new ExecutorServiceMetrics binder instance with configured prefix and tags
+     */
     private ExecutorServiceMetrics createExecutorServiceMetrics(ExecutorService executorService, String name) {
         String prefix = executorServiceMetricsPrefix;
         trace(logger -> logger.trace("ExecutorService[name: '{}', type: '{}'] {} -> ExecutorServiceMetrics[prefix: '{}', tags: {}]",
